@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="OtticaCatalog"/>
+  <title>Ottica Scanner & Gestione Catalogo</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <!-- HTML5 QR Code / Barcode Scanner -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16">
+
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-sky-500 p-2 rounded-lg text-slate-900">
+          <i class="fa-solid fa-glasses text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white leading-none">OtticaCatalog Pro</h1>
+          <p class="text-xs text-slate-400 mt-1">Scanner Barcode & Generatore Catalogo</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button onclick="newProductWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Prossimo Prodotto</span>
+        </button>
+        <a href="#drafts-section" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium px-3 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Bozze (<span id="drafts-count">0</span>)</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT COLUMN: SCANNER & MANUAL LOOKUP -->
+    <section class="lg:col-span-4 space-y-6">
+      
+      <!-- SCANNER CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md">
+        <h2 class="text-base font-semibold text-slate-200 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-barcode text-sky-400"></i> Lettore Codice a Barre / QR
+        </h2>
+        
+        <div id="reader-container" class="relative bg-slate-900 rounded-lg border border-slate-700 overflow-hidden mb-3 min-h-[220px] flex items-center justify-center">
+          <div id="reader" class="w-full"></div>
+          <div id="scanner-placeholder" class="text-center p-6 text-slate-400">
+            <i class="fa-solid fa-camera text-4xl mb-2 text-slate-600"></i>
+            <p class="text-xs">Clicca per avviare la fotocamera e inquadrare il codice a barre dell'occhiale.</p>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 text-center mb-2">
+          <i class="fa-solid fa-lightbulb text-amber-400"></i> Mantieni buona illuminazione e posiziona il codice al centro del riquadro.
+        </p>
+
+        <div class="flex gap-2">
+          <button id="btn-toggle-cam" onclick="toggleCamera()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-camera"></i> <span id="cam-btn-text">Avvia Fotocamera</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MANUAL SEARCH & QUICK EAN SEARCH -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
+        <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-search text-sky-400"></i> Ricerca Manuale o EAN
+        </h2>
+        
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Codice EAN o Modello Occhiale</label>
+          <div class="flex gap-2">
+            <input type="text" id="input-ean-search" placeholder="Es. 8053672827118 o RB3025" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500"/>
+            <button onclick="searchManualCode()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg transition">
+              Cerca
+            </button>
+          </div>
+        </div>
+
+        <!-- QUICK CATALOG PRESETS -->
+        <div class="pt-2 border-t border-slate-700">
+          <p class="text-xs text-slate-400 mb-2">Prodotti di prova rapidi:</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="loadPreset(0)" class="bg-slate-900 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-2 py-1 rounded">Ray-Ban Aviator</button>
+            <button onclick="loadPreset(1)" class="bg-slate-900 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-2 py-1 rounded">Persol 649</button>
+            <button onclick="loadPreset(2)" class="bg-slate-900 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-2 py-1 rounded">Oakley Radar</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: PRODUCT FORM & GALLERY -->
+    <section class="lg:col-span-8 space-y-6">
+
+      <!-- PRODUCT DATA FORM CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-sky-400"></i> Scheda Prodotto Scansionato
+          </h2>
+          <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300">In attesa di scansione</span>
+        </div>
+
+        <!-- ROW 1: BRAND, CODE, EAN -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-medium text-slate-400">Marca / Brand</label>
+              <button onclick="copyField('field-brand')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i> Copia</button>
+            </div>
+            <input type="text" id="field-brand" placeholder="Es. Ray-Ban" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="generateSalesDescription()"/>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-medium text-slate-400">Codice Modello</label>
+              <button onclick="copyField('field-code')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i> Copia</button>
+            </div>
+            <input type="text" id="field-code" placeholder="Es. RB3025 L0205" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="generateSalesDescription()"/>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-medium text-slate-400">Codice EAN</label>
+              <button onclick="copyField('field-ean')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i> Copia</button>
+            </div>
+            <input type="text" id="field-ean" placeholder="Es. 8053672827118" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500"/>
+          </div>
+        </div>
+
+        <!-- ROW 2: TITLE -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-medium text-slate-400">Titolo Prodotto</label>
+            <button onclick="copyField('field-title')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i> Copia</button>
+          </div>
+          <input type="text" id="field-title" placeholder="Es. Ray-Ban Aviator Classic RB3025 L0205 58-14" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="generateSalesDescription()"/>
+        </div>
+
+        <!-- ROW 3: TECHNICAL DESCRIPTION -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-medium text-slate-400">Descrizione Tecnica / Caratteristiche</label>
+            <button onclick="copyField('field-desc')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i> Copia</button>
+          </div>
+          <textarea id="field-desc" rows="2" placeholder="Caratteristiche, tipo di montatura, lenti, calibro..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="generateSalesDescription()"></textarea>
+        </div>
+
+        <!-- ROW 4: PRICING & DISCOUNT CALCULATOR -->
+        <div class="bg-slate-900/60 border border-slate-700 p-4 rounded-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Calcolatore Prezzo e Sconto (Opzionale anche in seguito)</h3>
+            <span class="text-xs text-slate-400">Puoi modificare lo sconto in qualsiasi momento</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs text-slate-400">Prezzo Listino (€)</label>
+                <button onclick="copyField('field-price')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i></button>
+              </div>
+              <input type="number" step="0.01" id="field-price" placeholder="165.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="onPriceOrDiscountChange()"/>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs text-slate-400">Sconto (%)</label>
+                <button onclick="copyField('field-discount')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i></button>
+              </div>
+              <input type="number" min="0" max="100" id="field-discount" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="onPriceOrDiscountChange()"/>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs text-slate-400">Prezzo Scontato</label>
+                <button onclick="copyField('field-final-price')" class="text-xs text-sky-400 hover:text-sky-300"><i class="fa-regular fa-copy"></i></button>
+              </div>
+              <input type="text" id="field-final-price" readonly placeholder="€ 0.00" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-400 font-bold"/>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Condizione</label>
+              <select id="field-condition" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" onchange="generateSalesDescription()">
+                <option value="Nuovo con etichetta e custodia">Nuovo con etichetta</option>
+                <option value="Come nuovo (Esposizione)">Come nuovo</option>
+                <option value="Usato garantito">Usato garantito</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- GENERATED E-COMMERCE SALES DESCRIPTION -->
+        <div class="bg-slate-900 border border-sky-900/50 p-4 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-file-lines"></i> Descrizione Pronta per la Vendita (Annuncio / Sito)
+            </label>
+            <div class="flex gap-2">
+              <button onclick="generateSalesDescription()" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
+                <i class="fa-solid fa-rotate text-xs"></i> Rigenera
+              </button>
+              <button onclick="copyField('field-sales-desc')" class="bg-sky-600 hover:bg-sky-500 text-white text-xs px-2.5 py-1 rounded font-medium transition flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> Copia Testo Vendita
+              </button>
+            </div>
+          </div>
+          <textarea id="field-sales-desc" rows="4" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 leading-relaxed focus:outline-none resize-y"></textarea>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex flex-wrap gap-3 pt-2">
+          <button onclick="saveToDrafts()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-lg shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i> Salva in Bozze / Inventario
+          </button>
+          <button onclick="newProductWorkflow()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 px-4 rounded-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Pulisci per Prossimo Prodotto
+          </button>
+        </div>
+      </div>
+
+      <!-- PHOTO GALLERY (5 PHOTOS GENERATED / FETCHED) -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Galleria Foto IA (<span id="photo-count-label">5</span>)
+            </h2>
+            <p class="text-xs text-slate-400">5 foto specifiche del modello con inquadrature e sfondi sempre differenti.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="generateModelPhotos()" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-arrows-rotate"></i> Rigenera Foto IA
+            </button>
+            <button onclick="openExternalGoogleImages()" class="text-xs bg-slate-700 hover:bg-slate-600 text-sky-300 border border-slate-600 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-brands fa-google"></i> Foto Google
+            </button>
+          </div>
+        </div>
+
+        <!-- GALLERY GRID -->
+        <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated photos -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- DRAFTS & INVENTORY SECTION -->
+  <section id="drafts-section" class="max-w-7xl mx-auto px-4 py-6">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-emerald-400"></i> Bozze e Inventario Scansionato
+          </h2>
+          <p class="text-xs text-slate-400">Prodotti salvati localmente. Puoi aggiornare gli sconti o copiare i dati in qualsiasi momento.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportDraftsCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-csv"></i> Esporta CSV
+          </button>
+          <button onclick="clearAllDrafts()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 text-xs font-semibold px-3 py-2 rounded-lg transition">
+            Elimina Tutto
+          </button>
+        </div>
+      </div>
+
+      <!-- DRAFTS TABLE -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-700">
+            <tr>
+              <th class="p-3">Prodotto</th>
+              <th class="p-3">Codice / EAN</th>
+              <th class="p-3">Listino</th>
+              <th class="p-3">Sconto %</th>
+              <th class="p-3">Prezzo Finale</th>
+              <th class="p-3 text-right">Azioni</th>
+            </tr>
+          </thead>
+          <tbody id="drafts-table-body" class="divide-y divide-slate-700/60">
+            <!-- Dynamically populated drafts -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-sm font-medium transition-all transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check"></i> <span id="toast-message">Messaggio</span>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // PRE-POPULATED EYEWEAR DATABASE FOR INSTANT DEMO LOOKUPS
+    const DATABASE = [
+      {
+        ean: "8053672827118",
+        code: "RB3025 L0205",
+        brand: "Ray-Ban",
+        title: "Ray-Ban Aviator Classic RB3025 L0205 58-14",
+        desc: "Montatura in metallo dorato lucido, lenti goccia in cristallo verde G-15 iconico.",
+        price: 165.00
+      },
+      {
+        ean: "805289297042",
+        code: "PO0649 24/31",
+        brand: "Persol",
+        title: "Persol 649 Series PO0649 24/31 54-20",
+        desc: "Montatura in acetato marrone Havana scuro con iconica freccia argentata sulle aste. Lenti verdi sfumate.",
+        price: 210.00
+      },
+      {
+        ean: "888392476548",
+        code: "OO9208-A4",
+        brand: "Oakley",
+        title: "Oakley Radar EV Path OO9208-A4",
+        desc: "Montatura sportiva avvolgente in O-Matter nero opaco con lente singola Prizm Road rossa specchiata.",
+        price: 195.00
+      }
+    ];
+
+    // APPLICATION STATE
+    let html5QrcodeScanner = null;
+    let isCameraActive = false;
+    let currentPhotos = [];
+    let isGeneratingPhotos = false;
+    let drafts = JSON.parse(localStorage.getItem('ottica_drafts') || '[]');
+
+    // INITIALIZATION ON WINDOW LOAD
+    window.onload = function() {
+      // Inizia con la scheda vuota pronta per la scansione
+      renderDrafts();
+    };
+
+    // CAMERA TOGGLE CON IMPOSTAZIONI AD ALTA VELOCITÀ
+    function toggleCamera() {
+      const btnText = document.getElementById('cam-btn-text');
+      const placeholder = document.getElementById('scanner-placeholder');
+
+      if (isCameraActive) {
+        stopCamera();
+      } else {
+        placeholder.style.display = 'none';
+        html5QrcodeScanner = new Html5Qrcode("reader");
+
+        const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
+          const minEdgePercentage = 0.75; 
+          const qrboxWidth = Math.floor(viewfinderWidth * minEdgePercentage);
+          const qrboxHeight = Math.floor(Math.min(160, viewfinderHeight * 0.4));
+          return {
+            width: qrboxWidth,
+            height: qrboxHeight
+          };
+        };
+
+        const config = {
+          fps: 25,
+          qrbox: qrboxFunction,
+          aspectRatio: 1.777778,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        };
+
+        html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          config,
+          onScanSuccess,
+          onScanError
+        ).then(() => {
+          isCameraActive = true;
+          btnText.innerText = "Fermate Fotocamera";
+        }).catch(err => {
+          showToast("Errore di accesso alla fotocamera: " + err);
+          placeholder.style.display = 'block';
+        });
+      }
+    }
+
+    function stopCamera() {
+      if (html5QrcodeScanner && isCameraActive) {
+        html5QrcodeScanner.stop().then(() => {
+          isCameraActive = false;
+          document.getElementById('cam-btn-text').innerText = "Avvia Fotocamera";
+          document.getElementById('scanner-placeholder').style.display = 'block';
+        }).catch(() => {});
+      }
+    }
+
+    // BEEP SOUND ON SUCCESSFUL SCAN
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 1000;
+        gain.gain.value = 0.1;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      } catch(e) {}
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      playBeep();
+      stopCamera();
+      showToast("Codice Scansionato: " + decodedText);
+      
+      document.getElementById('input-ean-search').value = decodedText;
+      processScannedCode(decodedText);
+    }
+
+    function onScanError(errorMessage) {
+      // Silent pass
+    }
+
+    // PROCESS CODE & POPULATE DATA
+    function processScannedCode(code) {
+      const matched = DATABASE.find(item => item.ean === code || item.code.toLowerCase().includes(code.toLowerCase()));
+
+      if (matched) {
+        populateProductForm(matched);
+      } else {
+        const fallbackProduct = {
+          ean: code,
+          code: "MOD-" + code.slice(-4),
+          brand: "Brand Scansionato",
+          title: "Occhiale Modello " + code,
+          desc: "Montatura confortevole con rifiniture di precisione e lenti con protezione UV integrata.",
+          price: 150.00
+        };
+        populateProductForm(fallbackProduct);
+      }
+    }
+
+    function searchManualCode() {
+      const val = document.getElementById('input-ean-search').value.trim();
+      if (!val) {
+        showToast("Inserisci un codice EAN o Modello");
+        return;
+      }
+      processScannedCode(val);
+    }
+
+    function loadPreset(index) {
+      if (DATABASE[index]) {
+        populateProductForm(DATABASE[index]);
+      }
+    }
+
+    // POPULATE FORM & GENERATE PHOTOS
+    function populateProductForm(data) {
+      document.getElementById('field-brand').value = data.brand || '';
+      document.getElementById('field-code').value = data.code || '';
+      document.getElementById('field-ean').value = data.ean || '';
+      document.getElementById('field-title').value = data.title || '';
+      document.getElementById('field-desc').value = data.desc || '';
+      document.getElementById('field-price').value = data.price ? data.price.toFixed(2) : '';
+
+      calculateDiscount();
+      generateSalesDescription();
+      generateModelPhotos();
+    }
+
+    // GENERATE MODEL PHOTOS VIA IA / DYNAMIC PLACEHOLDERS
+    async function generateModelPhotos() {
+      const brand = document.getElementById('field-brand').value.trim() || "Occhiale";
+      const code = document.getElementById('field-code').value.trim() || "";
+      const title = document.getElementById('field-title').value.trim() || "";
+      const desc = document.getElementById('field-desc').value.trim() || "";
+
+      const photoPrompts = [
+        { angle: "Vista Frontale", bg: "Studio Minimal Grigio" },
+        { angle: "Vista Trequarti", bg: "Marmo Bianco Lusso" },
+        { angle: "Dettaglio Asta & Logo", bg: "Legno Teak Scuro" },
+        { angle: "Custodia & Packaging", bg: "Microcemento Grigio" },
+        { angle: "Esposizione Manichino", bg: "Ambientazione Ottica" }
+      ];
+
+      currentPhotos = [];
+      renderGalleryLoading();
+      isGeneratingPhotos = true;
+
+      const apiKey = ""; // Canvas runtime key
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+      for (let i = 0; i < photoPrompts.length; i++) {
+        const item = photoPrompts[i];
+        const prompt = `Professional product catalog photograph of exact eyewear model: ${brand} ${code} ${title}. ${item.angle}. Displayed on: ${item.bg}. Photorealistic, 8k resolution, commercial e-commerce style.`;
+
+        try {
+          const payload = {
+            contents: [{
+              role: 'user',
+              parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+              responseModalities: ['IMAGE'],
+              imageConfig: { aspectRatio: "4:3" }
+            }
+          };
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+          if (part && part.inlineData) {
+            const imgData = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+            currentPhotos.push({
+              src: imgData,
+              angle: item.angle
+            });
+          } else {
+            currentPhotos.push({
+              src: `https://placehold.co/800x600/1e293b/38bdf8?text=${encodeURIComponent(brand + ' - ' + item.angle)}`,
+              angle: item.angle
+            });
+          }
+        } catch (err) {
+          currentPhotos.push({
+            src: `https://placehold.co/800x600/1e293b/38bdf8?text=${encodeURIComponent(brand + ' - ' + item.angle)}`,
+            angle: item.angle
+          });
+        }
+
+        renderGallery();
+      }
+
+      isGeneratingPhotos = false;
+      showToast("Tutte le 5 foto IA sono state generate!");
+    }
+
+    function renderGalleryLoading() {
+      const container = document.getElementById('gallery-grid');
+      container.innerHTML = '';
+      document.getElementById('photo-count-label').innerText = "Generazione in corso (0/5)...";
+
+      const angles = ["Vista Frontale", "Vista Trequarti", "Dettaglio Asta", "Custodia & Packaging", "Esposizione Manichino"];
+      
+      angles.forEach((angle, idx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-2 flex flex-col justify-between animate-pulse";
+        card.innerHTML = `
+          <div class="relative overflow-hidden rounded-md bg-slate-800 aspect-[4/3] flex flex-col items-center justify-center p-4 text-center">
+            <i class="fa-solid fa-wand-magic-sparkles text-3xl text-sky-400 mb-2 animate-bounce"></i>
+            <p class="text-xs font-semibold text-slate-300">Foto ${idx + 1} di 5...</p>
+            <p class="text-[10px] text-slate-400 mt-1">${angle}</p>
+          </div>
+          <div class="h-8 bg-slate-800 rounded"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderGallery() {
+      const container = document.getElementById('gallery-grid');
+      container.innerHTML = '';
+      document.getElementById('photo-count-label').innerText = currentPhotos.length;
+
+      currentPhotos.forEach((photoObj, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-2 flex flex-col justify-between shadow-md";
+
+        const imgSrc = photoObj.src || photoObj;
+        const angleLabel = photoObj.angle || `Foto ${index + 1}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="relative overflow-hidden rounded-md bg-slate-950 aspect-[4/3] flex items-center justify-center group">
+              <img src="${imgSrc}" 
+                   alt="Foto IA ${angleLabel}" 
+                   class="object-cover w-full h-full group-hover:scale-105 transition duration-300"/>
+              <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur text-sky-400 border border-sky-500/30 text-[10px] font-bold px-2 py-0.5 rounded">
+                <i class="fa-solid fa-sparkles text-[9px]"></i> IA Modellata
+              </span>
+            </div>
+            <p class="text-xs font-semibold text-slate-200 mt-2 flex items-center justify-between">
+              <span>${angleLabel}</span>
+              <span class="text-[10px] text-slate-400 font-normal">Sfondo ${index + 1}</span>
+            </p>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button onclick="downloadImage('${imgSrc}', 'occhiale-${index + 1}.png')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs py-1.5 px-2 rounded border border-slate-700 transition flex items-center justify-center gap-1 text-center font-medium">
+              <i class="fa-solid fa-download"></i> Scarica Foto
+            </button>
+            <button onclick="copyToClipboard('${imgSrc}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 px-2 rounded border border-slate-700 transition flex items-center justify-center gap-1">
+              <i class="fa-regular fa-copy"></i> Copia URL
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // PRICING & DISCOUNT CALCULATOR
+    function onPriceOrDiscountChange() {
+      calculateDiscount();
+      generateSalesDescription();
+    }
+
+    function calculateDiscount() {
+      const priceVal = parseFloat(document.getElementById('field-price').value) || 0;
+      const discountVal = parseFloat(document.getElementById('field-discount').value) || 0;
+
+      let discountedPrice = priceVal;
+      if (discountVal > 0 && discountVal <= 100) {
+        discountedPrice = priceVal - (priceVal * (discountVal / 100));
+      }
+
+      document.getElementById('field-final-price').value = discountedPrice > 0 ? `€ ${discountedPrice.toFixed(2)}` : '€ 0.00';
+
+      return { priceVal, discountVal, discountedPrice };
+    }
+
+    // GENERATE SALES DESCRIPTION
+    function generateSalesDescription() {
+      const title = document.getElementById('field-title').value.trim();
+      const brand = document.getElementById('field-brand').value.trim();
+      const code = document.getElementById('field-code').value.trim();
+      const desc = document.getElementById('field-desc').value.trim();
+      const condition = document.getElementById('field-condition').value;
+
+      const { priceVal, discountVal, discountedPrice } = calculateDiscount();
+
+      if (!title && !brand && !code) {
+        document.getElementById('field-sales-desc').value = "";
+        return;
+      }
+
+      let text = `Occhiale ${brand ? brand + ' ' : ''}${title ? title : 'da Sole/Vista'} (Modello ${code || 'Standard'}). `;
+      text += `Prodotto autentico in condizioni ${condition}. `;
+      
+      if (desc) {
+        text += `${desc} `;
+      } else {
+        text += `Caratterizzato da un design raffinato e materiali di alta qualità che garantiscono massima resistenza e massimo comfort visivo. `;
+      }
+
+      if (discountVal > 0) {
+        text += `Prezzo ufficiale di listino € ${priceVal.toFixed(2)}, in offerta promozionale a soli € ${discountedPrice.toFixed(2)} (sconto ${discountVal}%). `;
+      } else if (priceVal > 0) {
+        text += `Prezzo di vendita: € ${priceVal.toFixed(2)}. `;
+      }
+
+      text += `Venduto e spedito con imballo protettivo antichoc. Disponibile per la spedizione immediata o ritiro. Per maggiori dettagli o informazioni sulle misure non esitate a contattare.`;
+
+      document.getElementById('field-sales-desc').value = text;
+    }
+
+    // DRAFTS STORAGE LOGIC
+    function saveToDrafts() {
+      const title = document.getElementById('field-title').value.trim();
+      if (!title) {
+        showToast("Inserisci almeno un titolo prima di salvare.");
+        return;
+      }
+
+      const { priceVal, discountVal, discountedPrice } = calculateDiscount();
+
+      const newDraft = {
+        id: Date.now(),
+        brand: document.getElementById('field-brand').value,
+        code: document.getElementById('field-code').value,
+        ean: document.getElementById('field-ean').value,
+        title: title,
+        desc: document.getElementById('field-desc').value,
+        salesDesc: document.getElementById('field-sales-desc').value,
+        price: priceVal,
+        discount: discountVal,
+        finalPrice: discountedPrice,
+        photos: [...currentPhotos],
+        savedAt: new Date().toLocaleDateString('it-IT')
+      };
+
+      drafts.unshift(newDraft);
+      localStorage.setItem('ottica_drafts', JSON.stringify(drafts));
+
+      renderDrafts();
+      showToast("Prodotto salvato in Bozze!");
+    }
+
+    function renderDrafts() {
+      const tbody = document.getElementById('drafts-table-body');
+      document.getElementById('drafts-count').innerText = drafts.length;
+
+      if (drafts.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessuna bozza salvata al momento.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      drafts.forEach(draft => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/50 transition";
+
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-slate-100">${draft.brand || ''}</div>
+            <div class="text-slate-400 text-xs">${draft.title}</div>
+          </td>
+          <td class="p-3 font-mono text-slate-300">
+            ${draft.code || '-'}<br/>
+            <span class="text-slate-500 text-[10px]">${draft.ean || ''}</span>
+          </td>
+          <td class="p-3">€ ${draft.price ? draft.price.toFixed(2) : '0.00'}</td>
+          <td class="p-3">
+            <input type="number" min="0" max="100" value="${draft.discount || 0}" 
+              onchange="updateDraftDiscount(${draft.id}, this.value)"
+              class="w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-center text-white focus:outline-none focus:border-sky-500"/> %
+          </td>
+          <td class="p-3 font-bold text-emerald-400">
+            € ${draft.finalPrice ? draft.finalPrice.toFixed(2) : '0.00'}
+          </td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="copyToClipboard('${escapeJsString(draft.salesDesc)}')" class="bg-slate-700 hover:bg-slate-600 text-sky-300 px-2 py-1 rounded text-xs transition" title="Copia Descrizione Vendita">
+              <i class="fa-regular fa-copy"></i> Testo
+            </button>
+            <button onclick="loadDraftToForm(${draft.id})" class="bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-800 px-2 py-1 rounded text-xs transition" title="Carica nel Form">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button onclick="deleteDraft(${draft.id})" class="bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 px-2 py-1 rounded text-xs transition" title="Elimina">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateDraftDiscount(id, newDiscount) {
+      const draft = drafts.find(d => d.id === id);
+      if (draft) {
+        draft.discount = parseFloat(newDiscount) || 0;
+        draft.finalPrice = draft.price - (draft.price * (draft.discount / 100));
+        localStorage.setItem('ottica_drafts', JSON.stringify(drafts));
+        renderDrafts();
+        showToast("Sconto bozza aggiornato!");
+      }
+    }
+
+    function loadDraftToForm(id) {
+      const draft = drafts.find(d => d.id === id);
+      if (draft) {
+        document.getElementById('field-brand').value = draft.brand || '';
+        document.getElementById('field-code').value = draft.code || '';
+        document.getElementById('field-ean').value = draft.ean || '';
+        document.getElementById('field-title').value = draft.title || '';
+        document.getElementById('field-desc').value = draft.desc || '';
+        document.getElementById('field-price').value = draft.price || '';
+        document.getElementById('field-discount').value = draft.discount || 0;
+
+        calculateDiscount();
+        generateSalesDescription();
+
+        if (draft.photos && draft.photos.length > 0) {
+          currentPhotos = [...draft.photos];
+          renderGallery();
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Bozza caricata nel modulo!");
+      }
+    }
+
+    function deleteDraft(id) {
+      drafts = drafts.filter(d => d.id !== id);
+      localStorage.setItem('ottica_drafts', JSON.stringify(drafts));
+      renderDrafts();
+      showToast("Bozza rimossa.");
+    }
+
+    function clearAllDrafts() {
+      if (drafts.length === 0) return;
+      drafts = [];
+      localStorage.removeItem('ottica_drafts');
+      renderDrafts();
+      showToast("Tutte le bozze sono state eliminate.");
+    }
+
+    function exportDraftsCSV() {
+      if (drafts.length === 0) {
+        showToast("Nessuna bozza da esportare.");
+        return;
+      }
+
+      let csv = "ID;Marca;Codice;EAN;Titolo;PrezzoListino;Sconto;PrezzoFinale;Data\n";
+      drafts.forEach(d => {
+        csv += `"${d.id}";"${d.brand}";"${d.code}";"${d.ean}";"${d.title}";"${d.price}";"${d.discount}";"${d.finalPrice}";"${d.savedAt}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `inventario_ottica_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // WORKFLOW "PROSSIMO PRODOTTO"
+    function newProductWorkflow() {
+      // Reset completo di tutti i campi
+      document.getElementById('field-brand').value = '';
+      document.getElementById('field-code').value = '';
+      document.getElementById('field-ean').value = '';
+      document.getElementById('field-title').value = '';
+      document.getElementById('field-desc').value = '';
+      document.getElementById('field-price').value = '';
+      document.getElementById('field-discount').value = '0';
+      document.getElementById('field-final-price').value = '€ 0.00';
+      document.getElementById('field-sales-desc').value = '';
+      document.getElementById('input-ean-search').value = '';
+
+      document.getElementById('scan-status-badge').innerText = "In attesa di scansione";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300";
+
+      currentPhotos = [];
+      renderGallery();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (!isCameraActive) {
+        toggleCamera();
+      }
+
+      showToast("Tutti i dati azzerati. Pronto per il nuovo prodotto!");
+    }
+
+    // UTILITIES
+    function copyField(elementId) {
+      const el = document.getElementById(elementId);
+      if (el && el.value) {
+        copyToClipboard(el.value);
+      } else {
+        showToast("Campo vuoto!");
+      }
+    }
+
+    function copyToClipboard(text) {
+      if (!text) return;
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Copiato negli appunti!");
+      } catch (err) {
+        showToast("Errore durante la copia.");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function downloadImage(dataUrl, filename) {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("Download della foto avviato!");
+    }
+
+    function openExternalGoogleImages() {
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+      const query = encodeURIComponent(`${brand} ${code} occhiali`);
+      window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function escapeJsString(str) {
+      if (!str) return '';
+      return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+    }
+  </script>
+</body>
+</html>
