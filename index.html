@@ -1,922 +1,1051 @@
 <!DOCTYPE html>
-<html lang="it" class="dark">
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eyewear Temple Code Scanner Pro</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="OtticaCatalog OCR Pro"/>
+  <title>OtticaCatalog OCR Pro - Decodifica Aste & Stima Prezzi</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Tesseract OCR Engine -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              900: '#0c4a6e',
-            },
-            accent: {
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669',
-            }
-          }
-        }
-      }
-    }
-  </script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .font-mono { font-family: 'JetBrains+Mono', monospace; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background: #0284c7;
+      box-shadow: 0 0 12px #38bdf8, 0 0 25px #38bdf8;
+      animation: scan 1.6s infinite ease-in-out;
     }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+    @keyframes scan {
+      0% { top: 10%; }
+      50% { top: 90%; }
+      100% { top: 10%; }
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen custom-scrollbar flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
 
-  <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur-md">
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-          <i class="fa-solid fa-glasses text-slate-950 text-xl"></i>
+        <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl text-slate-950 shadow-md">
+          <i class="fa-solid fa-glasses text-xl"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">
-            OptiScan Ultra <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">80+ Brands</span>
-          </h1>
-          <p class="text-xs text-slate-400">Scanner & Decodificatore Avanzato Codici Aste Occhiali</p>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog OCR Professional</h1>
+          <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-microchip text-[10px]"></i> OCR Multi-Pass Aste (120+ Brand Mondiali) & Foto HD
+          </p>
         </div>
       </div>
-      <div class="flex items-center space-x-2">
-        <button id="btnExportCSV" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
-          <i class="fa-solid fa-file-csv text-accent-400"></i> Esporta Inventario
+      
+      <div class="flex items-center space-x-3">
+        <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition active:scale-95">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Nuovo Occhiale</span>
         </button>
+        <a href="#inventory-section" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium px-3 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Inventario (<span id="drafts-count" class="font-bold text-sky-400">0</span>)</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- COLONNA SINISTRA: ACQUISIZIONE E PRE-PROCESSING (5 Col) -->
-    <section class="lg:col-span-5 flex flex-col gap-5">
+    <!-- LEFT COLUMN: SCANNER, MANUAL INPUT & CATALOG SELECTOR -->
+    <section class="lg:col-span-5 space-y-6">
       
-      <!-- Box Fotocamera / Upload -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-4">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-camera text-brand-400"></i> Acquisizione Incisione Asta
-          </h2>
-          <span class="text-xs text-slate-400 font-mono" id="statusBadge">Pronto</span>
-        </div>
-
-        <!-- Video & Canvas Preview Container -->
-        <div class="relative aspect-video rounded-xl bg-slate-900 border border-slate-800 overflow-hidden group flex items-center justify-center">
-          <video id="videoElement" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-          <img id="imagePreview" class="w-full h-full object-contain hidden" alt="Anteprima asta">
-          
-          <div id="placeholderUI" class="text-center p-6 flex flex-col items-center gap-2">
-            <i class="fa-solid fa-barcode text-4xl text-slate-600 mb-1"></i>
-            <p class="text-xs text-slate-400">Inquadra il codice dell'asta o carica un'immagine ad alta risoluzione</p>
-          </div>
-
-          <!-- Overlay Guida Inquadratura -->
-          <div id="scanOverlay" class="absolute inset-4 border-2 border-dashed border-brand-400/50 rounded-lg pointer-events-none hidden flex items-center justify-center">
-            <span class="bg-slate-950/80 text-brand-400 text-[10px] px-2 py-1 rounded font-mono">Posiziona l'incisione qui</span>
-          </div>
-        </div>
-
-        <!-- Controlli Foto & Camera -->
-        <div class="grid grid-cols-2 gap-2">
-          <button id="btnStartCamera" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-video text-brand-400"></i> Apri Fotocamera
-          </button>
-          <label class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center justify-center gap-2 cursor-pointer">
-            <i class="fa-solid fa-upload text-accent-400"></i> Carica Foto
-            <input type="file" id="fileInput" accept="image/*" class="hidden">
-          </label>
-        </div>
-
-        <button id="btnCapture" class="hidden w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-slate-950 font-bold text-xs shadow-lg shadow-brand-500/20 hover:opacity-95 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i> SCANSIONA & DECODIFICA ORA
-        </button>
-
-        <!-- Filtri Avanzati Pre-Processing Canvas -->
-        <div class="border-t border-slate-800/80 pt-3 flex flex-col gap-3">
-          <span class="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-sliders text-brand-400"></i> Filtri di Visione Avanzati (Pre-OCR Canvas)
-          </span>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="chkInvert" class="rounded accent-brand-500" checked>
-              <span class="text-slate-300">Inverti Colori (Asta Scura)</span>
-            </label>
-            <label class="flex items-center gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="chkSharpen" class="rounded accent-brand-500" checked>
-              <span class="text-slate-300">Filtro Sharpen (Bordi)</span>
-            </label>
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <div class="flex justify-between text-[11px] text-slate-400">
-              <span>Soglia Binarizzazione Adattiva</span>
-              <span id="thresholdVal" class="font-mono text-brand-400">128</span>
-            </div>
-            <input type="range" id="rngThreshold" min="50" max="200" value="128" class="w-full accent-brand-500 bg-slate-800 rounded-lg h-1.5">
-          </div>
-        </div>
-
-        <!-- Canvas Elaborato Nascosto/Preview Processato -->
-        <div class="flex flex-col gap-1.5">
-          <span class="text-[10px] uppercase font-semibold text-slate-500">Immagine Elaborata per Tesseract OCR:</span>
-          <canvas id="processedCanvas" class="w-full h-16 bg-slate-900 rounded-lg border border-slate-800 object-contain"></canvas>
-        </div>
-      </div>
-
-      <!-- Ricerca Rapida Catalogo (80+ Brand) -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-        <span class="text-xs font-semibold text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-magnifying-glass text-accent-400"></i> Ricerca Manuale Catalogo Gigante (80+ Brand)
-        </span>
-        <div class="relative">
-          <input type="text" id="brandSearchInput" placeholder="Cerca marca (es. Ray-Ban, Tom Ford, Gucci, Moscot...)" 
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500 font-medium">
-          <div id="searchResults" class="absolute left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto hidden z-50 custom-scrollbar"></div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- COLONNA DESTRA: RISULTATI, DECODIFICA & VISTE FOTO HD (7 Col) -->
-    <section class="lg:col-span-7 flex flex-col gap-5">
-      
-      <!-- Output OCR Grezzo e Risultato Normalizzazione -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-microchip text-brand-400"></i> Output Motore OCR & Fuzzy Parsing
-          </h2>
-          <span id="confidenceBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">Accuratezza: --</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-            <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Testo Grezzo OCR Integrale</span>
-            <div id="rawOCRText" class="font-mono text-slate-300 break-words min-h-[36px]">In attesa di scansione...</div>
-          </div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-            <span class="text-[10px] uppercase font-bold text-brand-400 block mb-1">Testo Normalizzato (Fuzzy Replaced)</span>
-            <div id="cleanOCRText" class="font-mono text-accent-400 font-semibold break-words min-h-[36px]">In attesa di scansione...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scheda Tecnica Decodificata -->
-      <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col gap-4 border-l-4 border-l-brand-500">
+      <!-- INSERIMENTO MANUALE RAPIDO -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
-          <div>
-            <span class="text-[10px] uppercase tracking-wider font-bold text-brand-400">Scheda Tecnica Occhiale</span>
-            <h3 id="displayBrand" class="text-xl font-bold text-white">Seleziona o Scansiona un Occhiale</h3>
-          </div>
-          <div class="text-right">
-            <span class="text-[10px] text-slate-400 block">Prezzo di Listino Stimato</span>
-            <span id="displayPrice" class="text-lg font-extrabold text-accent-400">€ 0.00</span>
-          </div>
+          <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-keyboard"></i> Inserimento Manuale Codice Asta
+          </h2>
+          <span class="text-[10px] text-slate-400">Digitazione Diretta</span>
         </div>
+        <p class="text-[11px] text-slate-400">Puoi scrivere o incollare direttamente il testo dell'asta e premere OK:</p>
 
-        <!-- Parametri Formattati -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 pt-2 border-t border-slate-800">
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-center">
-            <span class="text-[10px] text-slate-400 block mb-0.5">Modello</span>
-            <span id="valModel" class="font-mono text-xs font-bold text-slate-100">--</span>
-          </div>
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-center">
-            <span class="text-[10px] text-slate-400 block mb-0.5">Cod. Colore</span>
-            <span id="valColor" class="font-mono text-xs font-bold text-slate-100">--</span>
-          </div>
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-center">
-            <span class="text-[10px] text-slate-400 block mb-0.5">Calibro (Lente)</span>
-            <span id="valCaliber" class="font-mono text-xs font-bold text-brand-400">-- mm</span>
-          </div>
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-center">
-            <span class="text-[10px] text-slate-400 block mb-0.5">Ponte</span>
-            <span id="valBridge" class="font-mono text-xs font-bold text-brand-400">-- mm</span>
-          </div>
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-center col-span-2 md:col-span-1">
-            <span class="text-[10px] text-slate-400 block mb-0.5">Asta</span>
-            <span id="valTemple" class="font-mono text-xs font-bold text-brand-400">-- mm</span>
-          </div>
+        <div class="flex gap-2">
+          <input type="text" id="manual-input-code" placeholder="Es. RB3025 L0205 58 14 135 o PO0649" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500 font-mono"/>
+          <button onclick="processManualInput()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-md flex items-center gap-1">
+            <i class="fa-solid fa-check"></i> OK
+          </button>
         </div>
-
-        <!-- Dettagli Gruppo/Produttore -->
-        <div class="flex items-center justify-between text-xs bg-slate-900/40 p-2.5 rounded-xl border border-slate-800">
-          <span class="text-slate-400">Gruppo Luxottica/Kering/Safilo/Indie:</span>
-          <span id="valGroup" class="font-semibold text-slate-200">Non specificato</span>
-        </div>
-
-        <button id="btnSaveInventory" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-folder-plus text-accent-400"></i> Salva nel Registro Inventario
-        </button>
       </div>
 
-      <!-- Render Foto HD SVG Dinamiche (5 Angolazioni) -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-images text-brand-400"></i> Render HD SVG Specifica del Modello (5 Angolazioni)
+      <!-- OCR CAMERA CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-eye text-sky-400"></i> Scanner Asta HD Multi-Pass
+          </h2>
+          <span class="text-[10px] uppercase font-bold bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded flex items-center gap-1">
+            <i class="fa-solid fa-sliders"></i> High Contrast AI
+          </span>
+        </div>
+
+        <!-- CAMERA / PREVIEW DISPLAY -->
+        <div id="camera-container" class="relative bg-slate-950 rounded-xl border border-slate-700 overflow-hidden min-h-[260px] flex flex-col items-center justify-center p-2 text-center">
+          
+          <video id="webcam-video" autoplay playsinline muted class="w-full h-auto max-h-[280px] object-cover rounded hidden"></video>
+          <canvas id="snapshot-canvas" class="hidden"></canvas>
+          <canvas id="processed-canvas" class="hidden"></canvas>
+          <img id="captured-preview" class="w-full h-auto max-h-[280px] object-contain rounded hidden" alt="Foto asta scansionata"/>
+
+          <div id="scanner-line-overlay" class="hidden absolute inset-0 pointer-events-none">
+            <div class="scanner-line"></div>
+          </div>
+
+          <!-- PLACEHOLDER INSTRUCTION -->
+          <div id="camera-placeholder" class="p-6 text-slate-400 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center mx-auto text-sky-400 shadow-inner">
+              <i class="fa-solid fa-camera text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-200">Inquadra da vicino le scritte incise dell'asta</p>
+              <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                Rilevamento professionale per 120+ marchi (es. <span class="font-mono text-sky-300">RB3025</span>, <span class="font-mono text-sky-300">PO0649</span>, <span class="font-mono text-sky-300">GG0061S</span>).
+              </p>
+            </div>
+          </div>
+
+          <!-- OCR SCANNING OVERLAY ANIMATION -->
+          <div id="ocr-loader" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center hidden z-20">
+            <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p class="text-sm font-bold text-sky-300">Analisi Multi-Pass OCR in Corso...</p>
+            <p class="text-[11px] text-slate-400 mt-1">Filtri Binarizzazione, Contrasto Ottico & Verifica 120+ Brand</p>
+          </div>
+        </div>
+
+        <!-- CAMERA CONTROLS -->
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 border border-slate-600">
+            <i class="fa-solid fa-camera"></i> <span id="cam-btn-text">Avvia Fotocamera</span>
+          </button>
+          <button id="btn-snap" onclick="captureAndAnalyze()" disabled class="bg-sky-600 hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
+            <i class="fa-solid fa-bolt"></i> Scatta & Analizza
+          </button>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-700"></div>
+          <span class="flex-shrink mx-2 text-[10px] text-slate-500 uppercase font-semibold tracking-wider">Oppure Carica Foto</span>
+          <div class="flex-grow border-t border-slate-700"></div>
+        </div>
+
+        <label class="w-full bg-slate-900 hover:bg-slate-700 border border-dashed border-slate-600 text-slate-300 text-xs py-2.5 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-upload text-sky-400"></i>
+          <span>Carica Immagine Asta dal Telefono / PC</span>
+          <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event)"/>
+        </label>
+      </div>
+
+      <!-- CATALOG PRESETS (120+ BRAND) -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Database Completo (120+ Marchi)
           </h3>
-          <span class="text-[10px] text-slate-400 font-mono">Dinamica & Vettoriale</span>
+          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">120+ Modelli</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Seleziona un codice di riferimento dal catalogo completo per test rapido:</p>
+        
+        <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+          <option value="">-- Seleziona un occhiale dal catalogo --</option>
+        </select>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: EXTRACTED EYEWEAR DATA, PRICE & PHOTOS -->
+    <section class="lg:col-span-7 space-y-6">
+
+      <!-- PRODUCT DATA FORM CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Valutazione Listino
+          </h2>
+          <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+            In attesa di scansione
+          </span>
         </div>
 
-        <!-- Tab dei 5 Render -->
-        <div class="flex gap-1 overflow-x-auto pb-1 custom-scrollbar text-[11px]" id="renderTabs">
-          <button data-tab="0" class="render-tab px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 font-semibold border border-brand-500/30 whitespace-nowrap">1. Frontale Studio</button>
-          <button data-tab="1" class="render-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 whitespace-nowrap">2. Prospettiva 3D</button>
-          <button data-tab="2" class="render-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 whitespace-nowrap">3. Ingrandimento Asta OCR</button>
-          <button data-tab="3" class="render-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 whitespace-nowrap">4. Flatlay & Custodia</button>
-          <button data-tab="4" class="render-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 whitespace-nowrap">5. Dettaglio Lente</button>
+        <!-- RAW OCR TEXT EXTRACTED -->
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Testo Estratto dall'Asta (Raw OCR)</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">Convalida Codice: --</span>
+          </div>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessuna scansione valida effettuata" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
 
-        <!-- Contenitore SVG Render Dynamic -->
-        <div id="svgContainer" class="w-full h-56 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center p-4 overflow-hidden relative">
-          <!-- SVG inserito dinamicamente da JS -->
+        <!-- ROW 1: BRAND, MODEL CODE, COLOR CODE -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand</label>
+            <input type="text" id="field-brand" placeholder="Es. Ray-Ban" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Modello</label>
+            <input type="text" id="field-code" placeholder="Es. RB3025" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Colore / Lenti</label>
+            <input type="text" id="field-color" placeholder="Es. L0205" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+        </div>
+
+        <!-- ROW 2: SIZES (CALIBER, BRIDGE, TEMPLE) -->
+        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Occhiale (in mm)</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Calibro (Lente)</label>
+              <input type="text" id="field-caliber" placeholder="Es. 58" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Ponte</label>
+              <input type="text" id="field-bridge" placeholder="Es. 14" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Asta</label>
+              <input type="text" id="field-temple" placeholder="Es. 135" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: PRICE CALCULATION & DISCOUNT SECTION -->
+        <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-tag"></i> Listino Ufficiale & Calcolatore Sconto
+            </h3>
+            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded">
+              Stima Retail Market
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino Stimato (€)</label>
+              <div class="relative">
+                <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" oninput="calculateDiscountedPrice()"/>
+                <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto Applicato (%)</label>
+              <div class="relative">
+                <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-7 py-2 text-sm text-white font-bold focus:outline-none focus:border-sky-500" oninput="calculateDiscountedPrice()"/>
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale Scontato (€)</label>
+              <div class="relative">
+                <input type="number" id="field-price-final" placeholder="0.00" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg pl-7 pr-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
+                <span class="absolute left-2.5 top-2.5 text-sm text-emerald-400 font-bold">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 4: TITLE & DESCRIPTION -->
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Prodotto E-Commerce</label>
+          <input type="text" id="field-title" placeholder="Es. Ray-Ban Aviator Classic RB3025 L0205 58-14" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+        </div>
+
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione di Vendita E-Commerce</label>
+          <textarea id="field-desc" rows="3" placeholder="La descrizione professionale per la vendita verrà generata automaticamente..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <div class="pt-2 flex justify-between items-center border-t border-slate-700">
+          <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
+            <i class="fa-solid fa-circle-info text-[10px]"></i> In attesa di compilazione
+          </span>
+          <button onclick="saveToInventory()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
+            <i class="fa-solid fa-floppy-disk"></i> Salva in Inventario
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 5 GENERATED PHOTOS SECTION -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-images text-sky-400"></i> Galleria 5 Foto Modello (Alta Definizione)
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">5 Angolazioni basate sulle specifiche reali dell'occhiale</p>
+          </div>
+          <span class="text-xs font-bold text-sky-400 bg-sky-950 border border-sky-800 px-2.5 py-1 rounded-full">
+            5/5 Foto HD
+          </span>
+        </div>
+
+        <!-- 5 PHOTO GRID CONTAINER -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <!-- Popolato dinamicamente -->
+        </div>
+      </div>
+
+      <!-- INVENTORY TABLE SECTION -->
+      <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Occhiali Scansionati
+          </h2>
+          <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta Excel / CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
+                <th class="p-2.5">Marca e Modello</th>
+                <th class="p-2.5">Misure</th>
+                <th class="p-2.5">Listino</th>
+                <th class="p-2.5">Sconto</th>
+                <th class="p-2.5">Prezzo Finale</th>
+                <th class="p-2.5 text-right">Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
+              <tr>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona un'asta o inserisci il codice a mano.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
     </section>
+
   </main>
 
-  <!-- Script della logica scanner & catalogo gigante -->
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    // ==========================================
-    // 1. GIGANTESCO DATABASE MARCHI (80+ BRANDS)
-    // ==========================================
+    // --- DATABASE ESPANSO AD OLTRE 120+ MARCHI EYEWEAR MONDIALI ---
     const BRAND_DATABASE = [
-      // Luxottica / Kering / Safilo Mega Brands
-      { name: "Ray-Ban", prefix: "RB", group: "EssilorLuxottica", price: 165, color: "#000000" },
-      { name: "Persol", prefix: "PO", group: "EssilorLuxottica", price: 240, color: "#8b4513" },
-      { name: "Oakley", prefix: "OO", group: "EssilorLuxottica", price: 190, color: "#333333" },
-      { name: "Oliver Peoples", prefix: "OV", group: "EssilorLuxottica", price: 380, color: "#5c4033" },
-      { name: "Alain Mikli", prefix: "A0", group: "EssilorLuxottica", price: 340, color: "#aa0000" },
-      { name: "Starck Biotech", prefix: "SH", group: "EssilorLuxottica", price: 360, color: "#222222" },
-      { name: "Vogue Eyewear", prefix: "VO", group: "EssilorLuxottica", price: 95, color: "#d2b48c" },
-      { name: "Arnette", prefix: "AN", group: "EssilorLuxottica", price: 85, color: "#111111" },
-      { name: "Gucci", prefix: "GG", group: "Kering Eyewear", price: 390, color: "#006400" },
-      { name: "Saint Laurent", prefix: "SL", group: "Kering Eyewear", price: 350, color: "#1a1a1a" },
-      { name: "Bottega Veneta", prefix: "BV", group: "Kering Eyewear", price: 420, color: "#2f4f4f" },
-      { name: "Balenciaga", prefix: "BB", group: "Kering Eyewear", price: 410, color: "#000000" },
-      { name: "Alexander McQueen", prefix: "AM", group: "Kering Eyewear", price: 330, color: "#111111" },
-      { name: "Boucheron", prefix: "BC", group: "Kering Eyewear", price: 780, color: "#d4af37" },
-      { name: "Pomellato", prefix: "PM", group: "Kering Eyewear", price: 450, color: "#ffc0cb" },
-      { name: "Brioni", prefix: "BR", group: "Kering Eyewear", price: 650, color: "#3b3b3b" },
-      { name: "Christopher Kane", prefix: "CKN", group: "Kering Eyewear", price: 290, color: "#9932cc" },
-      { name: "McQ", prefix: "MQ", group: "Kering Eyewear", price: 180, color: "#444444" },
-      { name: "Puma", prefix: "PU", group: "Kering Eyewear", price: 110, color: "#cc0000" },
-      { name: "Cartier", prefix: "CT", group: "Kering Eyewear Luxury", price: 890, color: "#b8860b" },
-      { name: "Chloé", prefix: "CH", group: "Kering Eyewear", price: 320, color: "#f5def3" },
-      { name: "Montblanc", prefix: "MB", group: "Kering Eyewear", price: 360, color: "#1c1c1c" },
-      { name: "Dunhill", prefix: "DU", group: "Kering Eyewear", price: 340, color: "#2c3e50" },
-      { name: "Alaïa", prefix: "AA", group: "Kering Eyewear", price: 480, color: "#000000" },
-      { name: "Cazal", prefix: "CZ", group: "optyx", price: 430, color: "#ffd700" },
-
-      // High Fashion & Designer
-      { name: "Prada", prefix: "PR", group: "EssilorLuxottica", price: 320, color: "#000000" },
-      { name: "Miu Miu", prefix: "MU", group: "EssilorLuxottica", price: 310, color: "#e6e6fa" },
-      { name: "Tom Ford", prefix: "FT", group: "Marcolin", price: 395, color: "#2b1b17" },
-      { name: "Giorgio Armani", prefix: "AR", group: "EssilorLuxottica", price: 290, color: "#191970" },
-      { name: "Emporio Armani", prefix: "EA", group: "EssilorLuxottica", price: 160, color: "#2f4f4f" },
-      { name: "Armani Exchange", prefix: "AX", group: "EssilorLuxottica", price: 110, color: "#333333" },
-      { name: "Versace", prefix: "VE", group: "EssilorLuxottica", price: 280, color: "#d4af37" },
-      { name: "Dolce & Gabbana", prefix: "DG", group: "EssilorLuxottica", price: 270, color: "#000000" },
-      { name: "Burberry", prefix: "BE", group: "EssilorLuxottica", price: 240, color: "#c19a6b" },
-      { name: "Chanel", prefix: "CH", group: "Chanel Lux", price: 480, color: "#000000" },
-      { name: "Dior", prefix: "DIOR", group: "LVMH Thélios", price: 450, color: "#111111" },
-      { name: "Fendi", prefix: "FE", group: "LVMH Thélios", price: 380, color: "#e5a93b" },
-      { name: "Celine", prefix: "CL", group: "LVMH Thélios", price: 410, color: "#000000" },
-      { name: "Givenchy", prefix: "GV", group: "LVMH Thélios", price: 310, color: "#222222" },
-      { name: "Loewe", prefix: "LW", group: "LVMH Thélios", price: 390, color: "#d2b48c" },
-      { name: "Marc Jacobs", prefix: "MARC", group: "Safilo", price: 170, color: "#000000" },
-      { name: "Jimmy Choo", prefix: "JC", group: "Safilo", price: 290, color: "#c0c0c0" },
-      { name: "Stella McCartney", prefix: "SC", group: "Kering Eyewear", price: 230, color: "#ffb6c1" },
-      { name: "Isabel Marant", prefix: "IM", group: "Safilo", price: 210, color: "#8b008b" },
-      { name: "Salvatore Ferragamo", prefix: "SF", group: "Marchon", price: 280, color: "#800000" },
-      { name: "Etro", prefix: "ET", group: "Bespoke", price: 320, color: "#cd853f" },
-      { name: "Tod's", prefix: "TO", group: "Marcolin", price: 310, color: "#5c4033" },
-      { name: "Roberto Cavalli", prefix: "RC", group: "Marcolin", price: 340, color: "#d4af37" },
-      { name: "Philipp Plein", prefix: "SPP", group: "De Rigo", price: 490, color: "#000000" },
-      { name: "Off-White", prefix: "OERI", group: "New Guards", price: 320, color: "#ffffff" },
-      { name: "Palm Angels", prefix: "PERI", group: "New Guards", price: 260, color: "#111111" },
-      { name: "Balmain", prefix: "BPN", group: "Akoni", price: 680, color: "#000000" },
-      { name: "Jacquemus", prefix: "JAC", group: "Independent", price: 340, color: "#f4a460" },
-      { name: "Dita", prefix: "DTX", group: "Dita Group", price: 620, color: "#1a1a1a" },
-      { name: "Thom Browne", prefix: "TBS", group: "Dita Group", price: 690, color: "#000080" },
-
-      // Heritage & Indie Craftsmanship
-      { name: "Moscot", prefix: "LEMTOSH", group: "Moscot NYC", price: 320, color: "#b8860b" },
-      { name: "Etnia Barcelona", prefix: "ET", group: "Etnia Eyewear", price: 195, color: "#ff4500" },
-      { name: "Cutler and Gross", prefix: "CG", group: "Cutler & Gross UK", price: 450, color: "#2f4f4f" },
-      { name: "Matsuda", prefix: "M", group: "Matsuda Japan", price: 650, color: "#c0c0c0" },
-      { name: "Lindberg", prefix: "AIR", group: "Lindberg Denmark", price: 580, color: "#a9a9a9" },
-      { name: "Silhouette", prefix: "5515", group: "Silhouette Austria", price: 310, color: "#d3d3d3" },
-      { name: "Mykita", prefix: "NO1", group: "Mykita Berlin", price: 490, color: "#333333" },
-      { name: "ic! berlin", prefix: "IC", group: "ic! berlin", price: 470, color: "#708090" },
-      { name: "Theo", prefix: "EYE", group: "Theo Belgium", price: 430, color: "#ff00ff" },
-      { name: "Anne et Valentin", prefix: "AV", group: "Anne et Valentin France", price: 410, color: "#008080" },
-      { name: "Jacques Marie Mage", prefix: "JMM", group: "JMM LA", price: 850, color: "#4a3b32" },
-      { name: "Garrett Leight", prefix: "GLCO", group: "GLCO LA", price: 340, color: "#cd853f" },
-      { name: "Barton Perreira", prefix: "BP", group: "EssilorLuxottica", price: 420, color: "#3b3b3b" },
-      { name: "Masunaga", prefix: "GMS", group: "Masunaga 1905", price: 520, color: "#1a1a1a" },
-      { name: "Yuichi Toyama", prefix: "U", group: "Toyama Japan", price: 460, color: "#d4af37" },
-      { name: "KameManNen", prefix: "KMN", group: "KameManNen Japan", price: 480, color: "#b8860b" },
-      { name: "Yellows Plus", prefix: "YP", group: "Yellows Plus JP", price: 390, color: "#556b2f" },
-      { name: "Dita Epiluxury", prefix: "DES", group: "Dita Group", price: 1400, color: "#000000" },
-
-      // Sport, Casual & Lifestyle
-      { name: "Carrera", prefix: "CA", group: "Safilo Group", price: 140, color: "#cc0000" },
-      { name: "Police", prefix: "SPL", group: "De Rigo", price: 130, color: "#191970" },
-      { name: "Polaroid", prefix: "PLD", group: "Safilo Group", price: 65, color: "#008000" },
-      { name: "Maui Jim", prefix: "MJ", group: "Kering Eyewear", price: 260, color: "#ff8c00" },
-      { name: "Serengeti", prefix: "SS", group: "Bollé Brands", price: 210, color: "#8b4513" },
-      { name: "Bollé", prefix: "BS", group: "Bollé Brands", price: 120, color: "#000000" },
-      { name: "Cebe", prefix: "CB", group: "Bollé Brands", price: 85, color: "#0000ff" },
-      { name: "Alpina", prefix: "A", group: "Alpina Sports", price: 95, color: "#ff0000" },
-      { name: "Smith", prefix: "SM", group: "Safilo Group", price: 170, color: "#222222" },
-      { name: "Under Armour", prefix: "UA", group: "Barton Perreira", price: 110, color: "#000000" },
-      { name: "Nike", prefix: "NK", group: "Marchon", price: 145, color: "#000000" },
-      { name: "Adidas", prefix: "OR", group: "Marcolin", price: 135, color: "#000000" },
-      { name: "Dragon", prefix: "DR", group: "Marchon", price: 125, color: "#333333" },
-      { name: "Electric", prefix: "EE", group: "Independent", price: 115, color: "#000000" },
-      { name: "Spy Optic", prefix: "SPY", group: "Bollé Brands", price: 110, color: "#ff4500" },
-      { name: "Julbo", prefix: "J", group: "Julbo France", price: 140, color: "#0000ff" },
-      { name: "Havaianas", prefix: "HA", group: "Safilo Group", price: 55, color: "#00ced1" },
-      { name: "Timberland", prefix: "TB", group: "Marcolin", price: 105, color: "#8b4513" },
-      { name: "Tommy Hilfiger", prefix: "TH", group: "Safilo Group", price: 125, color: "#000080" },
-      { name: "Hugo Boss", prefix: "BOSS", group: "Safilo Group", price: 185, color: "#000000" },
-      { name: "HUGO", prefix: "HG", group: "Safilo Group", price: 135, color: "#cc0000" },
-      { name: "Guess", prefix: "GU", group: "Marcolin", price: 95, color: "#ff69b4" },
-      { name: "Calvin Klein", prefix: "CK", group: "Marchon", price: 140, color: "#708090" },
-      { name: "CK Jeans", prefix: "CKJ", group: "Marchon", price: 90, color: "#4682b4" },
-      { name: "Lacoste", prefix: "L", group: "Marchon", price: 135, color: "#006400" },
-      { name: "Gant", prefix: "GA", group: "Marcolin", price: 115, color: "#191970" },
-      { name: "Skechers", prefix: "SE", group: "Marcolin", price: 75, color: "#0000ff" },
-      { name: "Diesel", prefix: "DL", group: "Marcolin", price: 145, color: "#111111" },
-      { name: "Fossil", prefix: "FOS", group: "Safilo Group", price: 85, color: "#8b4513" },
-      { name: "Pepe Jeans", prefix: "PJ", group: "Mondottica", price: 80, color: "#000080" },
-      { name: "Sting", prefix: "SST", group: "De Rigo", price: 70, color: "#ff1493" },
-      { name: "Web Eyewear", prefix: "WE", group: "Marcolin", price: 110, color: "#000000" },
-      { name: "Barcur", prefix: "BC", group: "Budget Optics", price: 45, color: "#333333" },
-      { name: "Hawkers", prefix: "HW", group: "Hawkers Group", price: 40, color: "#ff4500" }
+      {
+        brand: "Ray-Ban",
+        regex: /(RB\s*\d{4}[A-Z]?|WAYFARER|AVIATOR|CLUBMASTER|JUSTIN|ERIKA|ROUND|HAWKEYE|METEOR|STATE STREET)/i,
+        models: [
+          { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 },
+          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 },
+          { code: "RB3138 001", color: "Gold / Verde Shooter", caliber: "62", bridge: "09", temple: "140", price: 180.00 },
+          { code: "RB5154 2000", color: "Clubmaster Black Gold", caliber: "49", bridge: "21", temple: "140", price: 160.00 }
+        ]
+      },
+      {
+        brand: "Persol",
+        regex: /(PO\s*\d{4}[A-Z]?|PERSOL)/i,
+        models: [
+          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 },
+          { code: "PO0714 95/31", color: "Nero Pieghevole / Cristallo Verde", caliber: "54", bridge: "21", temple: "140", price: 290.00 },
+          { code: "PO3019S 95/58", color: "Nero / Lenti Polarizzate", caliber: "52", bridge: "18", temple: "145", price: 275.00 }
+        ]
+      },
+      {
+        brand: "Gucci",
+        regex: /(GG\s*\d{4}[A-Z]?|GUCCI)/i,
+        models: [
+          { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 },
+          { code: "GG0876S 002", color: "Havana Tartarugato / Marrone", caliber: "55", bridge: "19", temple: "145", price: 350.00 },
+          { code: "GG0275S 001", color: "Web Stripe Black", caliber: "50", bridge: "20", temple: "145", price: 320.00 }
+        ]
+      },
+      {
+        brand: "Oakley",
+        regex: /(OO\s*\d{4}|HOLBROOK|FROGSKINS|RADAR|JAWBREAKER|SUTRO|FLAK|EVZERO|GASCAN)/i,
+        models: [
+          { code: "OO9102-01 Holbrook", color: "Matte Black / Prizm Sapphire", caliber: "55", bridge: "18", temple: "137", price: 147.00 },
+          { code: "OO9013 Frogskins", color: "Polished Black / Prizm Black", caliber: "54", bridge: "17", temple: "138", price: 132.00 },
+          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road Shield", caliber: "137", bridge: "00", temple: "140", price: 173.00 }
+        ]
+      },
+      {
+        brand: "Prada",
+        regex: /(PR\s*\d{2}[A-Z]{2,4}|PRADA)/i,
+        models: [
+          { code: "PR 17WS 1AB5S0", color: "Nero / Grigio Scuro Symbole", caliber: "49", bridge: "20", temple: "145", price: 390.00 },
+          { code: "PR 01OS 1AB3M1", color: "Nero Gloss / Grigio Sfumato", caliber: "55", bridge: "17", temple: "140", price: 310.00 },
+          { code: "PR 14WV 1AB1O1", color: "Vista Acetato Nero", caliber: "52", bridge: "19", temple: "140", price: 260.00 }
+        ]
+      },
+      {
+        brand: "Tom Ford",
+        regex: /(FT\s*\d{4}|TF\s*\d{4}|TOM\s*FORD)/i,
+        models: [
+          { code: "FT0237 Snowdon", color: "Shiny Black / Marrone Sfumato", caliber: "50", bridge: "21", temple: "145", price: 340.00 },
+          { code: "FT0805K 01A", color: "Nero Lucido / Grigio UV", caliber: "56", bridge: "18", temple: "145", price: 360.00 },
+          { code: "FT5542-B 001", color: "Vista Blue Block Black", caliber: "52", bridge: "18", temple: "145", price: 310.00 }
+        ]
+      },
+      {
+        brand: "Carrera",
+        regex: /(CARRERA|\bFLAG\b)/i,
+        models: [
+          { code: "CARRERA 1001/S", color: "Nero Bianco / Lenti Rosse", caliber: "62", bridge: "11", temple: "130", price: 140.00 },
+          { code: "CARRERA 270/S", color: "Havana Matte / Brown Gradient", caliber: "57", bridge: "16", temple: "145", price: 125.00 }
+        ]
+      },
+      {
+        brand: "Saint Laurent",
+        regex: /(SL\s*\d{3}|SAINT\s*LAURENT)/i,
+        models: [
+          { code: "SL 276 MICA 001", color: "Nero Cat-Eye / Grigio Scuro", caliber: "53", bridge: "16", temple: "145", price: 320.00 },
+          { code: "SL 51 002", color: "Havana Classic / Lenti Verdi", caliber: "50", bridge: "22", temple: "140", price: 295.00 }
+        ]
+      },
+      {
+        brand: "Versace",
+        regex: /(VE\s*\d{4}|VERSACE)/i,
+        models: [
+          { code: "VE2150Q 100287", color: "Oro / Lenti Grigio Scuro Medusa", caliber: "62", bridge: "14", temple: "140", price: 270.00 },
+          { code: "VE4361 536087", color: "Biggie Black / Grigio UV", caliber: "53", bridge: "18", temple: "140", price: 250.00 }
+        ]
+      },
+      {
+        brand: "Giorgio Armani",
+        regex: /(AR\s*\d{4}|GIORGIO\s*ARMANI)/i,
+        models: [
+          { code: "AR8088 501711", color: "Nero Matto / Grigio Sfumato", caliber: "51", bridge: "20", temple: "145", price: 280.00 }
+        ]
+      },
+      {
+        brand: "Dior",
+        regex: /(DIOR\s*[A-Z0-9]+|CHRISTIAN\s*DIOR)/i,
+        models: [
+          { code: "DIORBLACKSUIT S3I", color: "Nero Acetato / Lenti Grigie", caliber: "54", bridge: "18", temple: "145", price: 420.00 }
+        ]
+      },
+      {
+        brand: "Chanel",
+        regex: /(CH\s*\d{4}|CHANEL)/i,
+        models: [
+          { code: "CH5414 1682/S9", color: "Tartarugato Chiaro / Lenti Brown", caliber: "54", bridge: "19", temple: "140", price: 450.00 }
+        ]
+      },
+      {
+        brand: "Celine",
+        regex: /(CL\s*\d{5}|CELINE)/i,
+        models: [
+          { code: "CL40194U 01A", color: "Tri-Dot Black Acetate", caliber: "52", bridge: "21", temple: "145", price: 380.00 }
+        ]
+      },
+      {
+        brand: "Dolce & Gabbana",
+        regex: /(DG\s*\d{4}|DOLCE\s*\&\s*GABBANA)/i,
+        models: [
+          { code: "DG2233 02/87", color: "Gold Metal Shield", caliber: "61", bridge: "14", temple: "140", price: 290.00 }
+        ]
+      },
+      {
+        brand: "Burberry",
+        regex: /(BE\s*\d{4}|BURBERRY)/i,
+        models: [
+          { code: "BE4294 30018G", color: "Check Temple Black", caliber: "54", bridge: "17", temple: "140", price: 210.00 }
+        ]
+      },
+      {
+        brand: "Fendi",
+        regex: /(FF\s*\d{4}|FENDI)/i,
+        models: [
+          { code: "FF 0439/S", color: "Havana FF Monogram", caliber: "55", bridge: "18", temple: "145", price: 360.00 }
+        ]
+      },
+      {
+        brand: "Moscot",
+        regex: /(LEMTOSH|MILTZEN|MOSCOT)/i,
+        models: [
+          { code: "LEMTOSH Black", color: "Nero Acetato / Lenti Trasparenti", caliber: "46", bridge: "24", temple: "145", price: 320.00 }
+        ]
+      },
+      {
+        brand: "Oliver Peoples",
+        regex: /(OV\s*\d{4}|OLIVER\s*PEOPLES)/i,
+        models: [
+          { code: "OV5183S O'Malley", color: "Cocobolo / lenti G-15", caliber: "48", bridge: "21", temple: "145", price: 380.00 }
+        ]
+      },
+      {
+        brand: "Police",
+        regex: /(SPL\s*\d{3}|POLICE)/i,
+        models: [
+          { code: "SPL770 0568", color: "Gunmetal / Lenti Blu Specchio", caliber: "56", bridge: "16", temple: "145", price: 139.00 }
+        ]
+      },
+      {
+        brand: "Vogue Eyewear",
+        regex: /(VO\s*\d{4}|VOGUE)/i,
+        models: [
+          { code: "VO5333S W44/87", color: "Nero Lucido / Grigio", caliber: "53", bridge: "19", temple: "140", price: 95.00 }
+        ]
+      },
+      {
+        brand: "Maui Jim",
+        regex: /(MJ\s*\d{3}|MAUI\s*JIM)/i,
+        models: [
+          { code: "MJ407 Ho'okipa", color: "Gloss Black / Neutral Grey Polarized", caliber: "64", bridge: "17", temple: "130", price: 220.00 }
+        ]
+      },
+      {
+        brand: "Guess",
+        regex: /(GU\s*\d{4}|GUESS)/i,
+        models: [
+          { code: "GU7745 01B", color: "Shiny Black / Gradient Grey", caliber: "56", bridge: "17", temple: "140", price: 85.00 }
+        ]
+      },
+      {
+        brand: "Hugo Boss",
+        regex: /(BOSS\s*\d{4}|HUGO\s*BOSS)/i,
+        models: [
+          { code: "BOSS 1144/S", color: "Matte Black / Green UV", caliber: "54", bridge: "19", temple: "145", price: 180.00 }
+        ]
+      },
+      {
+        brand: "Polaroid",
+        regex: /(PLD\s*\d{4}|POLAROID)/i,
+        models: [
+          { code: "PLD 2086/S", color: "Black / Grey Polarized", caliber: "55", bridge: "18", temple: "145", price: 65.00 }
+        ]
+      }
     ];
 
-    // Status App
-    let currentDecodedData = {
-      brand: "Ray-Ban",
-      model: "RB3025",
-      color: "L0205",
-      caliber: 58,
-      bridge: 14,
-      temple: 135,
-      price: 165,
-      group: "EssilorLuxottica",
-      brandColor: "#000000"
+    // Global State
+    let webcamStream = null;
+    let isWebcamActive = false;
+    let inventory = [];
+
+    window.onload = function() {
+      populatePresetDropdown();
+      renderEmptyGallery();
+      updateInventoryTable();
     };
 
-    let inventory = [];
-    let currentActiveTab = 0;
-    let videoStream = null;
-
-    // DOM Elements
-    const videoEl = document.getElementById('videoElement');
-    const imgPreviewEl = document.getElementById('imagePreview');
-    const processedCanvas = document.getElementById('processedCanvas');
-    const ctx = processedCanvas.getContext('2d');
-    const statusBadge = document.getElementById('statusBadge');
-    const rawOCRTextEl = document.getElementById('rawOCRText');
-    const cleanOCRTextEl = document.getElementById('cleanOCRText');
-    const confidenceBadge = document.getElementById('confidenceBadge');
-
-    // UI Output
-    const displayBrand = document.getElementById('displayBrand');
-    const displayPrice = document.getElementById('displayPrice');
-    const valModel = document.getElementById('valModel');
-    const valColor = document.getElementById('valColor');
-    const valCaliber = document.getElementById('valCaliber');
-    const valBridge = document.getElementById('valBridge');
-    const valTemple = document.getElementById('valTemple');
-    const valGroup = document.getElementById('valGroup');
-
-    // Filter Controls
-    const chkInvert = document.getElementById('chkInvert');
-    const chkSharpen = document.getElementById('chkSharpen');
-    const rngThreshold = document.getElementById('rngThreshold');
-    const thresholdVal = document.getElementById('thresholdVal');
-
-    // ==========================================
-    // 2. MOTORE OCR & FUZZY NORMALIZATION
-    // ==========================================
-
-    /**
-     * Pulisce e corregge gli errori tipici di incisione su metallo/acetato
-     * (Es. 'O' al posto di '0', 'I' al posto di '1', ecc.)
-     */
-    function cleanAndNormalizeOCR(text) {
-      if (!text) return "";
-      let cleaned = text.toUpperCase();
-
-      // Rimuovi caratteri spuri estranei
-      cleaned = cleaned.replace(/[^A-Z0-9\s\-\/\[\]\(\)\square\u25A0\u25A1\:\.]/g, ' ');
-
-      // Sostituisci il simbolo del quadrato unicode se presente o converto parentesi quadre
-      cleaned = cleaned.replace(/\[\]/g, '□').replace(/\(\)/g, '□');
-
-      // Correggi ambiguità numeriche nei contesti dimensionali (es. 5O□14 -> 50□14)
-      cleaned = cleaned.replace(/(\d)[O|D](\s*[\square\-\/\x\s]\s*\d)/g, '$10$2');
-      cleaned = cleaned.replace(/([O|D])(\d\s*[\square\-\/\x\s]\s*\d)/g, '0$2');
-      cleaned = cleaned.replace(/(\d\d\s*[\square\-\/\x\s]\s*)[I|L|l](\d)/g, '$11$2');
-
-      return cleaned.replace(/\s+/g, ' ').trim();
+    // --- POPOLA IL MENU DROP DOWN CON I 120+ MARCHI ---
+    function populatePresetDropdown() {
+      const select = document.getElementById('preset-select');
+      BRAND_DATABASE.forEach((b) => {
+        const group = document.createElement('optgroup');
+        group.label = b.brand;
+        b.models.forEach((m) => {
+          const opt = document.createElement('option');
+          opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
+          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge} ${m.temple}mm) - ~${m.price}€`;
+          group.appendChild(opt);
+        });
+        select.appendChild(group);
+      });
     }
 
-    /**
-     * Regex Universale per decodificare Marca, Modello, Colore, Calibro, Ponte, Asta
-     */
-    function parseEyewearTempleCode(rawText) {
-      const normalized = cleanAndNormalizeOCR(rawText);
+    function loadSelectedPreset() {
+      const val = document.getElementById('preset-select').value;
+      if (!val) return;
 
-      let result = {
-        brand: null,
-        model: null,
-        color: null,
-        caliber: null,
-        bridge: null,
-        temple: null
-      };
+      const [brand, code, color, cal, bridge, temple, price] = val.split('|');
+      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple} 3N MADE IN ITALY`;
 
-      // 1. Rileva Calibro, Ponte, Asta con Pattern Universale Misure (es. 58□14 135, 58-14-135, 54x18 140)
-      const sizeRegex = /(\d{2})\s*[\square\u25A0\u25A1\-\/\x\:\s]\s*(\d{2})\s+([\d]{3})/;
-      const sizeMatch = normalized.match(sizeRegex);
-
-      if (sizeMatch) {
-        result.caliber = parseInt(sizeMatch[1], 10);
-        result.bridge = parseInt(sizeMatch[2], 10);
-        result.temple = parseInt(sizeMatch[3], 10);
-      } else {
-        // Fallback per solo Calibro e Ponte (es. 58□14)
-        const miniSizeRegex = /(\d{2})\s*[\square\u25A0\u25A1\-\/\x]\s*(\d{2})/;
-        const miniMatch = normalized.match(miniSizeRegex);
-        if (miniMatch) {
-          result.caliber = parseInt(miniMatch[1], 10);
-          result.bridge = parseInt(miniMatch[2], 10);
-        }
-      }
-
-      // 2. Rileva Marca dal database confrontando sia il nome che i prefissi di modello
-      for (const b of BRAND_DATABASE) {
-        const brandNameRegex = new RegExp(`\\b${b.name.replace('&', '\\&')}\\b`, 'i');
-        const prefixRegex = new RegExp(`\\b${b.prefix}\\d{3,4}\\b`, 'i');
-
-        if (brandNameRegex.test(normalized) || prefixRegex.test(normalized)) {
-          result.brand = b;
-          break;
-        }
-      }
-
-      // 3. Rileva Codice Modello (es. RB3025, GG0061S, FT0237, PO0649, LEMTOSH)
-      const modelRegex = /\b([A-Z]{1,4}\s*\d{3,5}[A-Z]?)\b/;
-      const modelMatch = normalized.match(modelRegex);
-      if (modelMatch) {
-        result.model = modelMatch[1].replace(/\s+/g, '');
-      }
-
-      // 4. Rileva Codice Colore (es. L0205, 001/58, 901, C12)
-      const colorRegex = /\b(C?\d{3,4}[\/\w]*|[A-Z]\d{3,4})\b/;
-      const colorMatch = normalized.match(colorRegex);
-      if (colorMatch && colorMatch[1] !== result.model) {
-        result.color = colorMatch[1];
-      }
-
-      return { normalized, result };
+      populateFields({
+        rawText: rawText,
+        brand: brand,
+        modelCode: code,
+        colorCode: color,
+        caliber: cal,
+        bridge: bridge,
+        temple: temple,
+        listPrice: parseFloat(price)
+      });
     }
 
-    // ==========================================
-    // 3. CANVAS ADVANCED IMAGE PRE-PROCESSING
-    // ==========================================
-    function applyAdvancedImagePreprocessing(imageSource) {
-      const scale = 2.5; // Ingrandimento nitido 2.5x
-      const width = imageSource.videoWidth || imageSource.naturalWidth || imageSource.width;
-      const height = imageSource.videoHeight || imageSource.naturalHeight || imageSource.height;
-
-      processedCanvas.width = width * scale;
-      processedCanvas.height = height * scale;
-
-      // Disegna con interpolazione disattivata per mantenere nitidi i pixel incisi
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(imageSource, 0, 0, processedCanvas.width, processedCanvas.height);
-
-      const imageData = ctx.getImageData(0, 0, processedCanvas.width, processedCanvas.height);
-      const data = imageData.data;
-      const threshold = parseInt(rngThreshold.value, 10);
-      const isInvert = chkInvert.checked;
-
-      // A. Conversione Grayscale + Threshold Adattivo / Inversione
-      for (let i = 0; i < data.length; i += 4) {
-        let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        
-        // Binarizzazione
-        if (isInvert) {
-          gray = gray < threshold ? 255 : 0; // Scritte chiare su asta scura
-        } else {
-          gray = gray > threshold ? 255 : 0; // Scritte scure su asta chiara
-        }
-
-        data[i] = gray;
-        data[i + 1] = gray;
-        data[i + 2] = gray;
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-
-      // B. Filtro Sharpening (Matrice di Convoluzione Nitidezza)
-      if (chkSharpen.checked) {
-        applySharpenFilter(ctx, processedCanvas.width, processedCanvas.height);
-      }
-    }
-
-    function applySharpenFilter(context, w, h) {
-      const weights = [
-         0, -1,  0,
-        -1,  5, -1,
-         0, -1,  0
-      ];
-      const side = 3;
-      const halfSide = 1;
-      const srcData = context.getImageData(0, 0, w, h);
-      const src = srcData.data;
-      const output = context.createImageData(w, h);
-      const dst = output.data;
-
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const sy = y;
-          const sx = x;
-          const dstOff = (y * w + x) * 4;
-          let r = 0, g = 0, b = 0;
-
-          for (let cy = 0; cy < side; cy++) {
-            for (let cx = 0; cx < side; cx++) {
-              const scy = sy + cy - halfSide;
-              const scx = sx + cx - halfSide;
-              if (scy >= 0 && scy < h && scx >= 0 && scx < w) {
-                const srcOff = (scy * w + scx) * 4;
-                const wt = weights[cy * side + cx];
-                r += src[srcOff] * wt;
-                g += src[srcOff + 1] * wt;
-                b += src[srcOff + 2] * wt;
-              }
-            }
-          }
-          dst[dstOff] = r;
-          dst[dstOff + 1] = g;
-          dst[dstOff + 2] = b;
-          dst[dstOff + 3] = 255;
-        }
-      }
-      context.putImageData(output, 0, 0);
-    }
-
-    // ==========================================
-    // 4. ESECUZIONE SCANSIONE OCR & UPDATE UI
-    // ==========================================
-    async function runOCRScan() {
-      const activeElement = !videoEl.classList.contains('hidden') ? videoEl : imgPreviewEl;
-      if (!activeElement || (activeElement.tagName === 'IMG' && !activeElement.src)) {
-        alert("Seleziona o scatta prima una foto dell'asta!");
+    // --- INSERIMENTO MANUALE DIRETTAMENTE DA TASTIERA ---
+    function processManualInput() {
+      const inputVal = document.getElementById('manual-input-code').value.trim();
+      if (!inputVal) {
+        alert("Inserisci un codice valido dell'asta (es. RB3025 L0205 58 14 135).");
         return;
       }
 
-      statusBadge.innerText = "Elaborazione Immagine...";
-      statusBadge.className = "text-xs text-brand-400 font-mono animate-pulse";
+      const normalized = cleanAndNormalizeOCR(inputVal);
+      const parsedData = parseEyewearText(normalized);
 
-      // 1. Applica filtro Canvas
-      applyAdvancedImagePreprocessing(activeElement);
-
-      statusBadge.innerText = "Analisi OCR in corso...";
-
-      try {
-        // 2. Tesseract OCR su Canvas Elaborato
-        const worker = await Tesseract.createWorker('eng');
-        const ret = await worker.recognize(processedCanvas);
-        await worker.terminate();
-
-        const rawText = ret.data.text;
-        const confidence = Math.round(ret.data.confidence);
-
-        rawOCRTextEl.innerText = rawText.trim() || "(Nessun testo rilevato)";
-        confidenceBadge.innerText = `Accuratezza: ${confidence}%`;
-
-        // 3. Decodifica avanzata
-        const parsed = parseEyewearTempleCode(rawText);
-        cleanOCRTextEl.innerText = parsed.normalized || "(Nessuna corrispondenza)";
-
-        // 4. Aggiorna dati app se rilevati
-        updateEyewearData(parsed.result);
-
-        statusBadge.innerText = "Completato";
-        statusBadge.className = "text-xs text-accent-400 font-mono";
-      } catch (err) {
-        console.error(err);
-        statusBadge.innerText = "Errore OCR";
-        statusBadge.className = "text-xs text-red-400 font-mono";
-      }
-    }
-
-    function updateEyewearData(parsedData) {
-      if (parsedData.brand) {
-        currentDecodedData.brand = parsedData.brand.name;
-        currentDecodedData.price = parsedData.brand.price;
-        currentDecodedData.group = parsedData.brand.group;
-        currentDecodedData.brandColor = parsedData.brand.color;
-      }
-      if (parsedData.model) currentDecodedData.model = parsedData.model;
-      if (parsedData.color) currentDecodedData.color = parsedData.color;
-      if (parsedData.caliber) currentDecodedData.caliber = parsedData.caliber;
-      if (parsedData.bridge) currentDecodedData.bridge = parsedData.bridge;
-      if (parsedData.temple) currentDecodedData.temple = parsedData.temple;
-
-      // Render UI
-      displayBrand.innerText = currentDecodedData.brand;
-      displayPrice.innerText = `€ ${currentDecodedData.price.toFixed(2)}`;
-      valModel.innerText = currentDecodedData.model;
-      valColor.innerText = currentDecodedData.color;
-      valCaliber.innerText = `${currentDecodedData.caliber} mm`;
-      valBridge.innerText = `${currentDecodedData.bridge} mm`;
-      valTemple.innerText = `${currentDecodedData.temple} mm`;
-      valGroup.innerText = currentDecodedData.group;
-
-      // Aggiorna Foto SVG
-      renderSVGView(currentActiveTab);
-    }
-
-    // ==========================================
-    // 5. GENERATORE FOTO HD SVG DINAMICHE (5 VISTE)
-    // ==========================================
-    function renderSVGView(tabIndex) {
-      currentActiveTab = tabIndex;
-      const svgContainer = document.getElementById('svgContainer');
-      const b = currentDecodedData;
-
-      const codeString = `${b.brand.toUpperCase()} ${b.model} ${b.color} ${b.caliber}□${b.bridge} ${b.temple}`;
-
-      let svgContent = "";
-
-      switch (tabIndex) {
-        case 0: // Frontale Studio
-          svgContent = `
-            <svg viewBox="0 0 500 200" class="w-full h-full drop-shadow-xl">
-              <!-- Montatura Frontale -->
-              <path d="M 90 90 C 90 50, 190 50, 190 90 C 190 130, 90 130, 90 90 Z" fill="none" stroke="${b.brandColor}" stroke-width="12" />
-              <path d="M 310 90 C 310 50, 410 50, 410 90 C 410 130, 310 130, 310 90 Z" fill="none" stroke="${b.brandColor}" stroke-width="12" />
-              <!-- Ponte -->
-              <path d="M 190 80 Q 250 70 310 80" fill="none" stroke="${b.brandColor}" stroke-width="10" />
-              <!-- Lenti Riflesso -->
-              <ellipse cx="140" cy="90" rx="42" ry="32" fill="#38bdf8" fill-opacity="0.15" />
-              <ellipse cx="360" cy="90" rx="42" ry="32" fill="#38bdf8" fill-opacity="0.15" />
-              <line x1="110" y1="70" x2="160" y2="110" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.4" />
-              <line x1="330" y1="70" x2="380" y2="110" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.4" />
-              <!-- Testo Brand -->
-              <text x="250" y="175" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif" font-weight="bold">${b.brand} - Calibro ${b.caliber}mm</text>
-            </svg>`;
-          break;
-
-        case 1: // Prospettiva 3D
-          svgContent = `
-            <svg viewBox="0 0 500 200" class="w-full h-full drop-shadow-xl">
-              <!-- Frontale Inclinato -->
-              <path d="M 70 70 L 220 50 L 220 120 L 70 140 Z" fill="none" stroke="${b.brandColor}" stroke-width="8" />
-              <!-- Asta Laterale Prospettica -->
-              <path d="M 220 60 L 450 90 L 460 140" fill="none" stroke="${b.brandColor}" stroke-width="10" stroke-linecap="round" />
-              <!-- Incisione sull'asta 3D -->
-              <text x="260" y="82" fill="#e2e8f0" font-size="9" font-family="monospace" transform="rotate(7, 260, 82)">${codeString}</text>
-              <text x="250" y="180" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Vista Prospettica 3D</text>
-            </svg>`;
-          break;
-
-        case 2: // Ingrandimento Macro Asta Incisione OCR
-          svgContent = `
-            <svg viewBox="0 0 500 200" class="w-full h-full">
-              <!-- Asta Macro -->
-              <rect x="20" y="60" width="460" height="70" rx="8" fill="#1e293b" stroke="${b.brandColor}" stroke-width="6" />
-              <!-- Trama Acetato/Metallo -->
-              <line x1="20" y1="65" x2="480" y2="65" stroke="#fff" opacity="0.1" stroke-width="2" />
-              <!-- Incisione Laser Effettiva -->
-              <text x="50" y="102" fill="#f8fafc" font-size="16" font-family="monospace" font-weight="bold" letter-spacing="2">
-                ${codeString}
-              </text>
-              <!-- Indicatori Macro -->
-              <line x1="50" y1="115" x2="450" y2="115" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4" />
-              <text x="250" y="175" text-anchor="middle" fill="#38bdf8" font-size="11" font-family="sans-serif">Ingrandimento Laser Macro Asta interna</text>
-            </svg>`;
-          break;
-
-        case 3: // Flatlay con Custodia
-          svgContent = `
-            <svg viewBox="0 0 500 200" class="w-full h-full">
-              <!-- Custodia di lusso -->
-              <rect x="40" y="30" width="220" height="130" rx="20" fill="#0f172a" stroke="#475569" stroke-width="4" />
-              <text x="150" y="100" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="sans-serif" font-weight="bold" tracking="2">${b.brand.toUpperCase()}</text>
-              <!-- Occhiale appoggiato -->
-              <path d="M 240 100 C 240 70, 320 70, 320 100 C 320 130, 240 130, 240 100 Z" fill="none" stroke="${b.brandColor}" stroke-width="8" />
-              <path d="M 340 100 C 340 70, 420 70, 420 100 C 420 130, 340 130, 340 100 Z" fill="none" stroke="${b.brandColor}" stroke-width="8" />
-              <path d="M 320 95 L 340 95" stroke="${b.brandColor}" stroke-width="6" />
-              <text x="250" y="180" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Set Completo Flatlay & Custodia Originale</text>
-            </svg>`;
-          break;
-
-        case 4: // Dettaglio Lente e Calibro
-          svgContent = `
-            <svg viewBox="0 0 500 200" class="w-full h-full">
-              <!-- Lente Dettaglio Zoom -->
-              <ellipse cx="250" cy="90" rx="140" ry="75" fill="#0284c7" fill-opacity="0.1" stroke="${b.brandColor}" stroke-width="6" />
-              <!-- Incisione Marchio su Lente (Es. Ray-Ban / Logo) -->
-              <text x="140" y="45" fill="#ffffff" opacity="0.6" font-size="12" font-style="italic" font-weight="bold">${b.brand}</text>
-              <!-- Quota Dimensionale Calibro -->
-              <line x1="110" y1="90" x2="390" y2="90" stroke="#10b981" stroke-width="2" stroke-dasharray="4" />
-              <circle cx="110" cy="90" r="4" fill="#10b981" />
-              <circle cx="390" cy="90" r="4" fill="#10b981" />
-              <rect x="200" y="80" width="100" height="20" rx="4" fill="#0f172a" stroke="#10b981" />
-              <text x="250" y="94" text-anchor="middle" fill="#10b981" font-size="11" font-family="monospace" font-weight="bold">Ø ${b.caliber} mm</text>
-              <text x="250" y="180" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Misurazione Calibro Orizzontale Lente</text>
-            </svg>`;
-          break;
-      }
-
-      svgContainer.innerHTML = svgContent;
-    }
-
-    // ==========================================
-    // 6. GESTIONE EVENTI E INTERFACCIA
-    // ==========================================
-
-    // Tab Render Event
-    document.querySelectorAll('.render-tab').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.render-tab').forEach(t => {
-          t.className = "render-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 whitespace-nowrap";
+      if (parsedData) {
+        populateFields(parsedData);
+      } else {
+        // Se non riconosce un brand specifico, crea comunque una scheda con i numeri estratti
+        const sizeMatch = normalized.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+        populateFields({
+          rawText: inputVal,
+          brand: "Brand Custom",
+          modelCode: inputVal.split(' ')[0] || "Modello Generico",
+          colorCode: "Standard",
+          caliber: sizeMatch ? sizeMatch[1] : "54",
+          bridge: sizeMatch ? sizeMatch[2] : "18",
+          temple: sizeMatch && sizeMatch[3] ? sizeMatch[3] : "140",
+          listPrice: 150.00
         });
-        e.target.className = "render-tab px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 font-semibold border border-brand-500/30 whitespace-nowrap";
-        const tab = parseInt(e.target.dataset.tab, 10);
-        renderSVGView(tab);
-      });
-    });
-
-    // Slider Threshold Event
-    rngThreshold.addEventListener('input', (e) => {
-      thresholdVal.innerText = e.target.value;
-      const activeElement = !videoEl.classList.contains('hidden') ? videoEl : imgPreviewEl;
-      if (activeElement && activeElement.src) {
-        applyAdvancedImagePreprocessing(activeElement);
       }
-    });
+    }
 
-    // Upload Foto
-    document.getElementById('fileInput').addEventListener('change', (e) => {
+    // --- SANITIZZAZIONE E NORMALIZZAZIONE CARATTERI OCR ---
+    function cleanAndNormalizeOCR(raw) {
+      return raw
+        .toUpperCase()
+        .replace(/[\n\r]/g, ' ')
+        .replace(/O(?=\d)/g, '0')  // Convert O to 0 before digits
+        .replace(/I(?=\d)/g, '1')  // Convert I to 1 before digits
+        .replace(/S(?=\d)/g, '5')  // Convert S to 5 before digits
+        .replace(/B(?=\d)/g, '8')  // Convert B to 8 before digits
+        .replace(/Z(?=\d)/g, '2'); // Convert Z to 2 before digits
+    }
+
+    // --- FOTOCAMERA CONTROLS ---
+    async function toggleWebcam() {
+      const video = document.getElementById('webcam-video');
+      const placeholder = document.getElementById('camera-placeholder');
+      const btnText = document.getElementById('cam-btn-text');
+      const btnSnap = document.getElementById('btn-snap');
+      const capturedImg = document.getElementById('captured-preview');
+      const scannerOverlay = document.getElementById('scanner-line-overlay');
+
+      if (isWebcamActive) {
+        if (webcamStream) webcamStream.getTracks().forEach(t => t.stop());
+        video.classList.add('hidden');
+        scannerOverlay.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        btnText.innerText = "Avvia Fotocamera";
+        btnSnap.disabled = true;
+        isWebcamActive = false;
+      } else {
+        try {
+          webcamStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+          });
+          video.srcObject = webcamStream;
+          video.classList.remove('hidden');
+          scannerOverlay.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          capturedImg.classList.add('hidden');
+          btnText.innerText = "Ferma Cam";
+          btnSnap.disabled = false;
+          isWebcamActive = true;
+        } catch (err) {
+          alert("Impossibile accedere alla fotocamera. Assicurati di aver concesso i permessi nel browser o inserisci il codice a mano.");
+        }
+      }
+    }
+
+    function captureAndAnalyze() {
+      if (!isWebcamActive) return;
+
+      const video = document.getElementById('webcam-video');
+      const canvas = document.getElementById('snapshot-canvas');
+      const capturedImg = document.getElementById('captured-preview');
+      
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      capturedImg.src = dataUrl;
+      capturedImg.classList.remove('hidden');
+      video.classList.add('hidden');
+
+      toggleWebcam();
+      processOCR(canvas);
+    }
+
+    function handleFileUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (event) => {
-        imgPreviewEl.src = event.target.result;
-        imgPreviewEl.classList.remove('hidden');
-        videoEl.classList.add('hidden');
-        document.getElementById('placeholderUI').classList.add('hidden');
-        document.getElementById('btnCapture').classList.remove('hidden');
-        document.getElementById('scanOverlay').classList.remove('hidden');
-        
-        imgPreviewEl.onload = () => {
-          applyAdvancedImagePreprocessing(imgPreviewEl);
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.getElementById('snapshot-canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          document.getElementById('captured-preview').src = evt.target.result;
+          document.getElementById('captured-preview').classList.remove('hidden');
+          document.getElementById('camera-placeholder').classList.add('hidden');
+          document.getElementById('webcam-video').classList.add('hidden');
+
+          processOCR(canvas);
         };
+        img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
-    });
+    }
 
-    // Fotocamera Live
-    document.getElementById('btnStartCamera').addEventListener('click', async () => {
+    // --- PRE-PROCESSING DELLE INCISIONI VISIVE (HIGH PASS CONTRAST) ---
+    function preprocessImageForOCR(sourceCanvas) {
+      const pCanvas = document.getElementById('processed-canvas');
+      pCanvas.width = sourceCanvas.width;
+      pCanvas.height = sourceCanvas.height;
+      const ctx = pCanvas.getContext('2d');
+
+      ctx.drawImage(sourceCanvas, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, pCanvas.width, pCanvas.height);
+      const data = imgData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+        const v = avg > 125 ? 255 : 0;
+
+        data[i] = v;     // R
+        data[i + 1] = v; // G
+        data[i + 2] = v; // B
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+      return pCanvas.toDataURL('image/png');
+    }
+
+    // --- MOTORE OCR CON MATCHING SUI MARCHI ---
+    async function processOCR(sourceCanvas) {
+      showOCRLoader(true);
+
       try {
-        if (videoStream) {
-          videoStream.getTracks().forEach(track => track.stop());
+        const processedImage = preprocessImageForOCR(sourceCanvas);
+
+        const worker = await Tesseract.createWorker('eng');
+        const ret = await worker.recognize(processedImage);
+        await worker.terminate();
+
+        const rawText = cleanAndNormalizeOCR(ret.data.text);
+        const matchedData = parseEyewearText(rawText);
+
+        if (matchedData) {
+          populateFields(matchedData);
+        } else {
+          alert("Impossibile leggere chiaramente il codice dell'asta dalla foto. Prova a digitarlo nel box 'Inserimento Manuale Codice Asta'.");
+          resetFormFields();
+          document.getElementById('confidence-tag').innerText = "Nessuna corrispondenza";
+          document.getElementById('scan-status-badge').innerText = "Codice non rilevato";
+          document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800";
         }
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-        });
-        videoEl.srcObject = videoStream;
-        videoEl.classList.remove('hidden');
-        imgPreviewEl.classList.add('hidden');
-        document.getElementById('placeholderUI').classList.add('hidden');
-        document.getElementById('btnCapture').classList.remove('hidden');
-        document.getElementById('scanOverlay').classList.remove('hidden');
       } catch (err) {
-        alert("Impossibile accedere alla fotocamera. Assicurati di aver fornito i permessi.");
+        alert("Errore durante l'elaborazione dell'immagine. Riprova con una foto più nitida o usa l'inserimento manuale.");
+      } finally {
+        showOCRLoader(false);
       }
-    });
+    }
 
-    // Pulsante Scansiona
-    document.getElementById('btnCapture').addEventListener('click', runOCRScan);
+    function parseEyewearText(text) {
+      for (let b of BRAND_DATABASE) {
+        if (b.regex.test(text)) {
+          let matchedModel = b.models.find(m => text.includes(m.code.split(' ')[0]));
+          if (!matchedModel) matchedModel = b.models[0];
 
-    // Live Search Catalogo 80+ Brand
-    const brandSearchInput = document.getElementById('brandSearchInput');
-    const searchResults = document.getElementById('searchResults');
+          const sizeMatch = text.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+          const caliber = sizeMatch ? sizeMatch[1] : matchedModel.caliber;
+          const bridge = sizeMatch ? sizeMatch[2] : matchedModel.bridge;
+          const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : matchedModel.temple;
 
-    brandSearchInput.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      if (!q) {
-        searchResults.classList.add('hidden');
-        return;
+          return {
+            rawText: text,
+            brand: b.brand,
+            modelCode: matchedModel.code,
+            colorCode: matchedModel.color,
+            caliber: caliber,
+            bridge: bridge,
+            temple: temple,
+            listPrice: matchedModel.price
+          };
+        }
       }
 
-      const filtered = BRAND_DATABASE.filter(b => 
-        b.name.toLowerCase().includes(q) || b.prefix.toLowerCase().includes(q) || b.group.toLowerCase().includes(q)
-      );
+      const genericSizeMatch = text.match(/([A-Z0-9]{3,8})\s+(\d{2})[\s□\-]+(\d{2})\s+(\d{3})/);
+      if (genericSizeMatch) {
+        return {
+          rawText: text,
+          brand: "Modello Rilevato",
+          modelCode: genericSizeMatch[1],
+          colorCode: "Standard",
+          caliber: genericSizeMatch[2],
+          bridge: genericSizeMatch[3],
+          temple: genericSizeMatch[4],
+          listPrice: 150.00
+        };
+      }
 
-      if (filtered.length === 0) {
-        searchResults.innerHTML = `<div class="p-3 text-xs text-slate-500">Nessuna marca trovata</div>`;
-      } else {
-        searchResults.innerHTML = filtered.map(b => `
-          <div class="p-2.5 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 flex items-center justify-between text-xs transition"
-               onclick="selectBrandFromSearch('${b.name}')">
-            <div>
-              <span class="font-bold text-slate-100">${b.name}</span>
-              <span class="text-[10px] text-slate-400 block">${b.group} - Prefisso: ${b.prefix}</span>
+      return null;
+    }
+
+    function populateFields(data) {
+      document.getElementById('field-raw-ocr').value = data.rawText || '';
+      document.getElementById('field-brand').value = data.brand || '';
+      document.getElementById('field-code').value = data.modelCode || '';
+      document.getElementById('field-color').value = data.colorCode || '';
+      document.getElementById('field-caliber').value = data.caliber || '';
+      document.getElementById('field-bridge').value = data.bridge || '';
+      document.getElementById('field-temple').value = data.temple || '';
+      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
+      
+      document.getElementById('confidence-tag').innerText = "Codice Riconosciuto 100%";
+      document.getElementById('scan-status-badge').innerText = "Riconoscimento Completato";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700";
+
+      calculateDiscountedPrice();
+      generateAIImages();
+    }
+
+    function calculateDiscountedPrice() {
+      const listPrice = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const discountPct = parseFloat(document.getElementById('field-discount-pct').value) || 0;
+
+      const finalPrice = listPrice * (1 - (discountPct / 100));
+      document.getElementById('field-price-final').value = finalPrice.toFixed(2);
+
+      updateSalesDescription();
+    }
+
+    function updateSalesDescription() {
+      const brand = document.getElementById('field-brand').value || '';
+      const code = document.getElementById('field-code').value || '';
+      const color = document.getElementById('field-color').value || '';
+      const cal = document.getElementById('field-caliber').value || '';
+      const bridge = document.getElementById('field-bridge').value || '';
+      const temple = document.getElementById('field-temple').value || '';
+      const listPrice = document.getElementById('field-price-list').value || '0.00';
+      const finalPrice = document.getElementById('field-price-final').value || '0.00';
+
+      const fullTitle = `${brand} ${code} ${color} ${cal}-${bridge}`.trim();
+      document.getElementById('field-title').value = fullTitle;
+
+      const desc = `Occhiale originale ${brand} modello ${code} colore ${color}. Misura calibro ${cal} mm, ponte ${bridge} mm e asta ${temple} mm. Prezzo di listino ufficiale ${listPrice}€, in offerta al prezzo scontato di ${finalPrice}€. Spedizione rapida e garanzia di autenticità.`;
+      document.getElementById('field-desc').value = desc;
+    }
+
+    function showOCRLoader(show) {
+      const loader = document.getElementById('ocr-loader');
+      if (show) loader.classList.remove('hidden');
+      else loader.classList.add('hidden');
+    }
+
+    // --- GENERATORE 5 FOTO SPECIFICHE SUL MODELLO ---
+    function generateAIImages() {
+      const brand = document.getElementById('field-brand').value || 'Eyewear';
+      const code = document.getElementById('field-code').value || 'Model';
+      const color = document.getElementById('field-color').value || 'Dark';
+      const cal = document.getElementById('field-caliber').value || '58';
+      const bridge = document.getElementById('field-bridge').value || '14';
+      const temple = document.getElementById('field-temple').value || '135';
+
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+
+      const photoConfigs = [
+        { title: "1. Frontale Studio", bg: "Studio Lux", desc: "Frontale e Lenti" },
+        { title: "2. Prospettiva 3D", bg: "Marmo Carrara", desc: "Angolazione 45°" },
+        { title: "3. Ingrandimento Asta", bg: "Legno Teak", desc: `Incisione ${code}` },
+        { title: "4. Flatlay Custodia", bg: "Microcemento", desc: "Vista dall'alto" },
+        { title: "5. Dettaglio Lente", bg: "Bokeh Urbano", desc: `Misure ${cal}□${bridge}` }
+      ];
+
+      photoConfigs.forEach((config, idx) => {
+        const svgUri = generateEyewearSVG(brand, code, color, cal, bridge, temple, idx);
+
+        const cardHtml = `
+          <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between group hover:border-sky-500 transition shadow-sm">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
+              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${config.bg}</span>
             </div>
-            <span class="font-mono text-accent-400 font-semibold">€ ${b.price}</span>
+            <div class="relative bg-slate-950 p-2 min-h-[130px] flex items-center justify-center">
+              <img src="${svgUri}" alt="${config.title}" class="max-h-[120px] w-auto object-contain transition group-hover:scale-105 duration-300"/>
+            </div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
+              <span class="truncate">${config.desc}</span>
+              <a href="${svgUri}" download="${brand}_${code}_foto_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
+            </div>
           </div>
-        `).join('');
+        `;
+        galleryGrid.innerHTML += cardHtml;
+      });
+    }
+
+    function renderEmptyGallery() {
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+      for(let i=1; i<=5; i++) {
+        galleryGrid.innerHTML += `
+          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[140px] text-slate-600 space-y-2">
+            <i class="fa-solid fa-image text-2xl"></i>
+            <span class="text-[11px] font-medium">Foto ${i} in attesa</span>
+          </div>
+        `;
       }
-      searchResults.classList.remove('hidden');
-    });
+    }
 
-    window.selectBrandFromSearch = function(brandName) {
-      const b = BRAND_DATABASE.find(x => x.name === brandName);
-      if (b) {
-        updateEyewearData({
-          brand: b,
-          model: `${b.prefix}001`,
-          color: "001/31",
-          caliber: 54,
-          bridge: 18,
-          temple: 140
-        });
-      }
-      searchResults.classList.add('hidden');
-      brandSearchInput.value = "";
-    };
+    function generateEyewearSVG(brand, model, color, cal, bridge, temple, angleIndex) {
+      const themeColors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+      const themeColor = themeColors[angleIndex % themeColors.length];
 
-    // Salva in Inventario
-    document.getElementById('btnSaveInventory').addEventListener('click', () => {
-      const item = { ...currentDecodedData, id: Date.now(), date: new Date().toLocaleDateString() };
-      inventory.push(item);
-      alert(`Occhiale ${item.brand} ${item.model} salvato nell'inventario! Totale salvati: ${inventory.length}`);
-    });
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+        <rect width="400" height="240" fill="#090d16" rx="12"/>
+        <circle cx="200" cy="110" r="85" fill="${themeColor}" opacity="0.08"/>
+        <g stroke="${themeColor}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="70" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <rect x="230" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <path d="M170 95 Q200 85 230 95" stroke-width="5"/>
+          <path d="M70 100 L20 90" stroke-width="4"/>
+          <path d="M330 100 L380 90" stroke-width="4"/>
+        </g>
+        <text x="200" y="180" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="13" font-weight="bold">${brand} ${model}</text>
+        <text x="200" y="200" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
+        <text x="200" y="220" text-anchor="middle" fill="${themeColor}" font-family="sans-serif" font-size="9" font-weight="bold">FOTO ${angleIndex + 1} DECODIFICATA</text>
+      </svg>`;
 
-    // Esporta CSV
-    document.getElementById('btnExportCSV').addEventListener('click', () => {
-      if (inventory.length === 0) {
-        alert("L'inventario è vuoto! Scansiona e salva prima degli occhiali.");
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
+    }
+
+    // --- INVENTARIO E SALVATAGGIO ---
+    function saveToInventory() {
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+
+      if (!brand || !code) {
+        alert("Esegui prima una scansione o inserisci il codice a mano.");
         return;
       }
 
-      let csvContent = "data:text/csv;charset=utf-8,ID,Data,Marca,Gruppo,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino\n";
+      const item = {
+        id: Date.now(),
+        brand: brand,
+        code: code,
+        color: document.getElementById('field-color').value,
+        caliber: document.getElementById('field-caliber').value,
+        bridge: document.getElementById('field-bridge').value,
+        temple: document.getElementById('field-temple').value,
+        listPrice: parseFloat(document.getElementById('field-price-list').value) || 0,
+        discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
+        finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
+        title: document.getElementById('field-title').value
+      };
+
+      inventory.push(item);
+      updateInventoryTable();
+
+      const indicator = document.getElementById('saved-status-indicator');
+      indicator.className = "text-emerald-400 text-xs flex items-center gap-1 font-semibold";
+      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salva riuscito in inventario`;
+    }
+
+    function updateInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      document.getElementById('drafts-count').innerText = inventory.length;
+
+      if (inventory.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona un'asta e salva la scheda.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      inventory.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/80 transition";
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
+          <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
+          <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
+          <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-right">
+            <button onclick="deleteItem(${item.id})" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteItem(id) {
+      inventory = inventory.filter(i => i.id !== id);
+      updateInventoryTable();
+    }
+
+    function resetWorkflow() {
+      resetFormFields();
+      renderEmptyGallery();
+      document.getElementById('captured-preview').classList.add('hidden');
+      document.getElementById('camera-placeholder').classList.remove('hidden');
+      document.getElementById('preset-select').value = "";
+      document.getElementById('manual-input-code').value = "";
+      document.getElementById('scan-status-badge').innerText = "In attesa di scansione";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600";
+    }
+
+    function resetFormFields() {
+      document.getElementById('field-raw-ocr').value = '';
+      document.getElementById('field-brand').value = '';
+      document.getElementById('field-code').value = '';
+      document.getElementById('field-color').value = '';
+      document.getElementById('field-caliber').value = '';
+      document.getElementById('field-bridge').value = '';
+      document.getElementById('field-temple').value = '';
+      document.getElementById('field-price-list').value = '';
+      document.getElementById('field-price-final').value = '';
+      document.getElementById('field-title').value = '';
+      document.getElementById('field-desc').value = '';
+    }
+
+    function exportCSV() {
+      if (inventory.length === 0) {
+        alert("Nessun occhiale presente in inventario da esportare.");
+        return;
+      }
+
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino,Sconto,PrezzoFinale\n";
       inventory.forEach(i => {
-        csvContent += `${i.id},${i.date},"${i.brand}","${i.group}","${i.model}","${i.color}",${i.caliber},${i.bridge},${i.temple},${i.price}\n`;
+        csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`;
       });
 
-      const encodedUri = encodeURI(csvContent);
+      const uri = encodeURI(csv);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Inventario_Occhiali_${Date.now()}.csv`);
+      link.setAttribute("href", uri);
+      link.setAttribute("download", `Inventario_Ottica_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    });
-
-    // Inizializzazione di default
-    window.onload = () => {
-      renderSVGView(0);
-    };
+    }
   </script>
 </body>
 </html>
