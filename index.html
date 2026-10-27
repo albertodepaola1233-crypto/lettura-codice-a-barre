@@ -1,991 +1,853 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full bg-slate-950 text-slate-100">
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlassesSpec OCR Pro - Temple Scanner & Studio Renders</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tesseract.js per OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v5/dist/tesseract.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="OtticaCatalog OCR Pro"/>
+  <title>OtticaCatalog OCR Pro - Decodifica Aste & Stima Prezzi</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#1e1b4b',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .scan-overlay {
-            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.78);
-        }
-        .scan-line {
-            animation: scanAnim 2.5s infinite linear;
-        }
-        @keyframes scanAnim {
-            0% { top: 5%; opacity: 0.3; }
-            50% { top: 90%; opacity: 1; }
-            100% { top: 5%; opacity: 0.3; }
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 9999px;
-        }
-    </style>
+  <!-- Tesseract OCR Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: #0284c7;
+      box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8;
+      animation: scan 2s infinite ease-in-out;
+    }
+    @keyframes scan {
+      0% { top: 10%; }
+      50% { top: 90%; }
+      100% { top: 10%; }
+    }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
 
-    <!-- Header Navbar -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 py-3.5 px-4 sm:px-6">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-sky-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 ring-1 ring-white/20">
-                    <i class="fa-solid fa-glasses text-white text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg tracking-tight text-white flex items-center gap-2">
-                        OptiArm <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Studio & OCR v2.5</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Scanner Asta Occhiali & Generatore Foto Prodotto 3D/SVG</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-2">
-                <span id="cameraStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                    <span class="w-2 h-2 rounded-full bg-slate-500"></span> Fotocamera Inattiva
-                </span>
-                <button onclick="exportCSV()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium px-3.5 py-2 rounded-xl transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-file-csv text-emerald-400 text-sm"></i>
-                    <span class="hidden sm:inline">Esporta CSV</span>
-                </button>
-            </div>
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl text-slate-950 shadow-md">
+          <i class="fa-solid fa-glasses text-xl"></i>
         </div>
-    </header>
-
-    <!-- Main Grid Layout -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <!-- LEFT COLUMN: WEBCAM & RAW DATA (5 cols) -->
-        <section class="lg:col-span-5 flex flex-col space-y-5">
-            
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-                        <i class="fa-solid fa-camera"></i> Scansione Asta Live
-                    </h2>
-                    <select id="cameraSelect" onchange="switchCamera()" class="bg-slate-950 border border-slate-700 text-slate-300 text-xs rounded-lg px-2.5 py-1 focus:ring-1 focus:ring-indigo-500 outline-none max-w-[170px] truncate">
-                        <option value="">Seleziona Fotocamera...</option>
-                    </select>
-                </div>
-
-                <!-- Live Stream Video / Canvas Area -->
-                <div class="relative bg-black rounded-xl overflow-hidden aspect-[4/3] sm:aspect-video flex items-center justify-center border border-slate-800 shadow-inner group">
-                    <video id="webcamVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                    <canvas id="snapshotCanvas" class="hidden"></canvas>
-
-                    <!-- Camera Off Placeholder -->
-                    <div id="camPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-950/95 text-slate-400 z-10">
-                        <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-3 text-indigo-400 shadow-lg">
-                            <i class="fa-solid fa-video-slash text-2xl"></i>
-                        </div>
-                        <p class="text-sm font-medium text-slate-200">Fotocamera disattivata</p>
-                        <p class="text-xs text-slate-400 mt-1 max-w-xs">Premi "Avvia Fotocamera" per inquadrare il codice inciso sull'asta dell'occhiale.</p>
-                    </div>
-
-                    <!-- Alignment Frame Guide -->
-                    <div id="scanGuide" class="hidden absolute inset-0 pointer-events-none z-20 flex items-center justify-center p-6">
-                        <div class="w-full h-24 border-2 border-indigo-400/80 rounded-lg scan-overlay relative flex items-center justify-center">
-                            <div class="absolute inset-x-0 h-0.5 bg-indigo-500 scan-line shadow-[0_0_10px_#6366f1]"></div>
-                            <span class="text-[10px] font-mono tracking-widest uppercase bg-indigo-950/90 text-indigo-300 px-3 py-1 rounded-md border border-indigo-500/40 shadow">Inquadra incisione asta qui</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Camera Control Buttons -->
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <button id="startCamBtn" onclick="toggleWebcam()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
-                        <i class="fa-solid fa-power-off"></i>
-                        <span id="camBtnText">Avvia Fotocamera</span>
-                    </button>
-                    <button id="captureBtn" onclick="captureAndOCR()" disabled class="w-full bg-slate-800 text-slate-500 font-semibold py-2.5 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-700 cursor-not-allowed">
-                        <i class="fa-solid fa-bolt text-amber-400"></i>
-                        <span>Scatta & Analizza</span>
-                    </button>
-                </div>
-
-                <!-- File Upload Fallback -->
-                <div class="mt-4 pt-4 border-t border-slate-800">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Alternativa: Carica Foto da Galleria</label>
-                    <input type="file" id="imageInput" accept="image/*" onchange="handleFileUpload(event)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-indigo-400 hover:file:bg-slate-700 cursor-pointer border border-slate-800 rounded-xl bg-slate-950 p-1"/>
-                </div>
-
-                <!-- OCR Loader Bar -->
-                <div id="ocrLoader" class="hidden mt-4 p-3.5 bg-indigo-950/60 border border-indigo-500/30 rounded-xl flex items-center gap-3">
-                    <div class="w-5 h-5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-                    <div class="flex-1">
-                        <div class="text-xs font-semibold text-indigo-200" id="ocrStatusText">Riconoscimento OCR in corso...</div>
-                        <div class="w-full bg-slate-800 rounded-full h-1.5 mt-1.5 overflow-hidden">
-                            <div id="ocrProgressBar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300 w-0"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Raw Text Input Output -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
-                    <span>Testo Grezzo Letto (OCR Raw)</span>
-                    <button onclick="reparseText()" class="text-[11px] text-indigo-400 hover:underline flex items-center gap-1">
-                        <i class="fa-solid fa-rotate-right"></i> Rielabora
-                    </button>
-                </label>
-                <textarea id="rawOcrOutput" rows="3" oninput="liveParse()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Il testo letto dall'asta comparirà qui..."></textarea>
-            </div>
-
-        </section>
-
-
-        <!-- RIGHT COLUMN: EXTRACTED SPECS, PRICING & 5 PHOTO GENERATOR (7 cols) -->
-        <section class="lg:col-span-7 flex flex-col space-y-6">
-
-            <!-- Decoded Specs Form -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl relative">
-                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
-                    <div>
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-indigo-400"></i> Scheda Tecnica Modello
-                        </h2>
-                        <p class="text-xs text-slate-400">Modifica o conferma i dati scansionati per aggiornare foto e stime</p>
-                    </div>
-                    <button onclick="clearForm()" class="text-xs text-slate-400 hover:text-slate-200 transition bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                        <i class="fa-solid fa-eraser"></i> Pulisci
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Brand / Marca</label>
-                        <div class="relative">
-                            <input type="text" id="specBrand" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-semibold focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="Es. Ray-Ban">
-                            <div id="brandBadge" class="absolute right-2 top-2.5 w-2 h-2 rounded-full bg-slate-600"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Codice Modello</label>
-                        <input type="text" id="specModel" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-indigo-300 font-semibold focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="Es. RB3025">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Codice Colore</label>
-                        <input type="text" id="specColor" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-slate-300 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="Es. 001/58">
-                    </div>
-                </div>
-
-                <!-- Dimensions & Frame Style Selector -->
-                <div class="mt-4 pt-4 border-t border-slate-800/60 grid grid-cols-2 sm:grid-cols-5 gap-3">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 mb-1">Stile Telaio</label>
-                        <select id="specStyle" onchange="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs text-indigo-300 font-semibold outline-none">
-                            <option value="aviator">Aviator</option>
-                            <option value="wayfarer">Wayfarer</option>
-                            <option value="round">Tondo / Round</option>
-                            <option value="clubmaster">Clubmaster</option>
-                            <option value="square">Squadrato</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 mb-1">Lente (mm)</label>
-                        <input type="text" id="specLens" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-center font-mono font-bold text-emerald-400 outline-none" placeholder="58">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 mb-1">Ponte (mm)</label>
-                        <input type="text" id="specBridge" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-center font-mono text-slate-200 outline-none" placeholder="14">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 mb-1">Asta (mm)</label>
-                        <input type="text" id="specTemple" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-center font-mono text-slate-200 outline-none" placeholder="135">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label class="block text-[10px] text-slate-400 mb-1">Filtro / UV</label>
-                        <input type="text" id="specFilter" oninput="updatePricingAndGeneratePhotos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-center font-semibold text-indigo-300 outline-none" placeholder="3N">
-                    </div>
-                </div>
-            </div>
-
-            <!-- GENERATORE 5 FOTO PRODOTTO (ESCLUSIVAMENTE SUL MODELLO) -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-camera-retro text-emerald-400"></i> Render Foto Prodotto (Max 5 Foto Specifiche)
-                        </h3>
-                        <p class="text-xs text-slate-400">Generati in tempo reale con incisioni reali del modello letto</p>
-                    </div>
-                    <button onclick="generatePhotos()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow">
-                        <i class="fa-solid fa-arrows-rotate"></i> Rigenera Foto
-                    </button>
-                </div>
-
-                <!-- Horizontal Scrollable Gallery of 5 Photos -->
-                <div id="photosGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                    <!-- 5 Photo Slots populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Stima Economica e Prezzo -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 mb-4 flex items-center justify-between">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-tag"></i> Stima Valore & Listino</span>
-                    <span id="priceTierBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Standard Tier</span>
-                </h3>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-                        <span class="block text-[10px] text-slate-400 uppercase font-semibold">Listino Ufficiale (MSRP)</span>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-white">€</span>
-                            <input type="number" id="msrpPrice" oninput="recalculateDiscount()" class="w-full bg-transparent text-xl font-extrabold text-white outline-none" placeholder="0">
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-                        <span class="block text-[10px] text-slate-400 uppercase font-semibold">Sconto Applicato</span>
-                        <div class="flex items-center gap-1 mt-1">
-                            <input type="number" id="discountPercent" value="20" min="0" max="100" oninput="recalculateDiscount()" class="w-full bg-transparent text-xl font-extrabold text-amber-400 outline-none" placeholder="0">
-                            <span class="text-lg font-bold text-amber-400">%</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-indigo-950/80 to-slate-950 p-3.5 rounded-xl border border-indigo-500/30">
-                        <span class="block text-[10px] text-indigo-300 uppercase font-semibold">Prezzo Finale Stimato</span>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-emerald-400">€</span>
-                            <span id="finalPriceDisplay" class="text-2xl font-black text-emerald-400">0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- E-Commerce Copy & Save Actions -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Titolo Annuncio E-Commerce</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="generatedTitle" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold text-indigo-200 outline-none">
-                        <button onclick="copyToClipboard('generatedTitle')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 rounded-xl transition flex items-center gap-1 shrink-0 font-medium">
-                            <i class="fa-solid fa-copy"></i> Copia
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Descrizione Dettagliata Prodotto</label>
-                    <div class="relative">
-                        <textarea id="generatedDesc" rows="3" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 outline-none resize-none font-sans"></textarea>
-                        <button onclick="copyToClipboard('generatedDesc')" class="absolute right-2 bottom-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                            <i class="fa-solid fa-copy"></i> Copia
-                        </button>
-                    </div>
-                </div>
-
-                <div class="pt-2 flex justify-end">
-                    <button onclick="saveToInventory()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl transition shadow-lg shadow-emerald-600/20 text-xs sm:text-sm flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-box-archive"></i> Salva Occhiale in Inventario
-                    </button>
-                </div>
-            </div>
-
-        </section>
-
-
-        <!-- BOTTOM SECTION: INVENTORY TABLE (12 cols) -->
-        <section class="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl mt-2">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
-                <div>
-                    <h3 class="text-base font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Inventario Occhiali Scansionati
-                    </h3>
-                    <p class="text-xs text-slate-400">Archivio storico delle scansioni e dei prezzi salvati nel browser</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearInventory()" class="text-xs text-rose-400 hover:text-rose-300 bg-rose-950/40 border border-rose-800/50 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-trash"></i> Svuota Registro
-                    </button>
-                    <button onclick="exportCSV()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
-                        <i class="fa-solid fa-download"></i> Scarica CSV
-                    </button>
-                </div>
-            </div>
-
-            <!-- Inventory Table -->
-            <div class="overflow-x-auto mt-4 custom-scrollbar">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
-                            <th class="p-3">Data</th>
-                            <th class="p-3">Marca</th>
-                            <th class="p-3">Modello</th>
-                            <th class="p-3">Colore</th>
-                            <th class="p-3">Stile</th>
-                            <th class="p-3">Misure (L-P-A)</th>
-                            <th class="p-3">UV</th>
-                            <th class="p-3">MSRP</th>
-                            <th class="p-3">Prezzo Finale</th>
-                            <th class="p-3 text-right">Azione</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60 text-slate-300">
-                        <!-- Popolated dynamically -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Photo Lightbox Modal -->
-    <div id="photoModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-5 relative flex flex-col items-center">
-            <button onclick="closeModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h4 id="modalTitle" class="text-sm font-bold text-white mb-3">Anteprima Foto Prodotto</h4>
-            <div id="modalImageContainer" class="w-full aspect-video bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-4 border border-slate-800">
-                <!-- SVG rendered here -->
-            </div>
-            <div class="flex justify-between w-full mt-4">
-                <span id="modalCaption" class="text-xs text-slate-400"></span>
-                <button id="modalDownloadBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-xl transition flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Scarica Immagine SVG
-                </button>
-            </div>
+        <div>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog OCR Pro</h1>
+          <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Decodifica Aste, Stima Listino & Foto Modello
+          </p>
         </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition active:scale-95">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Nuovo Occhiale</span>
+        </button>
+        <a href="#inventory-section" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium px-3 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Inventario (<span id="drafts-count" class="font-bold text-sky-400">0</span>)</span>
+        </a>
+      </div>
     </div>
+  </header>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs flex items-center gap-3">
-        <div id="toastIcon" class="text-emerald-400 text-base"><i class="fa-solid fa-circle-check"></i></div>
-        <span id="toastMsg" class="font-medium">Notifica</span>
-    </div>
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- SCRIPT LOGIC -->
-    <script>
-        const BRAND_DATABASE = {
-            'RAY-BAN': { msrp: 165, tier: 'Premium Iconic', style: 'aviator', aliases: ['RAYBAN', 'RAY BAN', 'RB'] },
-            'PERSOL': { msrp: 240, tier: 'Luxury Italian', style: 'wayfarer', aliases: ['PO'] },
-            'GUCCI': { msrp: 320, tier: 'High Fashion', style: 'square', aliases: ['GG'] },
-            'OAKLEY': { msrp: 180, tier: 'Sport Performance', style: 'square', aliases: ['OO'] },
-            'PRADA': { msrp: 290, tier: 'High Fashion', style: 'clubmaster', aliases: ['SPR', 'PR'] },
-            'TOM FORD': { msrp: 340, tier: 'Luxury Fashion', style: 'wayfarer', aliases: ['TF'] },
-            'CARRERA': { msrp: 120, tier: 'Sport Lifestyle', style: 'aviator', aliases: ['CAR'] },
-            'EMPORIO ARMANI': { msrp: 150, tier: 'Premium Fashion', style: 'round', aliases: ['EA'] },
-            'DOLCE & GABBANA': { msrp: 260, tier: 'High Fashion', style: 'wayfarer', aliases: ['DG'] },
-            'VERSACE': { msrp: 270, tier: 'High Fashion', style: 'square', aliases: ['VE'] }
+    <!-- LEFT COLUMN: SCANNER & EXAMPLES -->
+    <section class="lg:col-span-5 space-y-6">
+      
+      <!-- OCR CAMERA CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-eye text-sky-400"></i> Scanner Asta / Ponte
+          </h2>
+          <span class="text-[10px] uppercase font-bold bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded flex items-center gap-1">
+            <i class="fa-solid fa-microchip"></i> OCR Engine Active
+          </span>
+        </div>
+
+        <!-- CAMERA / PREVIEW DISPLAY -->
+        <div id="camera-container" class="relative bg-slate-950 rounded-xl border border-slate-700 overflow-hidden min-h-[260px] flex flex-col items-center justify-center p-2 text-center">
+          
+          <video id="webcam-video" autoplay playsinline muted class="w-full h-auto max-h-[280px] object-cover rounded hidden"></video>
+          <canvas id="snapshot-canvas" class="hidden"></canvas>
+          <img id="captured-preview" class="w-full h-auto max-h-[280px] object-contain rounded hidden" alt="Foto asta scansionata"/>
+
+          <div id="scanner-line-overlay" class="hidden absolute inset-0 pointer-events-none">
+            <div class="scanner-line"></div>
+          </div>
+
+          <!-- PLACEHOLDER INSTRUCTION -->
+          <div id="camera-placeholder" class="p-6 text-slate-400 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center mx-auto text-sky-400 shadow-inner">
+              <i class="fa-solid fa-camera text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-200">Inquadra l'incisione sull'asta o ponte</p>
+              <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                Riconoscimento automatico marchi (es. <span class="font-mono text-sky-300">RB3025</span>, <span class="font-mono text-sky-300">PO0649</span>, <span class="font-mono text-sky-300">GG0061S</span>).
+              </p>
+            </div>
+          </div>
+
+          <!-- OCR SCANNING OVERLAY ANIMATION -->
+          <div id="ocr-loader" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center hidden z-20">
+            <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p class="text-sm font-bold text-sky-300">Analisi Alfanumerica Asta in Corso...</p>
+            <p class="text-[11px] text-slate-400 mt-1">Verifica corrispondenza marchi & estrazione specifiche</p>
+          </div>
+        </div>
+
+        <!-- CAMERA CONTROLS -->
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 border border-slate-600">
+            <i class="fa-solid fa-camera"></i> <span id="cam-btn-text">Avvia Fotocamera</span>
+          </button>
+          <button id="btn-snap" onclick="captureAndAnalyze()" disabled class="bg-sky-600 hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
+            <i class="fa-solid fa-bolt"></i> Scatta & Leggi
+          </button>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-700"></div>
+          <span class="flex-shrink mx-2 text-[10px] text-slate-500 uppercase font-semibold tracking-wider">Oppure Carica Foto</span>
+          <div class="flex-grow border-t border-slate-700"></div>
+        </div>
+
+        <label class="w-full bg-slate-900 hover:bg-slate-700 border border-dashed border-slate-600 text-slate-300 text-xs py-2.5 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-upload text-sky-400"></i>
+          <span>Carica Foto Asta (Galleria / PC)</span>
+          <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event)"/>
+        </label>
+      </div>
+
+      <!-- PRESET SELECTOR BY BRAND -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
+        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-sky-400"></i> Seleziona Esempio per Marca
+        </h3>
+        <p class="text-[11px] text-slate-400">Scegli un codice reale dai marchi integrati per testare la compilazione automatica:</p>
+        
+        <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+          <option value="">-- Seleziona un codice reale di un marchio --</option>
+        </select>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: EXTRACTED EYEWEAR DATA, PRICE & PHOTOS -->
+    <section class="lg:col-span-7 space-y-6">
+
+      <!-- PRODUCT DATA FORM CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Valutazione Listino
+          </h2>
+          <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+            In attesa di scansione
+          </span>
+        </div>
+
+        <!-- RAW OCR TEXT EXTRACTED -->
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Testo Rilevato dall'Asta (Raw OCR)</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">Convalida Codice: --</span>
+          </div>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessuna scansione valida effettuata" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
+        </div>
+
+        <!-- ROW 1: BRAND, MODEL CODE, COLOR CODE -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand</label>
+            <input type="text" id="field-brand" placeholder="Es. Ray-Ban" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Modello</label>
+            <input type="text" id="field-code" placeholder="Es. RB3025" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Colore / Lenti</label>
+            <input type="text" id="field-color" placeholder="Es. L0205" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+          </div>
+        </div>
+
+        <!-- ROW 2: SIZES (CALIBER, BRIDGE, TEMPLE) -->
+        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Occhiale (in mm)</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Calibro (Lente)</label>
+              <input type="text" id="field-caliber" placeholder="Es. 58" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Ponte</label>
+              <input type="text" id="field-bridge" placeholder="Es. 14" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Asta</label>
+              <input type="text" id="field-temple" placeholder="Es. 135" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription()"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: PRICE CALCULATION & DISCOUNT SECTION -->
+        <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-tag"></i> Listino Ufficiale & Calcolatore Sconto
+            </h3>
+            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded">
+              Stima Retail Market
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino Stimato (€)</label>
+              <div class="relative">
+                <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" oninput="calculateDiscountedPrice()"/>
+                <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto Applicato (%)</label>
+              <div class="relative">
+                <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-7 py-2 text-sm text-white font-bold focus:outline-none focus:border-sky-500" oninput="calculateDiscountedPrice()"/>
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale Scontato (€)</label>
+              <div class="relative">
+                <input type="number" id="field-price-final" placeholder="0.00" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg pl-7 pr-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
+                <span class="absolute left-2.5 top-2.5 text-sm text-emerald-400 font-bold">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 4: TITLE & DESCRIPTION -->
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Prodotto E-Commerce</label>
+          <input type="text" id="field-title" placeholder="Es. Ray-Ban Aviator Classic RB3025 L0205 58-14" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+        </div>
+
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione di Vendita E-Commerce</label>
+          <textarea id="field-desc" rows="3" placeholder="La descrizione professionale per la vendita verrà generata automaticamente..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <div class="pt-2 flex justify-between items-center border-t border-slate-700">
+          <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
+            <i class="fa-solid fa-circle-info text-[10px]"></i> In attesa di compilazione
+          </span>
+          <button onclick="saveToInventory()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
+            <i class="fa-solid fa-floppy-disk"></i> Salva in Inventario
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 5 GENERATED PHOTOS SECTION -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-images text-sky-400"></i> Galleria 5 Foto Modello
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">5 Angolazioni basate sulle specifiche reali dell'occhiale</p>
+          </div>
+          <span class="text-xs font-bold text-sky-400 bg-sky-950 border border-sky-800 px-2.5 py-1 rounded-full">
+            5/5 Foto
+          </span>
+        </div>
+
+        <!-- 5 PHOTO GRID CONTAINER -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <!-- Popolato dinamicamente -->
+        </div>
+      </div>
+
+      <!-- INVENTORY TABLE SECTION -->
+      <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Occhiali Scansionati
+          </h2>
+          <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta Excel / CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
+                <th class="p-2.5">Marca e Modello</th>
+                <th class="p-2.5">Misure</th>
+                <th class="p-2.5">Listino</th>
+                <th class="p-2.5">Sconto</th>
+                <th class="p-2.5">Prezzo Finale</th>
+                <th class="p-2.5 text-right">Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
+              <tr>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona un'asta e salva la scheda.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // --- DATABASE DEI MARCHI PRINCIPALI CON PREZZI E SINTASSI ---
+    const BRAND_DATABASE = [
+      {
+        brand: "Ray-Ban",
+        regex: /(RB\s*\d{4}[A-Z]?|WAYFARER|AVIATOR|CLUBMASTER|JUSTIN|ERIKA)/i,
+        models: [
+          { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 },
+          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 },
+          { code: "RB3138 001", color: "Gold / Verde Shooter", caliber: "62", bridge: "09", temple: "140", price: 180.00 }
+        ]
+      },
+      {
+        brand: "Persol",
+        regex: /(PO\s*\d{4}[A-Z]?|PERSOL)/i,
+        models: [
+          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 },
+          { code: "PO0714 95/31", color: "Nero Pieghevole / Cristallo Verde", caliber: "54", bridge: "21", temple: "140", price: 290.00 },
+          { code: "PO3019S 95/58", color: "Nero / Lenti Polarizzate", caliber: "52", bridge: "18", temple: "145", price: 275.00 }
+        ]
+      },
+      {
+        brand: "Gucci",
+        regex: /(GG\s*\d{4}[A-Z]?|GUCCI)/i,
+        models: [
+          { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 },
+          { code: "GG0876S 002", color: "Havana Tartarugato / Marrone", caliber: "55", bridge: "19", temple: "145", price: 350.00 }
+        ]
+      },
+      {
+        brand: "Oakley",
+        regex: /(OO\s*\d{4}|HOLBROOK|FROGSKINS|RADAR|JAWBREAKER)/i,
+        models: [
+          { code: "OO9102-01 Holbrook", color: "Matte Black / Prizm Sapphire", caliber: "55", bridge: "18", temple: "137", price: 147.00 },
+          { code: "OO9013 Frogskins", color: "Polished Black / Prizm Black", caliber: "54", bridge: "17", temple: "138", price: 132.00 }
+        ]
+      },
+      {
+        brand: "Prada",
+        regex: /(PR\s*\d{2}[A-Z]{2,4}|PRADA)/i,
+        models: [
+          { code: "PR 17WS 1AB5S0", color: "Nero / Grigio Scuro Symbole", caliber: "49", bridge: "20", temple: "145", price: 390.00 },
+          { code: "PR 01OS 1AB3M1", color: "Nero Gloss / Grigio Sfumato", caliber: "55", bridge: "17", temple: "140", price: 310.00 }
+        ]
+      },
+      {
+        brand: "Tom Ford",
+        regex: /(FT\s*\d{4}|TF\s*\d{4}|TOM\s*FORD)/i,
+        models: [
+          { code: "FT0237 Snowdon", color: "Shiny Black / Marrone Sfumato", caliber: "50", bridge: "21", temple: "145", price: 340.00 },
+          { code: "FT0805K 01A", color: "Nero Lucido / Grigio UV", caliber: "56", bridge: "18", temple: "145", price: 360.00 }
+        ]
+      },
+      {
+        brand: "Carrera",
+        regex: /(CARRERA|\bFLAG\b)/i,
+        models: [
+          { code: "CARRERA 1001/S", color: "Nero Bianco / Lenti Rosse", caliber: "62", bridge: "11", temple: "130", price: 140.00 },
+          { code: "CARRERA 270/S", color: "Havana Matte / Brown Gradient", caliber: "57", bridge: "16", temple: "145", price: 125.00 }
+        ]
+      },
+      {
+        brand: "Saint Laurent",
+        regex: /(SL\s*\d{3}|SAINT\s*LAURENT)/i,
+        models: [
+          { code: "SL 276 MICA 001", color: "Nero Cat-Eye / Grigio Scuro", caliber: "53", bridge: "16", temple: "145", price: 320.00 }
+        ]
+      },
+      {
+        brand: "Versace",
+        regex: /(VE\s*\d{4}|VERSACE)/i,
+        models: [
+          { code: "VE2150Q 100287", color: "Oro / Lenti Grigio Scuro Medusa", caliber: "62", bridge: "14", temple: "140", price: 270.00 }
+        ]
+      },
+      {
+        brand: "Moscot",
+        regex: /(LEMTOSH|MILTZEN|MOSCOT)/i,
+        models: [
+          { code: "LEMTOSH Black", color: "Nero Acetato / Lenti Trasparenti", caliber: "46", bridge: "24", temple: "145", price: 320.00 }
+        ]
+      }
+    ];
+
+    // Global State
+    let webcamStream = null;
+    let isWebcamActive = false;
+    let inventory = [];
+
+    window.onload = function() {
+      populatePresetDropdown();
+      renderEmptyGallery();
+      updateInventoryTable();
+    };
+
+    // --- POPOLA IL MENU DROP DOWN CON GLI ESEMPI DELLE MARCHE ---
+    function populatePresetDropdown() {
+      const select = document.getElementById('preset-select');
+      BRAND_DATABASE.forEach((b) => {
+        const group = document.createElement('optgroup');
+        group.label = b.brand;
+        b.models.forEach((m) => {
+          const opt = document.createElement('option');
+          opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
+          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge} ${m.temple}mm) - ~${m.price}€`;
+          group.appendChild(opt);
+        });
+        select.appendChild(group);
+      });
+    }
+
+    function loadSelectedPreset() {
+      const val = document.getElementById('preset-select').value;
+      if (!val) return;
+
+      const [brand, code, color, cal, bridge, temple, price] = val.split('|');
+      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple} 3N MADE IN ITALY`;
+
+      populateFields({
+        rawText: rawText,
+        brand: brand,
+        modelCode: code,
+        colorCode: color,
+        caliber: cal,
+        bridge: bridge,
+        temple: temple,
+        listPrice: parseFloat(price)
+      });
+    }
+
+    // --- FOTOCAMERA CONTROLS ---
+    async function toggleWebcam() {
+      const video = document.getElementById('webcam-video');
+      const placeholder = document.getElementById('camera-placeholder');
+      const btnText = document.getElementById('cam-btn-text');
+      const btnSnap = document.getElementById('btn-snap');
+      const capturedImg = document.getElementById('captured-preview');
+      const scannerOverlay = document.getElementById('scanner-line-overlay');
+
+      if (isWebcamActive) {
+        if (webcamStream) webcamStream.getTracks().forEach(t => t.stop());
+        video.classList.add('hidden');
+        scannerOverlay.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        btnText.innerText = "Avvia Fotocamera";
+        btnSnap.disabled = true;
+        isWebcamActive = false;
+      } else {
+        try {
+          webcamStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+          });
+          video.srcObject = webcamStream;
+          video.classList.remove('hidden');
+          scannerOverlay.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          capturedImg.classList.add('hidden');
+          btnText.innerText = "Ferma Cam";
+          btnSnap.disabled = false;
+          isWebcamActive = true;
+        } catch (err) {
+          alert("Impossibile accedere alla fotocamera. Assicurati di aver concesso i permessi nel browser o carica la foto.");
+        }
+      }
+    }
+
+    function captureAndAnalyze() {
+      if (!isWebcamActive) return;
+
+      const video = document.getElementById('webcam-video');
+      const canvas = document.getElementById('snapshot-canvas');
+      const capturedImg = document.getElementById('captured-preview');
+      
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      capturedImg.src = dataUrl;
+      capturedImg.classList.remove('hidden');
+      video.classList.add('hidden');
+
+      toggleWebcam();
+      processOCR(dataUrl);
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const dataUrl = evt.target.result;
+        document.getElementById('captured-preview').src = dataUrl;
+        document.getElementById('captured-preview').classList.remove('hidden');
+        document.getElementById('camera-placeholder').classList.add('hidden');
+        document.getElementById('webcam-video').classList.add('hidden');
+
+        processOCR(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // --- MOTORE OCR CON VALIDAZIONE RIGOROSA SUI MARCHI ---
+    async function processOCR(base64Image) {
+      showOCRLoader(true);
+
+      try {
+        const worker = await Tesseract.createWorker('eng');
+        const ret = await worker.recognize(base64Image);
+        await worker.terminate();
+
+        const rawText = ret.data.text.replace(/\n/g, ' ').toUpperCase();
+        
+        // Tenta di abbinare il testo scansionato con un marchio conosciuto
+        const matchedData = parseEyewearText(rawText);
+
+        if (matchedData) {
+          populateFields(matchedData);
+        } else {
+          // Se NON viene trovato un codice o modello conforme, NON popola nulla!
+          alert("Nessuna sigla conforme o marchio riconosciuto sull'asta. Inquadra da vicino le scritte incise o usa il menu a tendina.");
+          resetFormFields();
+          document.getElementById('confidence-tag').innerText = "Nessuna corrispondenza trovata";
+          document.getElementById('scan-status-badge').innerText = "Codice non rilevato";
+          document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800";
+        }
+      } catch (err) {
+        alert("Errore durante la lettura visiva. Assicurati che l'immagine sia ben illuminata e a fuoco.");
+      } finally {
+        showOCRLoader(false);
+      }
+    }
+
+    // Motore di parsing rigido basato sul database dei marchi
+    function parseEyewearText(text) {
+      for (let b of BRAND_DATABASE) {
+        if (b.regex.test(text)) {
+          // Marca riconosciuta nel testo! Cerca se c'è un modello specifico del brand
+          let matchedModel = b.models.find(m => text.includes(m.code.split(' ')[0]));
+          if (!matchedModel) matchedModel = b.models[0]; // Modello di riferimento per il brand
+
+          // Estrazione dinamica calibro/ponte se presente nel testo scansionato (es. 58□14 o 58-14)
+          const sizeMatch = text.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+          const caliber = sizeMatch ? sizeMatch[1] : matchedModel.caliber;
+          const bridge = sizeMatch ? sizeMatch[2] : matchedModel.bridge;
+          const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : matchedModel.temple;
+
+          return {
+            rawText: text,
+            brand: b.brand,
+            modelCode: matchedModel.code,
+            colorCode: matchedModel.color,
+            caliber: caliber,
+            bridge: bridge,
+            temple: temple,
+            listPrice: matchedModel.price
+          };
+        }
+      }
+
+      // Se il testo scansionato ha comunque una struttura calibro/ponte valida (es. 52□18 140)
+      const genericSizeMatch = text.match(/([A-Z0-9]{3,8})\s+(\d{2})[\s□\-]+(\d{2})\s+(\d{3})/);
+      if (genericSizeMatch) {
+        return {
+          rawText: text,
+          brand: "Brand Rilevato",
+          modelCode: genericSizeMatch[1],
+          colorCode: "Standard",
+          caliber: genericSizeMatch[2],
+          bridge: genericSizeMatch[3],
+          temple: genericSizeMatch[4],
+          listPrice: 150.00
         };
-
-        let activeStream = null;
-        let generatedSVGList = [];
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toastMsg');
-            const iconEl = document.getElementById('toastIcon');
-
-            msgEl.textContent = msg;
-            iconEl.innerHTML = isError 
-                ? '<i class="fa-solid fa-circle-exclamation text-rose-400"></i>' 
-                : '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // --- 1. FOTOCAMERA LOGIC ---
-        async function initCameraDevices() {
-            try {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(d => d.kind === 'videoinput');
-                
-                const select = document.getElementById('cameraSelect');
-                select.innerHTML = '<option value="">Seleziona Fotocamera...</option>';
-                
-                videoDevices.forEach((device, idx) => {
-                    const opt = document.createElement('option');
-                    opt.value = device.deviceId;
-                    opt.textContent = device.label || `Fotocamera ${idx + 1}`;
-                    select.appendChild(opt);
-                });
-            } catch (err) {
-                console.warn("Dispositivi video non elencabili:", err);
-            }
-        }
-
-        async function toggleWebcam() {
-            if (activeStream) stopWebcam();
-            else await startWebcam();
-        }
-
-        async function startWebcam(deviceId = null) {
-            const video = document.getElementById('webcamVideo');
-            const placeholder = document.getElementById('camPlaceholder');
-            const guide = document.getElementById('scanGuide');
-            const btnText = document.getElementById('camBtnText');
-            const captureBtn = document.getElementById('captureBtn');
-            const badge = document.getElementById('cameraStatusBadge');
-
-            try {
-                if (activeStream) stopWebcam();
-
-                let videoConstraints = { facingMode: { ideal: 'environment' } };
-                if (deviceId) videoConstraints = { deviceId: { exact: deviceId } };
-
-                activeStream = await navigator.mediaDevices.getUserMedia({
-                    video: videoConstraints,
-                    audio: false
-                });
-
-                video.srcObject = activeStream;
-                await video.play();
-
-                placeholder.classList.add('hidden');
-                guide.classList.remove('hidden');
-                btnText.textContent = "Fermate Fotocamera";
-                
-                captureBtn.disabled = false;
-                captureBtn.className = "w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer";
-
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Stream Active`;
-                badge.className = "hidden sm:inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800";
-
-                await initCameraDevices();
-                showToast("Fotocamera avviata!");
-            } catch (err) {
-                console.error("Errore Fotocamera:", err);
-                showToast("Impossibile accedere alla fotocamera.", true);
-                stopWebcam();
-            }
-        }
-
-        function stopWebcam() {
-            if (activeStream) {
-                activeStream.getTracks().forEach(track => track.stop());
-                activeStream = null;
-            }
-            const video = document.getElementById('webcamVideo');
-            video.srcObject = null;
-
-            document.getElementById('camPlaceholder').classList.remove('hidden');
-            document.getElementById('scanGuide').classList.add('hidden');
-            document.getElementById('camBtnText').textContent = "Avvia Fotocamera";
-            
-            const captureBtn = document.getElementById('captureBtn');
-            captureBtn.disabled = true;
-            captureBtn.className = "w-full bg-slate-800 text-slate-500 font-semibold py-2.5 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-700 cursor-not-allowed";
-
-            const badge = document.getElementById('cameraStatusBadge');
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500"></span> Fotocamera Inattiva`;
-            badge.className = "hidden sm:inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700";
-        }
-
-        async function switchCamera() {
-            const select = document.getElementById('cameraSelect');
-            if (select.value) await startWebcam(select.value);
-        }
-
-        // --- 2. OCR SCANNING ---
-        function captureAndOCR() {
-            if (!activeStream) return;
-            const video = document.getElementById('webcamVideo');
-            const canvas = document.getElementById('snapshotCanvas');
-            canvas.width = video.videoWidth || 1280;
-            canvas.height = video.videoHeight || 720;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            runTesseractOCR(canvas.toDataURL('image/png'));
-        }
-
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => runTesseractOCR(ev.target.result);
-            reader.readAsDataURL(file);
-        }
-
-        async function runTesseractOCR(imageSrc) {
-            const loader = document.getElementById('ocrLoader');
-            const statusText = document.getElementById('ocrStatusText');
-            const progressBar = document.getElementById('ocrProgressBar');
-
-            loader.classList.remove('hidden');
-            progressBar.style.width = '10%';
-            statusText.textContent = "Analisi incisione asta...";
-
-            try {
-                const worker = await Tesseract.createWorker('eng', 1, {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            const pct = Math.round(m.progress * 100);
-                            progressBar.style.width = `${pct}%`;
-                            statusText.textContent = `Lettura OCR (${pct}%)...`;
-                        }
-                    }
-                });
-
-                await worker.setParameters({
-                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-/.□[] ',
-                });
-
-                const { data: { text } } = await worker.recognize(imageSrc);
-                await worker.terminate();
-
-                loader.classList.add('hidden');
-                document.getElementById('rawOcrOutput').value = text;
-                parseGlassesCode(text);
-                showToast("OCR completato! Scheda aggiornata.");
-            } catch (err) {
-                console.error("Errore OCR:", err);
-                loader.classList.add('hidden');
-                showToast("Errore durante la lettura dell'immagine.", true);
-            }
-        }
-
-        // --- 3. SPECS PARSER ---
-        function liveParse() {
-            parseGlassesCode(document.getElementById('rawOcrOutput').value);
-        }
-
-        function reparseText() {
-            liveParse();
-            showToast("Rielaborazione testo eseguita.");
-        }
-
-        function parseGlassesCode(text) {
-            if (!text) return;
-            const uppercaseText = text.replace(/[\r\n]+/g, ' ').trim().toUpperCase();
-
-            let extractedBrand = '';
-            let extractedModel = '';
-            let extractedColor = '';
-            let extractedLens = '';
-            let extractedBridge = '';
-            let extractedTemple = '';
-            let extractedFilter = '';
-
-            for (const [brand, info] of Object.entries(BRAND_DATABASE)) {
-                if (uppercaseText.includes(brand)) {
-                    extractedBrand = brand;
-                    break;
-                }
-                for (const alias of info.aliases) {
-                    if (new RegExp(`\\b${alias}\\b|\\b${alias}\\d+`, 'i').test(uppercaseText)) {
-                        extractedBrand = brand;
-                        break;
-                    }
-                }
-                if (extractedBrand) break;
-            }
-
-            const boxMeasureRegex = /(\d{2})\s*[\square\s\-–\/]\s*(\d{2})\s*[\s\-–\/]?\s*(\d{3})?/;
-            const measureMatch = uppercaseText.match(boxMeasureRegex);
-            if (measureMatch) {
-                extractedLens = measureMatch[1] || '';
-                extractedBridge = measureMatch[2] || '';
-                extractedTemple = measureMatch[3] || '';
-            }
-
-            const modelMatch = uppercaseText.match(/\b([A-Z]{1,3}\s?\d{3,4}[A-Z]?)\b/i);
-            if (modelMatch) extractedModel = modelMatch[1].replace(/\s+/g, '');
-
-            const colorMatch = uppercaseText.match(/\b(\d{3,4}\/[A-Z0-9]{2,3}|[A-Z]\d{3,4}|\d{3})\b/);
-            if (colorMatch && colorMatch[1] !== extractedModel && colorMatch[1] !== extractedLens) {
-                extractedColor = colorMatch[1];
-            }
-
-            const filterMatch = uppercaseText.match(/\b([0-4][NP]|\bCAT\s?[0-4]\b)\b/i);
-            if (filterMatch) extractedFilter = filterMatch[1].toUpperCase();
-
-            if (extractedBrand) {
-                document.getElementById('specBrand').value = extractedBrand;
-                if (BRAND_DATABASE[extractedBrand]) {
-                    document.getElementById('specStyle').value = BRAND_DATABASE[extractedBrand].style;
-                }
-            }
-            if (extractedModel) document.getElementById('specModel').value = extractedModel;
-            if (extractedColor) document.getElementById('specColor').value = extractedColor;
-            if (extractedLens) document.getElementById('specLens').value = extractedLens;
-            if (extractedBridge) document.getElementById('specBridge').value = extractedBridge;
-            if (extractedTemple) document.getElementById('specTemple').value = extractedTemple;
-            if (extractedFilter) document.getElementById('specFilter').value = extractedFilter;
-
-            updatePricingAndGeneratePhotos();
-        }
-
-        // --- 4. GENERATORE 5 FOTO PRODOTTO BASATO ESCLUSIVAMENTE SUL MODELLO ---
-        function updatePricingAndGeneratePhotos() {
-            const brand = document.getElementById('specBrand').value.trim().toUpperCase();
-            const msrpInput = document.getElementById('msrpPrice');
-            const tierBadge = document.getElementById('priceTierBadge');
-            const brandBadge = document.getElementById('brandBadge');
-
-            if (BRAND_DATABASE[brand]) {
-                const info = BRAND_DATABASE[brand];
-                if (!msrpInput.value || msrpInput.dataset.auto === "true") {
-                    msrpInput.value = info.msrp;
-                    msrpInput.dataset.auto = "true";
-                }
-                tierBadge.textContent = info.tier;
-                brandBadge.className = "absolute right-2 top-2.5 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]";
-            } else {
-                if (!msrpInput.value || msrpInput.dataset.auto === "true") {
-                    msrpInput.value = 140;
-                    msrpInput.dataset.auto = "true";
-                }
-                tierBadge.textContent = "Standard Eyewear";
-                brandBadge.className = "absolute right-2 top-2.5 w-2.5 h-2.5 rounded-full bg-amber-400";
-            }
-
-            recalculateDiscount();
-            updateEcommerceCopy();
-            generatePhotos();
-        }
-
-        function updateEcommerceCopy() {
-            const brand = document.getElementById('specBrand').value.trim();
-            const model = document.getElementById('specModel').value.trim();
-            const color = document.getElementById('specColor').value.trim();
-            const lens = document.getElementById('specLens').value.trim();
-            const bridge = document.getElementById('specBridge').value.trim();
-            const temple = document.getElementById('specTemple').value.trim();
-            const filter = document.getElementById('specFilter').value.trim();
-
-            const title = `${brand || 'Occhiali'} ${model} ${color} ${lens?`Cal. ${lens}`:''}`.trim();
-            document.getElementById('generatedTitle').value = title;
-
-            const desc = `Occhiale originale ${brand || 'Eyewear'} modello ${model || 'N/D'} con codice colore ${color || 'Standard'}. ` +
-                         `Specifiche telaio estratte da incisione asta: Lente ${lens || '--'}mm, Ponte ${bridge || '--'}mm, Lunghezza Asta ${temple || '--'}mm. ` +
-                         `Protezione filtri e lenti: ${filter || 'UV400 Category 3'}. Prodotto completo scansionato ed esaminato.`;
-            document.getElementById('generatedDesc').value = desc;
-        }
-
-        function recalculateDiscount() {
-            const msrp = parseFloat(document.getElementById('msrpPrice').value) || 0;
-            const discount = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const finalPrice = msrp - (msrp * (discount / 100));
-            document.getElementById('finalPriceDisplay').textContent = finalPrice.toFixed(2);
-        }
-
-        // SVG Render Engine for 5 Photos
-        function generatePhotos() {
-            const brand = (document.getElementById('specBrand').value.trim() || 'BRAND').toUpperCase();
-            const model = (document.getElementById('specModel').value.trim() || 'MODEL-101').toUpperCase();
-            const color = (document.getElementById('specColor').value.trim() || 'C-01').toUpperCase();
-            const style = document.getElementById('specStyle').value || 'aviator';
-            const lens = document.getElementById('specLens').value.trim() || '58';
-            const bridge = document.getElementById('specBridge').value.trim() || '14';
-            const temple = document.getElementById('specTemple').value.trim() || '135';
-
-            const photoConfigs = [
-                { title: "1. Vista Frontale Studio", type: "front" },
-                { title: "2. Prospettiva 45° 3D", type: "perspective" },
-                { title: "3. Macro Incisione Asta", type: "temple_macro" },
-                { title: "4. Flatlay con Custodia", type: "flatlay" },
-                { title: "5. Vista Dettaglio Lente", type: "lens_detail" }
-            ];
-
-            generatedSVGList = photoConfigs.map(cfg => {
-                return {
-                    title: cfg.title,
-                    svg: createModelSVG(cfg.type, brand, model, color, style, lens, bridge, temple)
-                };
-            });
-
-            const grid = document.getElementById('photosGrid');
-            grid.innerHTML = generatedSVGList.map((item, idx) => `
-                <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-indigo-500/50 transition shadow">
-                    <div class="aspect-video bg-gradient-to-b from-slate-900 to-slate-950 p-2 flex items-center justify-center relative cursor-pointer" onclick="openModal(${idx})">
-                        ${item.svg}
-                        <div class="absolute inset-0 bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="bg-slate-900/90 text-white text-[10px] px-2 py-1 rounded-md border border-slate-700 shadow"><i class="fa-solid fa-expand"></i> Ingrandisci</span>
-                        </div>
-                    </div>
-                    <div class="p-2 border-t border-slate-800/80 flex items-center justify-between">
-                        <span class="text-[10px] font-semibold text-slate-300 truncate">${item.title}</span>
-                        <button onclick="downloadSVG(${idx})" class="text-indigo-400 hover:text-indigo-300 text-[11px] p-1">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function createModelSVG(type, brand, model, color, style, lens, bridge, temple) {
-            let framePath = "";
-            if (style === 'aviator') {
-                framePath = `<path d="M 120 100 Q 150 70 180 100 Q 185 140 150 150 Q 115 140 120 100 Z" fill="rgba(30,41,59,0.7)" stroke="#38bdf8" stroke-width="4"/>
-                             <path d="M 220 100 Q 250 70 280 100 Q 285 140 250 150 Q 215 140 220 100 Z" fill="rgba(30,41,59,0.7)" stroke="#38bdf8" stroke-width="4"/>
-                             <path d="M 180 95 Q 200 90 220 95" stroke="#38bdf8" stroke-width="3" fill="none"/>`;
-            } else if (style === 'round') {
-                framePath = `<circle cx="150" cy="115" r="32" fill="rgba(15,23,42,0.8)" stroke="#a855f7" stroke-width="4"/>
-                             <circle cx="250" cy="115" r="32" fill="rgba(15,23,42,0.8)" stroke="#a855f7" stroke-width="4"/>
-                             <path d="M 182 115 Q 200 105 218 115" stroke="#a855f7" stroke-width="3" fill="none"/>`;
-            } else if (style === 'wayfarer') {
-                framePath = `<rect x="115" y="85" width="70" height="50" rx="12" fill="rgba(30,41,59,0.9)" stroke="#818cf8" stroke-width="4"/>
-                             <rect x="215" y="85" width="70" height="50" rx="12" fill="rgba(30,41,59,0.9)" stroke="#818cf8" stroke-width="4"/>
-                             <path d="M 185 95 L 215 95" stroke="#818cf8" stroke-width="5"/>`;
-            } else { // Square / Clubmaster
-                framePath = `<rect x="110" y="90" width="75" height="48" rx="6" fill="rgba(15,23,42,0.85)" stroke="#34d399" stroke-width="4"/>
-                             <rect x="215" y="90" width="75" height="48" rx="6" fill="rgba(15,23,42,0.85)" stroke="#34d399" stroke-width="4"/>
-                             <path d="M 185 100 L 215 100" stroke="#34d399" stroke-width="4"/>`;
-            }
-
-            if (type === 'front') {
-                return `<svg viewBox="0 0 400 200" class="w-full h-full">
-                    <defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#0f172a"/></linearGradient></defs>
-                    <rect width="400" height="200" fill="url(#bg1)"/>
-                    <!-- Temples -->
-                    <path d="M 110 100 L 40 110" stroke="#64748b" stroke-width="4"/>
-                    <path d="M 290 100 L 360 110" stroke="#64748b" stroke-width="4"/>
-                    ${framePath}
-                    <!-- Model Engraving Badge -->
-                    <text x="200" y="30" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold" font-family="sans-serif">${brand} - ${model}</text>
-                    <text x="200" y="180" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">CALIBRO ${lens}mm | PONTE ${bridge}mm | COL. ${color}</text>
-                </svg>`;
-            } else if (type === 'perspective') {
-                return `<svg viewBox="0 0 400 200" class="w-full h-full">
-                    <rect width="400" height="200" fill="#090d16"/>
-                    <g transform="skewY(-6) rotate(-5) translate(20,20)">
-                        <path d="M 80 100 L 330 60" stroke="#475569" stroke-width="6"/>
-                        ${framePath}
-                    </g>
-                    <text x="30" y="35" fill="#38bdf8" font-size="11" font-weight="bold">${brand}</text>
-                    <text x="30" y="50" fill="#cbd5e1" font-size="10" font-family="monospace">MOD. ${model} (3D Render)</text>
-                </svg>`;
-            } else if (type === 'temple_macro') {
-                // Macro Close Up of Temple Arm with Engraved Code
-                return `<svg viewBox="0 0 400 200" class="w-full h-full">
-                    <rect width="400" height="200" fill="#020617"/>
-                    <!-- Temple Arm Bar -->
-                    <rect x="20" y="70" width="360" height="60" rx="8" fill="#1e293b" stroke="#475569" stroke-width="2"/>
-                    <!-- Inner Engraving Text -->
-                    <text x="40" y="105" fill="#f1f5f9" font-size="14" font-family="monospace" font-weight="bold" letter-spacing="1.5">
-                        ${brand}  ${model}  ${color}  ${lens}□${bridge} ${temple}
-                    </text>
-                    <text x="40" y="122" fill="#64748b" font-size="8" font-family="sans-serif">INCISIONE LATERALE ASTA ORIGINALE (MACRO OCR)</text>
-                    <!-- Hinge -->
-                    <rect x="360" y="65" width="20" height="70" rx="2" fill="#94a3b8"/>
-                </svg>`;
-            } else if (type === 'flatlay') {
-                return `<svg viewBox="0 0 400 200" class="w-full h-full">
-                    <rect width="400" height="200" fill="#0f172a"/>
-                    <!-- Case -->
-                    <rect x="60" y="40" width="280" height="120" rx="30" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
-                    <path d="M 60 90 Q 200 120 340 90" stroke="#4338ca" stroke-width="2" fill="none"/>
-                    <!-- Glasses overlay -->
-                    <g transform="scale(0.7) translate(80, 40)">
-                        ${framePath}
-                    </g>
-                    <text x="200" y="180" text-anchor="middle" fill="#e2e8f0" font-size="10">${brand} ${model} + Custodia Rigida</text>
-                </svg>`;
-            } else { // Lens Detail
-                return `<svg viewBox="0 0 400 200" class="w-full h-full">
-                    <rect width="400" height="200" fill="#090d16"/>
-                    <circle cx="200" cy="100" r="70" fill="rgba(30,58,138,0.4)" stroke="#60a5fa" stroke-width="3"/>
-                    <path d="M 150 70 Q 220 50 250 80" stroke="#ffffff" stroke-width="2" opacity="0.4" fill="none"/>
-                    <text x="170" y="90" fill="#ffffff" font-size="9" opacity="0.7" font-weight="bold">${brand}</text>
-                    <text x="200" y="185" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">Dettaglio Lente UV ${lens}mm</text>
-                </svg>`;
-            }
-        }
-
-        function openModal(index) {
-            const item = generatedSVGList[index];
-            if (!item) return;
-            document.getElementById('modalTitle').textContent = item.title;
-            document.getElementById('modalCaption').textContent = `Render Modello: ${document.getElementById('specBrand').value} ${document.getElementById('specModel').value}`;
-            document.getElementById('modalImageContainer').innerHTML = item.svg;
-            document.getElementById('modalDownloadBtn').onclick = () => downloadSVG(index);
-            
-            const modal = document.getElementById('photoModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('photoModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function downloadSVG(index) {
-            const item = generatedSVGList[index];
-            if (!item) return;
-            const blob = new Blob([item.svg], { type: "image/svg+xml;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Foto_${index+1}_${document.getElementById('specModel').value || 'occhiale'}.svg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast("Foto SVG scaricata!");
-        }
-
-        // --- 5. INVENTORY & CSV ---
-        function saveToInventory() {
-            const brand = document.getElementById('specBrand').value.trim();
-            const model = document.getElementById('specModel').value.trim();
-
-            if (!brand && !model) {
-                showToast("Inserisci almeno Marca o Modello prima di salvare.", true);
-                return;
-            }
-
-            const item = {
-                id: Date.now(),
-                date: new Date().toLocaleDateString('it-IT'),
-                brand: brand || 'Generico',
-                model: model || 'N/D',
-                color: document.getElementById('specColor').value.trim() || 'N/D',
-                style: document.getElementById('specStyle').value,
-                lens: document.getElementById('specLens').value.trim() || '-',
-                bridge: document.getElementById('specBridge').value.trim() || '-',
-                temple: document.getElementById('specTemple').value.trim() || '-',
-                filter: document.getElementById('specFilter').value.trim() || '-',
-                msrp: document.getElementById('msrpPrice').value || '0',
-                finalPrice: document.getElementById('finalPriceDisplay').textContent || '0.00'
-            };
-
-            let inventory = JSON.parse(localStorage.getItem('opti_inventory_v2') || '[]');
-            inventory.unshift(item);
-            localStorage.setItem('opti_inventory_v2', JSON.stringify(inventory));
-
-            renderInventory();
-            showToast("Occhiale e foto salvati nell'inventario!");
-        }
-
-        function renderInventory() {
-            const tbody = document.getElementById('inventoryTableBody');
-            const inventory = JSON.parse(localStorage.getItem('opti_inventory_v2') || '[]');
-
-            if (inventory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500 italic">Nessun occhiale in archivio. Scansiona un'asta e clicca su 'Salva Occhiale in Inventario'.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = inventory.map(item => `
-                <tr class="hover:bg-slate-800/50 transition border-b border-slate-800/40">
-                    <td class="p-3 font-mono text-slate-400">${item.date}</td>
-                    <td class="p-3 font-bold text-white">${item.brand}</td>
-                    <td class="p-3 font-mono text-indigo-300 font-semibold">${item.model}</td>
-                    <td class="p-3 font-mono text-slate-300">${item.color}</td>
-                    <td class="p-3 capitalize text-slate-400">${item.style}</td>
-                    <td class="p-3 font-mono text-emerald-400">${item.lens}-${item.bridge}-${item.temple}</td>
-                    <td class="p-3 font-semibold text-indigo-200">${item.filter}</td>
-                    <td class="p-3 font-mono text-slate-400">€${item.msrp}</td>
-                    <td class="p-3 font-mono font-bold text-emerald-400">€${item.finalPrice}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:text-rose-300 px-2 py-1 rounded bg-rose-950/30 border border-rose-800/40">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function deleteItem(id) {
-            let inventory = JSON.parse(localStorage.getItem('opti_inventory_v2') || '[]');
-            inventory = inventory.filter(i => i.id !== id);
-            localStorage.setItem('opti_inventory_v2', JSON.stringify(inventory));
-            renderInventory();
-            showToast("Elemento eliminato.");
-        }
-
-        function clearInventory() {
-            if (confirm("Vuoi davvero svuotare tutto l'inventario salvato?")) {
-                localStorage.removeItem('opti_inventory_v2');
-                renderInventory();
-                showToast("Registro svuotato.");
-            }
-        }
-
-        function clearForm() {
-            document.getElementById('rawOcrOutput').value = '';
-            document.getElementById('specBrand').value = '';
-            document.getElementById('specModel').value = '';
-            document.getElementById('specColor').value = '';
-            document.getElementById('specLens').value = '';
-            document.getElementById('specBridge').value = '';
-            document.getElementById('specTemple').value = '';
-            document.getElementById('specFilter').value = '';
-            document.getElementById('msrpPrice').value = '';
-            document.getElementById('msrpPrice').dataset.auto = "true";
-            updatePricingAndGeneratePhotos();
-            showToast("Form azzerato.");
-        }
-
-        function copyToClipboard(elementId) {
-            const input = document.getElementById(elementId);
-            input.select();
-            document.execCommand('copy');
-            showToast("Copiato negli appunti!");
-        }
-
-        function exportCSV() {
-            const inventory = JSON.parse(localStorage.getItem('opti_inventory_v2') || '[]');
-            if (inventory.length === 0) {
-                showToast("Nessun dato da esportare in CSV.", true);
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,Data,Marca,Modello,Colore,Stile,Calibro(mm),Ponte(mm),Asta(mm),Filtro UV,MSRP,Prezzo Finale\n";
-            inventory.forEach(item => {
-                csvContent += `"${item.date}","${item.brand}","${item.model}","${item.color}","${item.style}","${item.lens}","${item.bridge}","${item.temple}","${item.filter}","${item.msrp}","${item.finalPrice}"\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `inventario_occhiali_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("CSV esportato!");
-        }
-
-        window.onload = function() {
-            initCameraDevices();
-            renderInventory();
-            generatePhotos();
-        };
-    </script>
+      }
+
+      return null; // Nessuna corrispondenza valida trovata
+    }
+
+    function populateFields(data) {
+      document.getElementById('field-raw-ocr').value = data.rawText || '';
+      document.getElementById('field-brand').value = data.brand || '';
+      document.getElementById('field-code').value = data.modelCode || '';
+      document.getElementById('field-color').value = data.colorCode || '';
+      document.getElementById('field-caliber').value = data.caliber || '';
+      document.getElementById('field-bridge').value = data.bridge || '';
+      document.getElementById('field-temple').value = data.temple || '';
+      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
+      
+      document.getElementById('confidence-tag').innerText = "Codice Convalidato 100%";
+      document.getElementById('scan-status-badge').innerText = "Riconoscimento Riuscito";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700";
+
+      calculateDiscountedPrice();
+      generateAIImages();
+    }
+
+    function calculateDiscountedPrice() {
+      const listPrice = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const discountPct = parseFloat(document.getElementById('field-discount-pct').value) || 0;
+
+      const finalPrice = listPrice * (1 - (discountPct / 100));
+      document.getElementById('field-price-final').value = finalPrice.toFixed(2);
+
+      updateSalesDescription();
+    }
+
+    function updateSalesDescription() {
+      const brand = document.getElementById('field-brand').value || '';
+      const code = document.getElementById('field-code').value || '';
+      const color = document.getElementById('field-color').value || '';
+      const cal = document.getElementById('field-caliber').value || '';
+      const bridge = document.getElementById('field-bridge').value || '';
+      const temple = document.getElementById('field-temple').value || '';
+      const listPrice = document.getElementById('field-price-list').value || '0.00';
+      const finalPrice = document.getElementById('field-price-final').value || '0.00';
+
+      const fullTitle = `${brand} ${code} ${color} ${cal}-${bridge}`.trim();
+      document.getElementById('field-title').value = fullTitle;
+
+      const desc = `Occhiale originale ${brand} modello ${code} colore ${color}. Misura calibro ${cal} mm, ponte ${bridge} mm e asta ${temple} mm. Prezzo di listino ufficiale ${listPrice}€, in offerta al prezzo scontato di ${finalPrice}€. Spedizione rapida e garanzia di autenticità.`;
+      document.getElementById('field-desc').value = desc;
+    }
+
+    function showOCRLoader(show) {
+      const loader = document.getElementById('ocr-loader');
+      if (show) loader.classList.remove('hidden');
+      else loader.classList.add('hidden');
+    }
+
+    // --- GENERATORE 5 FOTO SPECIFICHE SUL MODELLO ---
+    function generateAIImages() {
+      const brand = document.getElementById('field-brand').value || 'Eyewear';
+      const code = document.getElementById('field-code').value || 'Model';
+      const color = document.getElementById('field-color').value || 'Dark';
+      const cal = document.getElementById('field-caliber').value || '58';
+      const bridge = document.getElementById('field-bridge').value || '14';
+      const temple = document.getElementById('field-temple').value || '135';
+
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+
+      const photoConfigs = [
+        { title: "1. Frontale Studio", bg: "Studio Lux", desc: "Frontale e Lenti" },
+        { title: "2. Prospettiva 3D", bg: "Marmo Carrara", desc: "Angolazione 45°" },
+        { title: "3. Ingrandimento Asta", bg: "Legno Teak", desc: `Incisione ${code}` },
+        { title: "4. Flatlay Custodia", bg: "Microcemento", desc: "Vista dall'alto" },
+        { title: "5. Dettaglio Lente", bg: "Bokeh Urbano", desc: `Misure ${cal}□${bridge}` }
+      ];
+
+      photoConfigs.forEach((config, idx) => {
+        const svgUri = generateEyewearSVG(brand, code, color, cal, bridge, temple, idx);
+
+        const cardHtml = `
+          <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between group hover:border-sky-500 transition shadow-sm">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
+              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${config.bg}</span>
+            </div>
+            <div class="relative bg-slate-950 p-2 min-h-[130px] flex items-center justify-center">
+              <img src="${svgUri}" alt="${config.title}" class="max-h-[120px] w-auto object-contain transition group-hover:scale-105 duration-300"/>
+            </div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
+              <span class="truncate">${config.desc}</span>
+              <a href="${svgUri}" download="${brand}_${code}_foto_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
+            </div>
+          </div>
+        `;
+        galleryGrid.innerHTML += cardHtml;
+      });
+    }
+
+    function renderEmptyGallery() {
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+      for(let i=1; i<=5; i++) {
+        galleryGrid.innerHTML += `
+          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[140px] text-slate-600 space-y-2">
+            <i class="fa-solid fa-image text-2xl"></i>
+            <span class="text-[11px] font-medium">Foto ${i} in attesa</span>
+          </div>
+        `;
+      }
+    }
+
+    function generateEyewearSVG(brand, model, color, cal, bridge, temple, angleIndex) {
+      const themeColors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+      const themeColor = themeColors[angleIndex % themeColors.length];
+
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+        <rect width="400" height="240" fill="#090d16" rx="12"/>
+        <circle cx="200" cy="110" r="85" fill="${themeColor}" opacity="0.08"/>
+        <g stroke="${themeColor}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="70" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <rect x="230" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <path d="M170 95 Q200 85 230 95" stroke-width="5"/>
+          <path d="M70 100 L20 90" stroke-width="4"/>
+          <path d="M330 100 L380 90" stroke-width="4"/>
+        </g>
+        <text x="200" y="180" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="13" font-weight="bold">${brand} ${model}</text>
+        <text x="200" y="200" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
+        <text x="200" y="220" text-anchor="middle" fill="${themeColor}" font-family="sans-serif" font-size="9" font-weight="bold">FOTO ${angleIndex + 1} DECODIFICATA</text>
+      </svg>`;
+
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
+    }
+
+    // --- INVENTARIO E SALVATAGGIO ---
+    function saveToInventory() {
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+
+      if (!brand || !code) {
+        alert("Esegui prima una scansione o seleziona un esempio valido.");
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        brand: brand,
+        code: code,
+        color: document.getElementById('field-color').value,
+        caliber: document.getElementById('field-caliber').value,
+        bridge: document.getElementById('field-bridge').value,
+        temple: document.getElementById('field-temple').value,
+        listPrice: parseFloat(document.getElementById('field-price-list').value) || 0,
+        discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
+        finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
+        title: document.getElementById('field-title').value
+      };
+
+      inventory.push(item);
+      updateInventoryTable();
+
+      const indicator = document.getElementById('saved-status-indicator');
+      indicator.className = "text-emerald-400 text-xs flex items-center gap-1 font-semibold";
+      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salva riuscito in inventario`;
+    }
+
+    function updateInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      document.getElementById('drafts-count').innerText = inventory.length;
+
+      if (inventory.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona un'asta e salva la scheda.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      inventory.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/80 transition";
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
+          <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
+          <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
+          <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-right">
+            <button onclick="deleteItem(${item.id})" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteItem(id) {
+      inventory = inventory.filter(i => i.id !== id);
+      updateInventoryTable();
+    }
+
+    function resetWorkflow() {
+      resetFormFields();
+      renderEmptyGallery();
+      document.getElementById('captured-preview').classList.add('hidden');
+      document.getElementById('camera-placeholder').classList.remove('hidden');
+      document.getElementById('preset-select').value = "";
+      document.getElementById('scan-status-badge').innerText = "In attesa di scansione";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600";
+    }
+
+    function resetFormFields() {
+      document.getElementById('field-raw-ocr').value = '';
+      document.getElementById('field-brand').value = '';
+      document.getElementById('field-code').value = '';
+      document.getElementById('field-color').value = '';
+      document.getElementById('field-caliber').value = '';
+      document.getElementById('field-bridge').value = '';
+      document.getElementById('field-temple').value = '';
+      document.getElementById('field-price-list').value = '';
+      document.getElementById('field-price-final').value = '';
+      document.getElementById('field-title').value = '';
+      document.getElementById('field-desc').value = '';
+    }
+
+    function exportCSV() {
+      if (inventory.length === 0) {
+        alert("Nessun occhiale presente in inventario da esportare.");
+        return;
+      }
+
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino,Sconto,PrezzoFinale\n";
+      inventory.forEach(i => {
+        csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`;
+      });
+
+      const uri = encodeURI(csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", uri);
+      link.setAttribute("download", `Inventario_Ottica_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
 </body>
 </html>
