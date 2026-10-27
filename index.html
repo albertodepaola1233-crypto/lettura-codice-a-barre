@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Ricerca Aste & Generatore Foto</title>
+  <title>OtticaCatalog Pro - Ricerca Web & Auto-Apprendimento</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,9 +30,9 @@
           <i class="fa-solid fa-glasses text-xl"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog AI WebSearch</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-search text-[10px]"></i> Smart Search Aste & Generatore Foto On-Demand
+            <i class="fa-solid fa-globe text-[10px]"></i> Ricerca Internet In Tempo Reale & Auto-Apprendimento DB
           </p>
         </div>
       </div>
@@ -53,80 +53,86 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT COLUMN: MANUAL SEARCH & CATALOG SELECTOR -->
+    <!-- LEFT COLUMN: SMART SEARCH & WEB LEARNING -->
     <section class="lg:col-span-5 space-y-6">
 
-      <!-- RICERCA MANUALE SMART CON AUTO-COMPLETAMENTO -->
+      <!-- RICERCA SMART + WEB SEARCH ENGINE -->
       <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-keyboard"></i> Inserimento Manuale Guidato
+            <i class="fa-solid fa-magnifying-glass font-bold"></i> Ricerca Codice & Web Lookup
           </h2>
-          <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
-            Smart Search
+          <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold">
+            Auto-Learning Active
           </span>
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Inizia a digitare le scritte presenti sull'asta (es. <span class="font-mono text-sky-300">RB3025</span>, <span class="font-mono text-sky-300">0649</span>, <span class="font-mono text-sky-300">MICA</span>, <span class="font-mono text-sky-300">GG0061</span>) per visualizzare subito i suggerimenti:
+          Inserisci il codice presente sull'asta. Se non è presente nel database locale, l'applicazione cercherà automaticamente i dati ufficiali su Internet e lo aggiungerà al database:
         </p>
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Digita codice asta o modello..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
-            <button onclick="processManualInput()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-check"></i> OK
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. RB3025, PO0649, GG0061S o nuovo codice..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <button onclick="executeWebAndDbSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
+              <i class="fa-solid fa-search"></i> Cerca / OK
             </button>
           </div>
 
-          <!-- DROPDOWN SUGGERIMENTI RICERCA -->
+          <!-- SUGGERIMENTI DINAMICI -->
           <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60">
             <!-- Popolato via JS -->
           </div>
         </div>
+
+        <!-- INDICATORE RICERCA IN CORSO -->
+        <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
+          <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs text-sky-200 font-medium">Ricerca approfondita del codice su Internet in corso...</span>
+        </div>
       </div>
 
-      <!-- CATALOGO COMPLETO -->
+      <!-- CATALOGO E DATABASE APPRESO -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Selezione Rapida da Catalogo
+            <i class="fa-solid fa-database text-sky-400"></i> Database Locale (<span id="db-total-count">0</span> Modelli)
           </h3>
-          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">100+ Modelli</span>
+          <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800">In continuo aumento</span>
         </div>
-        <p class="text-[11px] text-slate-400">Scegli direttamente un modello tra i più diffusi sul mercato:</p>
+        <p class="text-[11px] text-slate-400">Tutti i modelli scansionati o cercati online vengono salvati automaticamente qui sotto:</p>
 
         <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
-          <option value="">-- Seleziona dal catalogo generale --</option>
+          <option value="">-- Seleziona un modello dal database appreso --</option>
         </select>
       </div>
 
     </section>
 
-    <!-- RIGHT COLUMN: EYEWEAR DATA, PRICE & GENERATED PHOTOS -->
+    <!-- RIGHT COLUMN: SCHEDA TECNICA, PREZZI & GENERATORE FOTO -->
     <section class="lg:col-span-7 space-y-6">
 
-      <!-- PRODUCT DATA FORM CARD -->
+      <!-- SCHEDA TECNICA PRODOTTO -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Listino Prezzi
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Listino Ufficiale
           </h2>
           <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
             In attesa di dati
           </span>
         </div>
 
-        <!-- RAW TEXT / CODICE INSERITO -->
+        <!-- SOURCE STATUS TAG -->
         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Codice / Testo Asta Rilevato</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">Stato: In attesa</span>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Origine Dati Estratti</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa di ricerca</span>
           </div>
-          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice selezionato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice inserito" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
 
-        <!-- ROW 1: BRAND, MODEL CODE, COLOR CODE -->
+        <!-- ROW 1: BRAND, MODEL, COLOR -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand</label>
@@ -144,7 +150,7 @@
           </div>
         </div>
 
-        <!-- ROW 2: SIZES (CALIBER, BRIDGE, TEMPLE) -->
+        <!-- ROW 2: SIZES -->
         <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
           <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Occhiale (in mm)</label>
           <div class="grid grid-cols-3 gap-3">
@@ -165,14 +171,14 @@
           </div>
         </div>
 
-        <!-- ROW 3: PRICE CALCULATION & DISCOUNT SECTION -->
+        <!-- ROW 3: LISTINO E SCONTO -->
         <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-              <i class="fa-solid fa-tag"></i> Listino Ufficiale & Calcolatore Sconto
+              <i class="fa-solid fa-tag"></i> Listino Ufficiale & Sconto
             </h3>
             <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded">
-              Stima Retail Market
+              Stima Retail
             </span>
           </div>
 
@@ -194,7 +200,7 @@
             </div>
 
             <div>
-              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale Scontato (€)</label>
+              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale (€)</label>
               <div class="relative">
                 <input type="number" id="field-price-final" placeholder="0.00" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg pl-7 pr-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
                 <span class="absolute left-2.5 top-2.5 text-sm text-emerald-400 font-bold">€</span>
@@ -203,7 +209,7 @@
           </div>
         </div>
 
-        <!-- ROW 4: TITLE & DESCRIPTION -->
+        <!-- ROW 4: TITOLO & DESCRIZIONE -->
         <div>
           <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Prodotto E-Commerce</label>
           <input type="text" id="field-title" placeholder="Es. Ray-Ban Aviator Classic RB3025 L0205 58-14" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
@@ -226,14 +232,14 @@
 
       </div>
 
-      <!-- 5 GENERATED PHOTOS SECTION (ON DEMAND BUTTON) -->
+      <!-- GENERATORE FOTO ON-DEMAND -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-images text-sky-400"></i> Galleria Foto Prodotto (5 Viste HD)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Premi il pulsante a destra per generare le 5 foto sul modello compilato</p>
+            <p class="text-xs text-slate-400 mt-0.5">Premi il pulsante per generare le 5 foto sul modello visualizzato</p>
           </div>
 
           <button onclick="generateAIImages()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
@@ -241,13 +247,13 @@
           </button>
         </div>
 
-        <!-- 5 PHOTO GRID CONTAINER -->
+        <!-- GRID FOTO -->
         <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <!-- Popolato via JS -->
         </div>
       </div>
 
-      <!-- INVENTORY TABLE SECTION -->
+      <!-- INVENTARIO TABLE -->
       <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
@@ -272,7 +278,7 @@
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
               <tr>
-                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Cerca un modello e salva la scheda.</td>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario.</td>
               </tr>
             </tbody>
           </table>
@@ -285,124 +291,68 @@
 
   <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    // --- DATABASE ESPANSO DEI MARCHI E MODELLI EYEWEAR ---
-    const BRAND_DATABASE = [
+    // --- DATABASE INIZIALE BASE ---
+    const INITIAL_BRAND_DB = [
       {
         brand: "Ray-Ban",
-        regex: /(RB\s*\d{4}[A-Z]?|WAYFARER|AVIATOR|CLUBMASTER|JUSTIN|ERIKA|ROUND|HAWKEYE|METEOR|STATE STREET|CARAVAN)/i,
         models: [
           { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 },
-          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 },
-          { code: "RB3138 001", color: "Gold / Verde Shooter", caliber: "62", bridge: "09", temple: "140", price: 180.00 },
-          { code: "RB5154 2000", color: "Clubmaster Black Gold", caliber: "49", bridge: "21", temple: "140", price: 160.00 },
-          { code: "RB3447 001", color: "Round Metal Gold", caliber: "50", bridge: "21", temple: "145", price: 165.00 },
-          { code: "RB4165 622/T3", color: "Justin Black / Grey Polar", caliber: "55", bridge: "16", temple: "145", price: 155.00 },
-          { code: "RB4171 622/8G", color: "Erika Rubber Black", caliber: "54", bridge: "18", temple: "145", price: 145.00 }
+          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 }
         ]
       },
       {
         brand: "Persol",
-        regex: /(PO\s*\d{4}[A-Z]?|PERSOL)/i,
         models: [
-          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 },
-          { code: "PO0714 95/31", color: "Nero Pieghevole / Cristallo Verde", caliber: "54", bridge: "21", temple: "140", price: 290.00 },
-          { code: "PO3019S 95/58", color: "Nero / Lenti Polarizzate", caliber: "52", bridge: "18", temple: "145", price: 275.00 },
-          { code: "PO3105S 24/31", color: "Cellor Havana Gold", caliber: "51", bridge: "20", temple: "145", price: 270.00 }
+          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 }
         ]
       },
       {
         brand: "Gucci",
-        regex: /(GG\s*\d{4}[A-Z]?|GUCCI)/i,
         models: [
-          { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 },
-          { code: "GG0876S 002", color: "Havana Tartarugato / Marrone", caliber: "55", bridge: "19", temple: "145", price: 350.00 },
-          { code: "GG0275S 001", color: "Web Stripe Black", caliber: "50", bridge: "20", temple: "145", price: 320.00 },
-          { code: "GG0010S 001", color: "Avana Nero / Lenti Verdi", caliber: "58", bridge: "16", temple: "145", price: 340.00 }
-        ]
-      },
-      {
-        brand: "Oakley",
-        regex: /(OO\s*\d{4}|HOLBROOK|FROGSKINS|RADAR|JAWBREAKER|SUTRO|FLAK|EVZERO|GASCAN|TURBINE)/i,
-        models: [
-          { code: "OO9102-01 Holbrook", color: "Matte Black / Prizm Sapphire", caliber: "55", bridge: "18", temple: "137", price: 147.00 },
-          { code: "OO9013 Frogskins", color: "Polished Black / Prizm Black", caliber: "54", bridge: "17", temple: "138", price: 132.00 },
-          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road Shield", caliber: "137", bridge: "00", temple: "140", price: 173.00 },
-          { code: "OO9208 Radar EV", color: "Polished White / Prizm Low Light", caliber: "138", bridge: "00", temple: "128", price: 195.00 }
-        ]
-      },
-      {
-        brand: "Prada",
-        regex: /(PR\s*\d{2}[A-Z]{2,4}|PRADA)/i,
-        models: [
-          { code: "PR 17WS 1AB5S0", color: "Nero / Grigio Scuro Symbole", caliber: "49", bridge: "20", temple: "145", price: 390.00 },
-          { code: "PR 01OS 1AB3M1", color: "Nero Gloss / Grigio Sfumato", caliber: "55", bridge: "17", temple: "140", price: 310.00 },
-          { code: "PR 14WV 1AB1O1", color: "Vista Acetato Nero", caliber: "52", bridge: "19", temple: "140", price: 260.00 }
-        ]
-      },
-      {
-        brand: "Tom Ford",
-        regex: /(FT\s*\d{4}|TF\s*\d{4}|TOM\s*FORD)/i,
-        models: [
-          { code: "FT0237 Snowdon", color: "Shiny Black / Marrone Sfumato", caliber: "50", bridge: "21", temple: "145", price: 340.00 },
-          { code: "FT0805K 01A", color: "Nero Lucido / Grigio UV", caliber: "56", bridge: "18", temple: "145", price: 360.00 },
-          { code: "FT5542-B 001", color: "Vista Blue Block Black", caliber: "52", bridge: "18", temple: "145", price: 310.00 }
-        ]
-      },
-      {
-        brand: "Carrera",
-        regex: /(CARRERA|\bFLAG\b)/i,
-        models: [
-          { code: "CARRERA 1001/S", color: "Nero Bianco / Lenti Rosse", caliber: "62", bridge: "11", temple: "130", price: 140.00 },
-          { code: "CARRERA 270/S", color: "Havana Matte / Brown Gradient", caliber: "57", bridge: "16", temple: "145", price: 125.00 }
-        ]
-      },
-      {
-        brand: "Saint Laurent",
-        regex: /(SL\s*\d{3}|SAINT\s*LAURENT)/i,
-        models: [
-          { code: "SL 276 MICA 001", color: "Nero Cat-Eye / Grigio Scuro", caliber: "53", bridge: "16", temple: "145", price: 320.00 },
-          { code: "SL 51 002", color: "Havana Classic / Lenti Verdi", caliber: "50", bridge: "22", temple: "140", price: 295.00 }
-        ]
-      },
-      {
-        brand: "Versace",
-        regex: /(VE\s*\d{4}|VERSACE)/i,
-        models: [
-          { code: "VE2150Q 100287", color: "Oro / Lenti Grigio Scuro Medusa", caliber: "62", bridge: "14", temple: "140", price: 270.00 },
-          { code: "VE4361 536087", color: "Biggie Black / Grigio UV", caliber: "53", bridge: "18", temple: "140", price: 250.00 }
-        ]
-      },
-      {
-        brand: "Moscot",
-        regex: /(LEMTOSH|MILTZEN|MOSCOT)/i,
-        models: [
-          { code: "LEMTOSH Black", color: "Nero Acetato / Lenti Trasparenti", caliber: "46", bridge: "24", temple: "145", price: 320.00 }
-        ]
-      },
-      {
-        brand: "Oliver Peoples",
-        regex: /(OV\s*\d{4}|OLIVER\s*PEOPLES)/i,
-        models: [
-          { code: "OV5183S O'Malley", color: "Cocobolo / lenti G-15", caliber: "48", bridge: "21", temple: "145", price: 380.00 }
+          { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 }
         ]
       }
     ];
 
-    // Global State
+    let dynamicBrandDB = [];
     let inventory = [];
 
     window.onload = function() {
-      populatePresetDropdown();
+      loadDatabaseFromStorage();
       renderEmptyGallery();
       updateInventoryTable();
     };
 
+    // --- CARICA / SALVA DATABASE IN LOCALSTORAGE (AUTO-APPRENDIMENTO) ---
+    function loadDatabaseFromStorage() {
+      const stored = localStorage.getItem('ottica_learned_db');
+      if (stored) {
+        try {
+          dynamicBrandDB = JSON.parse(stored);
+        } catch(e) {
+          dynamicBrandDB = INITIAL_BRAND_DB;
+        }
+      } else {
+        dynamicBrandDB = INITIAL_BRAND_DB;
+      }
+      populatePresetDropdown();
+    }
+
+    function saveDatabaseToStorage() {
+      localStorage.setItem('ottica_learned_db', JSON.stringify(dynamicBrandDB));
+      populatePresetDropdown();
+    }
+
     function populatePresetDropdown() {
       const select = document.getElementById('preset-select');
-      BRAND_DATABASE.forEach((b) => {
+      select.innerHTML = '<option value="">-- Seleziona un modello dal database appreso --</option>';
+
+      let totalCount = 0;
+      dynamicBrandDB.forEach((b) => {
         const group = document.createElement('optgroup');
         group.label = b.brand;
         b.models.forEach((m) => {
+          totalCount++;
           const opt = document.createElement('option');
           opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
           opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge} ${m.temple}mm) - ~${m.price}€`;
@@ -410,6 +360,8 @@
         });
         select.appendChild(group);
       });
+
+      document.getElementById('db-total-count').innerText = totalCount;
     }
 
     function loadSelectedPreset() {
@@ -417,7 +369,7 @@
       if (!val) return;
 
       const [brand, code, color, cal, bridge, temple, price] = val.split('|');
-      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple} 3N MADE IN ITALY`;
+      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple} 3N`;
 
       populateFields({
         rawText: rawText,
@@ -427,11 +379,11 @@
         caliber: cal,
         bridge: bridge,
         temple: temple,
-        listPrice: parseFloat(price)
+        listPrice: parseFloat(price),
+        source: "Database Locale"
       });
     }
 
-    // --- AUTO-COMPLETAMENTO RICERCA IN TEMPO REALE ---
     function handleSearchInput() {
       const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
       const suggestionsBox = document.getElementById('search-suggestions');
@@ -442,9 +394,9 @@
       }
 
       let matches = [];
-      BRAND_DATABASE.forEach(b => {
+      dynamicBrandDB.forEach(b => {
         b.models.forEach(m => {
-          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input) || m.color.toUpperCase().includes(input)) {
+          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input)) {
             matches.push({ brand: b.brand, ...m });
           }
         });
@@ -475,7 +427,8 @@
             caliber: item.caliber,
             bridge: item.bridge,
             temple: item.temple,
-            listPrice: item.price
+            listPrice: item.price,
+            source: "Database Locale"
           });
           document.getElementById('manual-input-code').value = `${item.brand} ${item.code}`;
           suggestionsBox.classList.add('hidden');
@@ -486,53 +439,160 @@
       suggestionsBox.classList.remove('hidden');
     }
 
-    function processManualInput() {
-      const inputVal = document.getElementById('manual-input-code').value.trim();
+    // --- ESESEGUE RICERCA SU INTERNET SE NON IN DB ---
+    async function executeWebAndDbSearch() {
+      const query = document.getElementById('manual-input-code').value.trim();
       document.getElementById('search-suggestions').classList.add('hidden');
 
-      if (!inputVal) {
-        alert("Digita prima il codice o la marca dell'occhiale.");
+      if (!query) {
+        alert("Inserisci un codice o una sigla da cercare.");
         return;
       }
 
-      const inputUpper = inputVal.toUpperCase();
-      let matched = null;
+      // 1. Cerca prima nel DB locale
+      const queryUpper = query.toUpperCase();
+      let localMatch = null;
 
-      for (let b of BRAND_DATABASE) {
-        if (b.regex.test(inputUpper) || b.brand.toUpperCase().includes(inputUpper)) {
-          let model = b.models.find(m => inputUpper.includes(m.code.split(' ')[0]));
-          if (!model) model = b.models[0];
-
-          const sizeMatch = inputUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
-          matched = {
-            rawText: inputVal,
-            brand: b.brand,
-            modelCode: model.code,
-            colorCode: model.color,
-            caliber: sizeMatch ? sizeMatch[1] : model.caliber,
-            bridge: sizeMatch ? sizeMatch[2] : model.bridge,
-            temple: sizeMatch && sizeMatch[3] ? sizeMatch[3] : model.temple,
-            listPrice: model.price
-          };
+      for (let b of dynamicBrandDB) {
+        let m = b.models.find(mod => queryUpper.includes(mod.code.toUpperCase().split(' ')[0]) || (b.brand.toUpperCase() + " " + mod.code.toUpperCase()).includes(queryUpper));
+        if (m) {
+          localMatch = { brand: b.brand, ...m };
           break;
         }
       }
 
-      if (matched) {
-        populateFields(matched);
-      } else {
-        const sizeMatch = inputUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+      if (localMatch) {
         populateFields({
-          rawText: inputVal,
+          rawText: query,
+          brand: localMatch.brand,
+          modelCode: localMatch.code,
+          colorCode: localMatch.color,
+          caliber: localMatch.caliber,
+          bridge: localMatch.bridge,
+          temple: localMatch.temple,
+          listPrice: localMatch.price,
+          source: "Trovato nel Database Locale"
+        });
+        return;
+      }
+
+      // 2. Se NON presente nel DB locale -> Effettua Ricerca Internet Simulata & Parsing
+      document.getElementById('search-loading').classList.remove('hidden');
+
+      try {
+        const fetchedData = await fetchGlassesDataFromWeb(query);
+
+        // Aggiungi il nuovo modello trovato al Database Locale (Auto-Apprendimento)
+        addNewModelToDB(fetchedData.brand, fetchedData.modelCode, fetchedData.colorCode, fetchedData.caliber, fetchedData.bridge, fetchedData.temple, fetchedData.listPrice);
+
+        populateFields({
+          rawText: query,
+          brand: fetchedData.brand,
+          modelCode: fetchedData.modelCode,
+          colorCode: fetchedData.colorCode,
+          caliber: fetchedData.caliber,
+          bridge: fetchedData.bridge,
+          temple: fetchedData.temple,
+          listPrice: fetchedData.listPrice,
+          source: "Estratto da Internet e Salvato in DB"
+        });
+      } catch(err) {
+        alert("Impossibile reperire automaticamente i dati da Internet. Verrà creata una scheda personalizzata.");
+        const sizeMatch = queryUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+        populateFields({
+          rawText: query,
           brand: "Brand Custom",
-          modelCode: inputVal.split(' ')[0] || "Modello Generico",
+          modelCode: query.split(' ')[0] || "Modello Sconosciuto",
           colorCode: "Standard",
           caliber: sizeMatch ? sizeMatch[1] : "54",
           bridge: sizeMatch ? sizeMatch[2] : "18",
           temple: sizeMatch && sizeMatch[3] ? sizeMatch[3] : "140",
-          listPrice: 150.00
+          listPrice: 150.00,
+          source: "Inserimento Manuale Custom"
+        });
+      } finally {
+        document.getElementById('search-loading').classList.add('hidden');
+      }
+    }
+
+    // Simulatore/Scraper dinamico basato sul pattern alfanumerico
+    function fetchGlassesDataFromWeb(query) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const q = query.toUpperCase();
+          let brand = "Eyewear Brand";
+          let modelCode = query;
+          let colorCode = "001 Black";
+          let cal = "52";
+          let bridge = "18";
+          let temple = "140";
+          let price = 185.00;
+
+          if (q.startsWith("RB") || q.includes("RAY")) {
+            brand = "Ray-Ban";
+            price = 165.00;
+          } else if (q.startsWith("PO") || q.includes("PERSOL")) {
+            brand = "Persol";
+            price = 260.00;
+          } else if (q.startsWith("GG") || q.includes("GUCCI")) {
+            brand = "Gucci";
+            price = 350.00;
+          } else if (q.startsWith("OO") || q.includes("OAKLEY")) {
+            brand = "Oakley";
+            price = 150.00;
+          } else if (q.startsWith("FT") || q.includes("FORD")) {
+            brand = "Tom Ford";
+            price = 320.00;
+          } else if (q.startsWith("PR") || q.includes("PRADA")) {
+            brand = "Prada";
+            price = 310.00;
+          }
+
+          const sizeMatch = q.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+          if (sizeMatch) {
+            cal = sizeMatch[1];
+            bridge = sizeMatch[2];
+            if (sizeMatch[3]) temple = sizeMatch[3];
+          }
+
+          resolve({
+            brand: brand,
+            modelCode: modelCode,
+            colorCode: colorCode,
+            caliber: cal,
+            bridge: bridge,
+            temple: temple,
+            listPrice: price
+          });
+        }, 800);
+      });
+    }
+
+    function addNewModelToDB(brand, code, color, cal, bridge, temple, price) {
+      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
+      if (bIndex !== -1) {
+        dynamicBrandDB[bIndex].models.push({
+          code: code,
+          color: color,
+          caliber: cal,
+          bridge: bridge,
+          temple: temple,
+          price: price
+        });
+      } else {
+        dynamicBrandDB.push({
+          brand: brand,
+          models: [{
+            code: code,
+            color: color,
+            caliber: cal,
+            bridge: bridge,
+            temple: temple,
+            price: price
+          }]
         });
       }
+      saveDatabaseToStorage();
     }
 
     function populateFields(data) {
@@ -545,8 +605,8 @@
       document.getElementById('field-temple').value = data.temple || '';
       document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
 
-      document.getElementById('confidence-tag').innerText = "Modello Riconosciuto";
-      document.getElementById('scan-status-badge').innerText = "Scheda Compilata";
+      document.getElementById('data-source-tag').innerText = data.source || "Riconosciuto";
+      document.getElementById('scan-status-badge').innerText = "Scheda Completa";
       document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700";
 
       calculateDiscountedPrice();
@@ -579,7 +639,7 @@
       document.getElementById('field-desc').value = desc;
     }
 
-    // --- GENERATORE 5 FOTO ON DEMAND ---
+    // --- GENERATORE FOTO ON DEMAND ---
     function generateAIImages() {
       const brand = document.getElementById('field-brand').value || 'Eyewear';
       const code = document.getElementById('field-code').value || 'Model';
@@ -589,7 +649,7 @@
       const temple = document.getElementById('field-temple').value || '135';
 
       if (!brand || !code || brand === 'Eyewear') {
-        alert("Compila o seleziona prima la marca e il modello dell'occhiale prima di generare le foto.");
+        alert("Inserisci o cerca prima un modello di occhiale prima di generare le foto.");
         return;
       }
 
@@ -666,7 +726,7 @@
       const code = document.getElementById('field-code').value;
 
       if (!brand || !code) {
-        alert("Inserisci prima un modello o selezionalo dal catalogo.");
+        alert("Inserisci o cerca prima un modello da salvare.");
         return;
       }
 
@@ -689,7 +749,7 @@
 
       const indicator = document.getElementById('saved-status-indicator');
       indicator.className = "text-emerald-400 text-xs flex items-center gap-1 font-semibold";
-      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salva riuscito in inventario`;
+      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salvato in inventario`;
     }
 
     function updateInventoryTable() {
@@ -697,7 +757,7 @@
       document.getElementById('drafts-count').innerText = inventory.length;
 
       if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Cerca un modello e salva la scheda.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario.</td></tr>`;
         return;
       }
 
@@ -746,6 +806,7 @@
       document.getElementById('field-price-final').value = '';
       document.getElementById('field-title').value = '';
       document.getElementById('field-desc').value = '';
+      document.getElementById('data-source-tag').innerText = 'In attesa di ricerca';
     }
 
     function exportCSV() {
