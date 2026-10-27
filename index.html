@@ -5,36 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Scanner & Gestione Aste Occhiali</title>
-  
+  <title>OtticaCatalog Pro - Ricerca Aste & Generatore Foto</title>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <!-- Tesseract OCR Engine -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
-    
-    .scanner-line {
-      position: absolute;
-      width: 100%;
-      height: 3px;
-      background: #0284c7;
-      box-shadow: 0 0 12px #38bdf8, 0 0 25px #38bdf8;
-      animation: scan 1.6s infinite ease-in-out;
-    }
-    @keyframes scan {
-      0% { top: 10%; }
-      50% { top: 90%; }
-      100% { top: 10%; }
-    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
@@ -49,11 +32,11 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-microchip text-[10px]"></i> Decodificatore Aste, Smart Search & Generatore Foto HD
+            <i class="fa-solid fa-search text-[10px]"></i> Smart Search Aste & Generatore Foto On-Demand
           </p>
         </div>
       </div>
-      
+
       <div class="flex items-center space-x-3">
         <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition active:scale-95">
           <i class="fa-solid fa-plus"></i>
@@ -70,112 +53,57 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT COLUMN: MANUAL INPUT, OCR & CATALOG -->
+    <!-- LEFT COLUMN: MANUAL SEARCH & CATALOG SELECTOR -->
     <section class="lg:col-span-5 space-y-6">
-      
-      <!-- INSERIMENTO MANUALE & RICERCA INTELLIGENTE (FUNZIONAMENTO GARANTITO AL 100%) -->
-      <div class="bg-slate-800 border-2 border-sky-500/80 rounded-xl p-4 shadow-lg space-y-3">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-keyboard"></i> Inserimento Manuale / Ricerca Rapida
-          </h2>
-          <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">Consigliato per Aste Usurate</span>
-        </div>
-        <p class="text-[11px] text-slate-300">Scrivi direttamente le lettere o i numeri dell'asta (es: <span class="font-mono text-sky-300">RB3025</span>, <span class="font-mono text-sky-300">PO0649</span>, <span class="font-mono text-sky-300">GG0061S</span>) o incolla l'intera incisione e premi <strong>OK</strong>:</p>
 
-        <div class="flex gap-2">
-          <input type="text" id="manual-input-code" placeholder="Digita codice es. RB3025 L0205 58-14 135" class="flex-grow bg-slate-950 border border-sky-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
-          <button onclick="processManualInput()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2 rounded-lg transition shadow-md flex items-center gap-1 active:scale-95">
-            <i class="fa-solid fa-check text-sm"></i> OK & Genera
-          </button>
-        </div>
-      </div>
-
-      <!-- OCR CAMERA CARD -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-eye text-sky-400"></i> Scanner Foto / Webcam OCR
+      <!-- RICERCA MANUALE SMART CON AUTO-COMPLETAMENTO -->
+      <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-keyboard"></i> Inserimento Manuale Guidato
           </h2>
-          <span class="text-[10px] uppercase font-bold bg-slate-900 text-slate-400 border border-slate-700 px-2 py-0.5 rounded flex items-center gap-1">
-            <i class="fa-solid fa-sliders"></i> High Contrast Filter
+          <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
+            Smart Search
           </span>
         </div>
 
-        <!-- CAMERA / PREVIEW DISPLAY -->
-        <div id="camera-container" class="relative bg-slate-950 rounded-xl border border-slate-700 overflow-hidden min-h-[240px] flex flex-col items-center justify-center p-2 text-center">
-          
-          <video id="webcam-video" autoplay playsinline muted class="w-full h-auto max-h-[260px] object-cover rounded hidden"></video>
-          <canvas id="snapshot-canvas" class="hidden"></canvas>
-          <canvas id="processed-canvas" class="hidden"></canvas>
-          <img id="captured-preview" class="w-full h-auto max-h-[260px] object-contain rounded hidden" alt="Foto asta scansionata"/>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Inizia a digitare le scritte presenti sull'asta (es. <span class="font-mono text-sky-300">RB3025</span>, <span class="font-mono text-sky-300">0649</span>, <span class="font-mono text-sky-300">MICA</span>, <span class="font-mono text-sky-300">GG0061</span>) per visualizzare subito i suggerimenti:
+        </p>
 
-          <div id="scanner-line-overlay" class="hidden absolute inset-0 pointer-events-none">
-            <div class="scanner-line"></div>
+        <div class="relative">
+          <div class="flex gap-2">
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Digita codice asta o modello..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <button onclick="processManualInput()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
+              <i class="fa-solid fa-check"></i> OK
+            </button>
           </div>
 
-          <!-- PLACEHOLDER INSTRUCTION -->
-          <div id="camera-placeholder" class="p-6 text-slate-400 space-y-3">
-            <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center mx-auto text-sky-400 shadow-inner">
-              <i class="fa-solid fa-camera text-2xl"></i>
-            </div>
-            <div>
-              <p class="text-xs font-semibold text-slate-200">Scatta una foto nitida da vicino dell'asta</p>
-              <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                Assicurati che la luce sia forte ed evita riflessi metallici diretti.
-              </p>
-            </div>
-          </div>
-
-          <!-- OCR SCANNING OVERLAY ANIMATION -->
-          <div id="ocr-loader" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center hidden z-20">
-            <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p class="text-sm font-bold text-sky-300">Analisi Ottica & Binarizzazione in Corso...</p>
-            <p class="text-[11px] text-slate-400 mt-1">Confronto con Database Brand Mondiali</p>
+          <!-- DROPDOWN SUGGERIMENTI RICERCA -->
+          <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60">
+            <!-- Popolato via JS -->
           </div>
         </div>
-
-        <!-- CAMERA CONTROLS -->
-        <div class="grid grid-cols-2 gap-2">
-          <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 border border-slate-600">
-            <i class="fa-solid fa-camera"></i> <span id="cam-btn-text">Avvia Cam</span>
-          </button>
-          <button id="btn-snap" onclick="captureAndAnalyze()" disabled class="bg-sky-600 hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold py-2.5 px-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
-            <i class="fa-solid fa-bolt"></i> Scatta & Leggi
-          </button>
-        </div>
-
-        <div class="relative flex py-1 items-center">
-          <div class="flex-grow border-t border-slate-700"></div>
-          <span class="flex-shrink mx-2 text-[10px] text-slate-500 uppercase font-semibold tracking-wider">Oppure Carica File</span>
-          <div class="flex-grow border-t border-slate-700"></div>
-        </div>
-
-        <label class="w-full bg-slate-900 hover:bg-slate-700 border border-dashed border-slate-600 text-slate-300 text-xs py-2.5 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
-          <i class="fa-solid fa-upload text-sky-400"></i>
-          <span>Carica Foto Asta dal Telefono / PC</span>
-          <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event)"/>
-        </label>
       </div>
 
-      <!-- MEGA CATALOG PRESETS (250+ BRAND E MODELLI) -->
+      <!-- CATALOGO COMPLETO -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Mega Catalogo (50+ Brand & 250+ Modelli)
+            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Selezione Rapida da Catalogo
           </h3>
-          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">Completo</span>
+          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">100+ Modelli</span>
         </div>
-        <p class="text-[11px] text-slate-400">Seleziona direttamente un modello dal menu per provarne la decodifica istantanea:</p>
-        
+        <p class="text-[11px] text-slate-400">Scegli direttamente un modello tra i più diffusi sul mercato:</p>
+
         <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
-          <option value="">-- Seleziona marca e modello dal catalogo completo --</option>
+          <option value="">-- Seleziona dal catalogo generale --</option>
         </select>
       </div>
 
     </section>
 
-    <!-- RIGHT COLUMN: EXTRACTED EYEWEAR DATA, PRICE & PHOTOS -->
+    <!-- RIGHT COLUMN: EYEWEAR DATA, PRICE & GENERATED PHOTOS -->
     <section class="lg:col-span-7 space-y-6">
 
       <!-- PRODUCT DATA FORM CARD -->
@@ -189,13 +117,13 @@
           </span>
         </div>
 
-        <!-- RAW OCR TEXT EXTRACTED -->
+        <!-- RAW TEXT / CODICE INSERITO -->
         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Testo Estratto / Digitato (Raw Text)</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">Stato: --</span>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Codice / Testo Asta Rilevato</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">Stato: In attesa</span>
           </div>
-          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun dato inserito o scansionato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice selezionato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
 
         <!-- ROW 1: BRAND, MODEL CODE, COLOR CODE -->
@@ -298,23 +226,24 @@
 
       </div>
 
-      <!-- 5 GENERATED PHOTOS SECTION -->
+      <!-- 5 GENERATED PHOTOS SECTION (ON DEMAND BUTTON) -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-images text-sky-400"></i> Galleria 5 Foto Modello (Alta Definizione)
+              <i class="fa-solid fa-images text-sky-400"></i> Galleria Foto Prodotto (5 Viste HD)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">5 Angolazioni generate sulle specifiche esatte dell'occhiale</p>
+            <p class="text-xs text-slate-400 mt-0.5">Premi il pulsante a destra per generare le 5 foto sul modello compilato</p>
           </div>
-          <span class="text-xs font-bold text-sky-400 bg-sky-950 border border-sky-800 px-2.5 py-1 rounded-full">
-            5/5 Foto HD
-          </span>
+
+          <button onclick="generateAIImages()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Genera 5 Foto HD
+          </button>
         </div>
 
         <!-- 5 PHOTO GRID CONTAINER -->
         <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <!-- Popolato dinamicamente -->
+          <!-- Popolato via JS -->
         </div>
       </div>
 
@@ -343,7 +272,7 @@
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
               <tr>
-                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona l'asta o digita il codice a mano.</td>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Cerca un modello e salva la scheda.</td>
               </tr>
             </tbody>
           </table>
@@ -356,7 +285,7 @@
 
   <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    // --- DATABASE ESTESO (50+ BRAND E 250+ MODELLI) ---
+    // --- DATABASE ESPANSO DEI MARCHI E MODELLI EYEWEAR ---
     const BRAND_DATABASE = [
       {
         brand: "Ray-Ban",
@@ -366,7 +295,9 @@
           { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 },
           { code: "RB3138 001", color: "Gold / Verde Shooter", caliber: "62", bridge: "09", temple: "140", price: 180.00 },
           { code: "RB5154 2000", color: "Clubmaster Black Gold", caliber: "49", bridge: "21", temple: "140", price: 160.00 },
-          { code: "RB3447 001", color: "Round Metal Gold", caliber: "50", bridge: "21", temple: "145", price: 165.00 }
+          { code: "RB3447 001", color: "Round Metal Gold", caliber: "50", bridge: "21", temple: "145", price: 165.00 },
+          { code: "RB4165 622/T3", color: "Justin Black / Grey Polar", caliber: "55", bridge: "16", temple: "145", price: 155.00 },
+          { code: "RB4171 622/8G", color: "Erika Rubber Black", caliber: "54", bridge: "18", temple: "145", price: 145.00 }
         ]
       },
       {
@@ -385,7 +316,8 @@
         models: [
           { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 },
           { code: "GG0876S 002", color: "Havana Tartarugato / Marrone", caliber: "55", bridge: "19", temple: "145", price: 350.00 },
-          { code: "GG0275S 001", color: "Web Stripe Black", caliber: "50", bridge: "20", temple: "145", price: 320.00 }
+          { code: "GG0275S 001", color: "Web Stripe Black", caliber: "50", bridge: "20", temple: "145", price: 320.00 },
+          { code: "GG0010S 001", color: "Avana Nero / Lenti Verdi", caliber: "58", bridge: "16", temple: "145", price: 340.00 }
         ]
       },
       {
@@ -394,7 +326,8 @@
         models: [
           { code: "OO9102-01 Holbrook", color: "Matte Black / Prizm Sapphire", caliber: "55", bridge: "18", temple: "137", price: 147.00 },
           { code: "OO9013 Frogskins", color: "Polished Black / Prizm Black", caliber: "54", bridge: "17", temple: "138", price: 132.00 },
-          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road Shield", caliber: "137", bridge: "00", temple: "140", price: 173.00 }
+          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road Shield", caliber: "137", bridge: "00", temple: "140", price: 173.00 },
+          { code: "OO9208 Radar EV", color: "Polished White / Prizm Low Light", caliber: "138", bridge: "00", temple: "128", price: 195.00 }
         ]
       },
       {
@@ -456,8 +389,6 @@
     ];
 
     // Global State
-    let webcamStream = null;
-    let isWebcamActive = false;
     let inventory = [];
 
     window.onload = function() {
@@ -500,20 +431,97 @@
       });
     }
 
-    function processManualInput() {
-      const inputVal = document.getElementById('manual-input-code').value.trim();
-      if (!inputVal) {
-        alert("Inserisci un codice dell'asta valido.");
+    // --- AUTO-COMPLETAMENTO RICERCA IN TEMPO REALE ---
+    function handleSearchInput() {
+      const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
+      const suggestionsBox = document.getElementById('search-suggestions');
+
+      if (input.length < 2) {
+        suggestionsBox.classList.add('hidden');
         return;
       }
 
-      const normalized = cleanAndNormalizeOCR(inputVal);
-      const parsedData = parseEyewearText(normalized);
+      let matches = [];
+      BRAND_DATABASE.forEach(b => {
+        b.models.forEach(m => {
+          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input) || m.color.toUpperCase().includes(input)) {
+            matches.push({ brand: b.brand, ...m });
+          }
+        });
+      });
 
-      if (parsedData) {
-        populateFields(parsedData);
+      if (matches.length === 0) {
+        suggestionsBox.classList.add('hidden');
+        return;
+      }
+
+      suggestionsBox.innerHTML = '';
+      matches.slice(0, 6).forEach(item => {
+        const div = document.createElement('div');
+        div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
+        div.innerHTML = `
+          <div>
+            <span class="font-bold text-sky-400">${item.brand} ${item.code}</span>
+            <div class="text-[10px] text-slate-400">${item.color} (${item.caliber}□${item.bridge}-${item.temple})</div>
+          </div>
+          <span class="text-emerald-400 font-mono font-bold">€${item.price}</span>
+        `;
+        div.onclick = function() {
+          populateFields({
+            rawText: `${item.brand.toUpperCase()} ${item.code} ${item.caliber}□${item.bridge} ${item.temple}`,
+            brand: item.brand,
+            modelCode: item.code,
+            colorCode: item.color,
+            caliber: item.caliber,
+            bridge: item.bridge,
+            temple: item.temple,
+            listPrice: item.price
+          });
+          document.getElementById('manual-input-code').value = `${item.brand} ${item.code}`;
+          suggestionsBox.classList.add('hidden');
+        };
+        suggestionsBox.appendChild(div);
+      });
+
+      suggestionsBox.classList.remove('hidden');
+    }
+
+    function processManualInput() {
+      const inputVal = document.getElementById('manual-input-code').value.trim();
+      document.getElementById('search-suggestions').classList.add('hidden');
+
+      if (!inputVal) {
+        alert("Digita prima il codice o la marca dell'occhiale.");
+        return;
+      }
+
+      const inputUpper = inputVal.toUpperCase();
+      let matched = null;
+
+      for (let b of BRAND_DATABASE) {
+        if (b.regex.test(inputUpper) || b.brand.toUpperCase().includes(inputUpper)) {
+          let model = b.models.find(m => inputUpper.includes(m.code.split(' ')[0]));
+          if (!model) model = b.models[0];
+
+          const sizeMatch = inputUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+          matched = {
+            rawText: inputVal,
+            brand: b.brand,
+            modelCode: model.code,
+            colorCode: model.color,
+            caliber: sizeMatch ? sizeMatch[1] : model.caliber,
+            bridge: sizeMatch ? sizeMatch[2] : model.bridge,
+            temple: sizeMatch && sizeMatch[3] ? sizeMatch[3] : model.temple,
+            listPrice: model.price
+          };
+          break;
+        }
+      }
+
+      if (matched) {
+        populateFields(matched);
       } else {
-        const sizeMatch = normalized.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+        const sizeMatch = inputUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
         populateFields({
           rawText: inputVal,
           brand: "Brand Custom",
@@ -527,193 +535,6 @@
       }
     }
 
-    function cleanAndNormalizeOCR(raw) {
-      return raw
-        .toUpperCase()
-        .replace(/[\n\r]/g, ' ')
-        .replace(/O(?=\d)/g, '0')
-        .replace(/I(?=\d)/g, '1')
-        .replace(/S(?=\d)/g, '5')
-        .replace(/B(?=\d)/g, '8')
-        .replace(/Z(?=\d)/g, '2');
-    }
-
-    async function toggleWebcam() {
-      const video = document.getElementById('webcam-video');
-      const placeholder = document.getElementById('camera-placeholder');
-      const btnText = document.getElementById('cam-btn-text');
-      const btnSnap = document.getElementById('btn-snap');
-      const capturedImg = document.getElementById('captured-preview');
-      const scannerOverlay = document.getElementById('scanner-line-overlay');
-
-      if (isWebcamActive) {
-        if (webcamStream) webcamStream.getTracks().forEach(t => t.stop());
-        video.classList.add('hidden');
-        scannerOverlay.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        btnText.innerText = "Avvia Cam";
-        btnSnap.disabled = true;
-        isWebcamActive = false;
-      } else {
-        try {
-          webcamStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-          });
-          video.srcObject = webcamStream;
-          video.classList.remove('hidden');
-          scannerOverlay.classList.remove('hidden');
-          placeholder.classList.add('hidden');
-          capturedImg.classList.add('hidden');
-          btnText.innerText = "Ferma Cam";
-          btnSnap.disabled = false;
-          isWebcamActive = true;
-        } catch (err) {
-          alert("Impossibile accedere alla fotocamera. Assicurati di aver concesso i permessi o digita il codice nel box in alto.");
-        }
-      }
-    }
-
-    function captureAndAnalyze() {
-      if (!isWebcamActive) return;
-
-      const video = document.getElementById('webcam-video');
-      const canvas = document.getElementById('snapshot-canvas');
-      const capturedImg = document.getElementById('captured-preview');
-      
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      capturedImg.src = dataUrl;
-      capturedImg.classList.remove('hidden');
-      video.classList.add('hidden');
-
-      toggleWebcam();
-      processOCR(canvas);
-    }
-
-    function handleFileUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.getElementById('snapshot-canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-
-          document.getElementById('captured-preview').src = evt.target.result;
-          document.getElementById('captured-preview').classList.remove('hidden');
-          document.getElementById('camera-placeholder').classList.add('hidden');
-          document.getElementById('webcam-video').classList.add('hidden');
-
-          processOCR(canvas);
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function preprocessImageForOCR(sourceCanvas) {
-      const pCanvas = document.getElementById('processed-canvas');
-      pCanvas.width = sourceCanvas.width;
-      pCanvas.height = sourceCanvas.height;
-      const ctx = pCanvas.getContext('2d');
-
-      ctx.drawImage(sourceCanvas, 0, 0);
-
-      const imgData = ctx.getImageData(0, 0, pCanvas.width, pCanvas.height);
-      const data = imgData.data;
-
-      for (let i = 0; i < data.length; i += 4) {
-        const avg = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
-        const v = avg > 125 ? 255 : 0;
-
-        data[i] = v;
-        data[i + 1] = v;
-        data[i + 2] = v;
-      }
-
-      ctx.putImageData(imgData, 0, 0);
-      return pCanvas.toDataURL('image/png');
-    }
-
-    async function processOCR(sourceCanvas) {
-      showOCRLoader(true);
-
-      try {
-        const processedImage = preprocessImageForOCR(sourceCanvas);
-
-        const worker = await Tesseract.createWorker('eng');
-        const ret = await worker.recognize(processedImage);
-        await worker.terminate();
-
-        const rawText = cleanAndNormalizeOCR(ret.data.text);
-        const matchedData = parseEyewearText(rawText);
-
-        if (matchedData) {
-          populateFields(matchedData);
-        } else {
-          alert("Lettura visiva incerta. Puoi digitare le poche lettere/numeri leggibili direttamente nel box 'Inserimento Manuale / Ricerca Rapida' in alto e premere OK.");
-          resetFormFields();
-          document.getElementById('confidence-tag').innerText = "Nessuna corrispondenza";
-          document.getElementById('scan-status-badge').innerText = "Usa Inserimento Manuale";
-          document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-800";
-        }
-      } catch (err) {
-        alert("Errore nell'elaborazione visiva. Usa il box di inserimento manuale in alto.");
-      } finally {
-        showOCRLoader(false);
-      }
-    }
-
-    function parseEyewearText(text) {
-      for (let b of BRAND_DATABASE) {
-        if (b.regex.test(text)) {
-          let matchedModel = b.models.find(m => text.includes(m.code.split(' ')[0]));
-          if (!matchedModel) matchedModel = b.models[0];
-
-          const sizeMatch = text.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
-          const caliber = sizeMatch ? sizeMatch[1] : matchedModel.caliber;
-          const bridge = sizeMatch ? sizeMatch[2] : matchedModel.bridge;
-          const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : matchedModel.temple;
-
-          return {
-            rawText: text,
-            brand: b.brand,
-            modelCode: matchedModel.code,
-            colorCode: matchedModel.color,
-            caliber: caliber,
-            bridge: bridge,
-            temple: temple,
-            listPrice: matchedModel.price
-          };
-        }
-      }
-
-      const genericSizeMatch = text.match(/([A-Z0-9]{3,8})\s+(\d{2})[\s□\-]+(\d{2})\s+(\d{3})/);
-      if (genericSizeMatch) {
-        return {
-          rawText: text,
-          brand: "Modello Rilevato",
-          modelCode: genericSizeMatch[1],
-          colorCode: "Standard",
-          caliber: genericSizeMatch[2],
-          bridge: genericSizeMatch[3],
-          temple: genericSizeMatch[4],
-          listPrice: 150.00
-        };
-      }
-
-      return null;
-    }
-
     function populateFields(data) {
       document.getElementById('field-raw-ocr').value = data.rawText || '';
       document.getElementById('field-brand').value = data.brand || '';
@@ -723,13 +544,12 @@
       document.getElementById('field-bridge').value = data.bridge || '';
       document.getElementById('field-temple').value = data.temple || '';
       document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
-      
-      document.getElementById('confidence-tag').innerText = "Dati Caricati Con Successo";
-      document.getElementById('scan-status-badge').innerText = "Riconoscimento Completato";
+
+      document.getElementById('confidence-tag').innerText = "Modello Riconosciuto";
+      document.getElementById('scan-status-badge').innerText = "Scheda Compilata";
       document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700";
 
       calculateDiscountedPrice();
-      generateAIImages();
     }
 
     function calculateDiscountedPrice() {
@@ -759,12 +579,7 @@
       document.getElementById('field-desc').value = desc;
     }
 
-    function showOCRLoader(show) {
-      const loader = document.getElementById('ocr-loader');
-      if (show) loader.classList.remove('hidden');
-      else loader.classList.add('hidden');
-    }
-
+    // --- GENERATORE 5 FOTO ON DEMAND ---
     function generateAIImages() {
       const brand = document.getElementById('field-brand').value || 'Eyewear';
       const code = document.getElementById('field-code').value || 'Model';
@@ -772,6 +587,11 @@
       const cal = document.getElementById('field-caliber').value || '58';
       const bridge = document.getElementById('field-bridge').value || '14';
       const temple = document.getElementById('field-temple').value || '135';
+
+      if (!brand || !code || brand === 'Eyewear') {
+        alert("Compila o seleziona prima la marca e il modello dell'occhiale prima di generare le foto.");
+        return;
+      }
 
       const galleryGrid = document.getElementById('photo-gallery-grid');
       galleryGrid.innerHTML = '';
@@ -846,7 +666,7 @@
       const code = document.getElementById('field-code').value;
 
       if (!brand || !code) {
-        alert("Esegui prima una scansione o inserisci il codice a mano.");
+        alert("Inserisci prima un modello o selezionalo dal catalogo.");
         return;
       }
 
@@ -877,7 +697,7 @@
       document.getElementById('drafts-count').innerText = inventory.length;
 
       if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Scansiona l'asta o digita il codice a mano.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario. Cerca un modello e salva la scheda.</td></tr>`;
         return;
       }
 
@@ -907,11 +727,10 @@
     function resetWorkflow() {
       resetFormFields();
       renderEmptyGallery();
-      document.getElementById('captured-preview').classList.add('hidden');
-      document.getElementById('camera-placeholder').classList.remove('hidden');
       document.getElementById('preset-select').value = "";
       document.getElementById('manual-input-code').value = "";
-      document.getElementById('scan-status-badge').innerText = "In attesa di scansione";
+      document.getElementById('search-suggestions').classList.add('hidden');
+      document.getElementById('scan-status-badge').innerText = "In attesa di dati";
       document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600";
     }
 
