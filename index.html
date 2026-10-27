@@ -116,40 +116,6 @@
         </label>
       </div>
 
-      <!-- DEMO TEST PRESETS -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-flask text-amber-400"></i> Test Rapido senza Fotocamera
-        </h2>
-        <p class="text-xs text-slate-400">Seleziona una sigla per simularne il riconoscimento completo con stima prezzo:</p>
-        
-        <div class="space-y-2">
-          <button onclick="simulateOCR(0)" class="w-full text-left bg-slate-900 hover:bg-slate-700 p-2.5 rounded-lg border border-slate-700 text-xs transition flex justify-between items-center group">
-            <div>
-              <div class="font-bold text-sky-400 group-hover:text-sky-300">Ray-Ban Aviator Classic</div>
-              <div class="text-[11px] text-slate-400 font-mono mt-0.5">RB3025 L0205 58□14 135 3N</div>
-            </div>
-            <span class="text-emerald-400 font-bold text-xs bg-emerald-950/80 px-2 py-1 rounded border border-emerald-800">~165€</span>
-          </button>
-
-          <button onclick="simulateOCR(1)" class="w-full text-left bg-slate-900 hover:bg-slate-700 p-2.5 rounded-lg border border-slate-700 text-xs transition flex justify-between items-center group">
-            <div>
-              <div class="font-bold text-sky-400 group-hover:text-sky-300">Persol Original 649</div>
-              <div class="text-[11px] text-slate-400 font-mono mt-0.5">PO0649 24/31 54□20 140 2N</div>
-            </div>
-            <span class="text-emerald-400 font-bold text-xs bg-emerald-950/80 px-2 py-1 rounded border border-emerald-800">~260€</span>
-          </button>
-
-          <button onclick="simulateOCR(2)" class="w-full text-left bg-slate-900 hover:bg-slate-700 p-2.5 rounded-lg border border-slate-700 text-xs transition flex justify-between items-center group">
-            <div>
-              <div class="font-bold text-sky-400 group-hover:text-sky-300">Oakley Holbrook Matte</div>
-              <div class="text-[11px] text-slate-400 font-mono mt-0.5">OO9102-01 55□18 137 Prizm</div>
-            </div>
-            <span class="text-emerald-400 font-bold text-xs bg-emerald-950/80 px-2 py-1 rounded border border-emerald-800">~147€</span>
-          </button>
-        </div>
-      </div>
-
     </section>
 
     <!-- RIGHT COLUMN: EXTRACTED EYEWEAR DATA, PRICE ESTIMATION & GENERATED PHOTOS -->
@@ -170,7 +136,7 @@
         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
           <div class="flex justify-between items-center mb-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Testo Rilevato dall'Asta (Raw OCR)</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">AI Vision 99.8%</span>
+            <span class="text-[10px] text-sky-400 font-mono" id="confidence-tag">AI Vision OCR</span>
           </div>
           <input type="text" id="field-raw-ocr" readonly placeholder="Nessuna scansione effettuata" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
@@ -198,7 +164,7 @@
               <label class="text-xs font-medium text-slate-400">Codice Colore / Lenti</label>
               <button onclick="copyField('field-color')" class="text-xs text-sky-400 hover:text-sky-300" title="Copia"><i class="fa-regular fa-copy"></i></button>
             </div>
-            <input type="text" id="field-color" placeholder="Es. L0205 / G-15 Green" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+            <input type="text" id="field-color" placeholder="Es. L0205" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
           </div>
         </div>
 
@@ -369,45 +335,7 @@
     let currentDraftId = null;
     let isCurrentProductSaved = true;
 
-    // Presets for quick offline simulation
-    const PRESETS = [
-      {
-        raw: "RB 3025 AVIATOR LARGE METAL L0205 58□14 135 3N",
-        brand: "Ray-Ban",
-        code: "RB3025 L0205",
-        color: "Arista Gold / Lenti Verde G-15 Classic",
-        caliber: "58",
-        bridge: "14",
-        temple: "135",
-        listPrice: 165.00,
-        desc: "Occhiale da sole Ray-Ban Aviator Classic RB3025 L0205 con iconica montatura in metallo dorato ed eleganti lenti verde G-15. Progettato originariamente per i piloti americani nel 1937, offre un design intramontabile combinato a un comfort eccezionale. Calibro 58 mm, ponte 14 mm e aste 135 mm, protezione UV400 completa di grado 3N. Prezzo di listino ufficiale 165.00€."
-      },
-      {
-        raw: "PERSOL PO 0649 24/31 54□20 140 2N HAND MADE IN ITALY",
-        brand: "Persol",
-        code: "PO 0649 24/31",
-        color: "Havana Acetato / Lenti Grigio Verde Crystal",
-        caliber: "54",
-        bridge: "20",
-        temple: "140",
-        listPrice: 260.00,
-        desc: "Occhiale da sole Persol 0649 24/31 realizzato a mano in Italia con pregiato acetato Havana arricchito dal leggendario sistema Meflecto sulle aste per la massima flessibilità. Equipaggiato con lenti in cristallo grigio-verde per una chiarezza ottica insuperabile. Calibro 54 mm, ponte 20 mm e aste 140 mm. Prezzo di listino ufficiale 260.00€."
-      },
-      {
-        raw: "OAKLEY HOLBROOK OO9102-01 55□18 137 PRIZM SAPPHIRE",
-        brand: "Oakley",
-        code: "OO9102-01 Holbrook",
-        color: "Matte Black / Lenti Prizm Sapphire Mirror",
-        caliber: "55",
-        bridge: "18",
-        temple: "137",
-        listPrice: 147.00,
-        desc: "Occhiale da sole sportivo e lifestyle Oakley Holbrook OO9102-01 in montatura ultraleggera O Matter nero opaco con dettagli rivettati. Dotato di lenti ad alta tecnologia Prizm Sapphire che ottimizzano i contrasti e la visibilità della luce. Calibro 55 mm, ponte 18 mm e aste 137 mm. Prezzo di listino ufficiale 147.00€."
-      }
-    ];
-
     window.onload = function() {
-      // Initialize clean start (no preset auto-loaded)
       renderEmptyGallery();
       updateDraftsTable();
     };
@@ -421,7 +349,6 @@
       const capturedImg = document.getElementById('captured-preview');
 
       if (isWebcamActive) {
-        // Stop camera
         if (webcamStream) {
           webcamStream.getTracks().forEach(track => track.stop());
         }
@@ -431,7 +358,6 @@
         btnSnap.disabled = true;
         isWebcamActive = false;
       } else {
-        // Start camera
         try {
           webcamStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
@@ -467,7 +393,7 @@
       capturedImg.classList.remove('hidden');
       video.classList.add('hidden');
 
-      toggleWebcam(); // Turn off live camera stream
+      toggleWebcam(); // Spegne lo stream live della fotocamera
       processOCR(dataUrl);
     }
 
@@ -496,9 +422,9 @@
     async function processOCR(base64Image) {
       showOCRLoader(true);
 
-      const promptText = `Analizza l'immagine di quest'asta o ponte di occhiali da vista/sole. 
-Leggi con attenzione tutte le scritte e i numeri incisi (es. Marca, Modello, Codice Colore, Calibro, Ponte, Lunghezza Aste).
-Fornisci anche una stima del PREZZO DI LISTINO UFFICIALE (Retail List Price in Euro €) basata sul valore di mercato di questo marchio e modello.
+      const promptText = `Analizza attentamente l'immagine fornita (asta o ponte di occhiali da vista/sole).
+Estrai con accuratezza esclusiva il testo e le incisioni visibili nell'immagine ricevuta: Marca, Modello, Codice Colore, Calibro, Ponte, Lunghezza Aste.
+Stima inoltre un PREZZO DI LISTINO UFFICIALE (Retail List Price in Euro €) in base al marchio e modello identificato.
 
 Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo formato esatto:
 {
@@ -509,8 +435,8 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
   "caliber": "numero calibro in mm (solo cifra)",
   "bridge": "numero ponte in mm (solo cifra)",
   "temple": "lunghezza aste in mm (solo cifra)",
-  "listPrice": 165.00,
-  "description": "Un unico paragrafo fluido e professionale senza a capo che descriva l'occhiale con tutte le specifiche e il prezzo di listino stimato per l'e-commerce."
+  "listPrice": 0.00,
+  "description": "Un unico paragrafo fluido e professionale senza a capo che descriva l'occhiale con tutte le specifiche estratte dall'immagine e il prezzo di listino stimato."
 }`;
 
       const apiKey = ""; // Canvas runtime API Key injection
@@ -543,34 +469,14 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
           const parsed = JSON.parse(jsonText);
           populateFields(parsed);
         } else {
-          fallbackToPreset("Impossibile leggere chiaramente la sigla. Inserisci i dati manualmente o riprova con maggiore luce.");
+          alert("Impossibile leggere chiaramente il testo sull'asta. Prova a scattare una foto più nitida o inserisci i dati manualmente.");
         }
       } catch (err) {
-        console.warn("Chiamata OCR API fallita, utilizzo simulazione intelligente:", err);
-        // Fallback simulation for reliable testing
-        simulateOCR(0);
-      } finally {
+        console.error("Errore durante la lettura OCR:", err);
+        alert("Si è verificato un errore nella lettura dell'immagine. Riprova con una foto più chiara e illuminata.");
+      } font-bold {
         showOCRLoader(false);
       }
-    }
-
-    function simulateOCR(index) {
-      showOCRLoader(true);
-      setTimeout(() => {
-        const item = PRESETS[index];
-        populateFields({
-          rawText: item.raw,
-          brand: item.brand,
-          modelCode: item.code,
-          colorCode: item.color,
-          caliber: item.caliber,
-          bridge: item.bridge,
-          temple: item.temple,
-          listPrice: item.listPrice,
-          description: item.desc
-        });
-        showOCRLoader(false);
-      }, 600);
     }
 
     function populateFields(data) {
@@ -581,7 +487,7 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
       document.getElementById('field-caliber').value = data.caliber || '';
       document.getElementById('field-bridge').value = data.bridge || '';
       document.getElementById('field-temple').value = data.temple || '';
-      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '150.00';
+      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
       
       const fullTitle = `${data.brand || ''} ${data.modelCode || ''} ${data.colorCode || ''} ${data.caliber || ''}-${data.bridge || ''}`.trim();
       document.getElementById('field-title').value = fullTitle;
@@ -647,7 +553,7 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
       const color = document.getElementById('field-color').value || 'Dark';
       const galleryGrid = document.getElementById('photo-gallery-grid');
 
-      galleryGrid.innerHTML = ''; // Clear previous
+      galleryGrid.innerHTML = '';
 
       const photoConfigs = [
         { title: "1. Vista Frontale", bg: "Studio Neutro Lux", desc: "Montatura frontale e lenti" },
@@ -658,7 +564,6 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
       ];
 
       photoConfigs.forEach((config, idx) => {
-        // Generate dynamic high resolution SVG mockup representing specific brand/color
         const svgUri = generateEyewearSVG(brand, code, color, idx);
 
         const cardHtml = `
@@ -770,7 +675,7 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
       document.getElementById('drafts-count').innerText = draftsInventory.length;
 
       if (draftsInventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato nelle bozzie. Scansiona un'asta e clicca su "Salva in Bozze".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato nelle bozze. Scansiona un'asta e clicca su "Salva in Bozze".</td></tr>`;
         return;
       }
 
@@ -825,7 +730,6 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
     }
 
     function newProductWorkflow() {
-      // Clear all input fields for brand new product
       currentDraftId = null;
       document.getElementById('field-raw-ocr').value = '';
       document.getElementById('field-brand').value = '';
@@ -853,7 +757,6 @@ Rispondi TASSATIVAMENTE ed ESCLUSIVAMENTE con un oggetto JSON valido in questo f
       indicator.className = "text-slate-500 flex items-center gap-1";
       indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Nuova scheda vuota`;
 
-      // Automatically launch camera for instant next workflow scan
       if (!isWebcamActive) {
         toggleWebcam();
       }
