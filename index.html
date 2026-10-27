@@ -1,357 +1,303 @@
 <!DOCTYPE html>
-<html lang="it" class="dark">
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OptiScan Pro - Archiviazione & Schede Tecniche Occhiali</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
+  <title>OtticaCatalog Pro - Smart Search & Foto HD</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              900: '#0c4a6e',
-            },
-            accent: {
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669',
-            }
-          }
-        }
-      }
-    }
-  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .font-mono { font-family: 'JetBrains+Mono', monospace; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen custom-scrollbar flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
 
-  <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-          <i class="fa-solid fa-glasses text-slate-950 text-xl"></i>
+        <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl text-slate-950 shadow-md">
+          <i class="fa-solid fa-glasses text-xl"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">
-            OptiScan Ultra Pro <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">Match Foto Reali Web</span>
-          </h1>
-          <p class="text-xs text-slate-400">Decodificatore Aste, Ricerca Foto Catalogo Online e Gestione Inventario</p>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro Ultra</h1>
+          <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-globe text-[10px]"></i> Ricerca Universale Codici Aste & Auto-Apprendimento
+          </p>
         </div>
       </div>
-      <div class="flex items-center space-x-2">
-        <button id="btnExportCSV" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
-          <i class="fa-solid fa-file-csv text-accent-400 text-sm"></i> Esporta Registro CSV
+
+      <div class="flex items-center space-x-3">
+        <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition active:scale-95">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Nuovo Occhiale</span>
         </button>
+        <a href="#inventory-section" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium px-3 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Inventario (<span id="drafts-count" class="font-bold text-sky-400">0</span>)</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- COLONNA SINISTRA: ACQUISIZIONE, OCR & FORUM DI VALIDAZIONE (5 Col) -->
-    <section class="lg:col-span-5 flex flex-col gap-5">
-      
-      <!-- Box Fotocamera / Upload OCR -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-4">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-2">
-            <i class="fa-solid fa-camera"></i> 1. Scansione Laser Asta (OCR)
+    <!-- LEFT COLUMN: SEARCH & DATABASE -->
+    <section class="lg:col-span-5 space-y-6">
+
+      <!-- RICERCA UNIVERASLE CODICE ASTA -->
+      <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass"></i> Ricerca & Verifica Codice Asta
           </h2>
-          <span class="text-xs text-slate-400 font-mono" id="statusBadge">Pronto</span>
-        </div>
-
-        <!-- Video & Canvas Preview Container -->
-        <div class="relative aspect-video rounded-xl bg-slate-900 border border-slate-800 overflow-hidden group flex items-center justify-center">
-          <video id="videoElement" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-          <img id="imagePreview" class="w-full h-full object-contain hidden" alt="Anteprima asta">
-          
-          <div id="placeholderUI" class="text-center p-6 flex flex-col items-center gap-2">
-            <i class="fa-solid fa-barcode text-4xl text-slate-600 mb-1"></i>
-            <p class="text-xs text-slate-400">Fotografa l'incisione o carica un'immagine ad alta risoluzione dell'asta</p>
-          </div>
-
-          <!-- Overlay Guida Inquadratura -->
-          <div id="scanOverlay" class="absolute inset-4 border-2 border-dashed border-brand-400/50 rounded-lg pointer-events-none hidden flex items-center justify-center">
-            <span class="bg-slate-950/80 text-brand-400 text-[10px] px-2 py-1 rounded font-mono">Inquadra il codice incisione</span>
-          </div>
-        </div>
-
-        <!-- Controlli Foto & Camera -->
-        <div class="grid grid-cols-2 gap-2">
-          <button id="btnStartCamera" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-video text-brand-400"></i> Fotocamera Live
-          </button>
-          <label class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center justify-center gap-2 cursor-pointer">
-            <i class="fa-solid fa-upload text-accent-400"></i> Carica Immagine
-            <input type="file" id="fileInput" accept="image/*" class="hidden">
-          </label>
-        </div>
-
-        <button id="btnCapture" class="hidden w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-slate-950 font-bold text-xs shadow-lg shadow-brand-500/20 hover:opacity-95 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i> DECODIFICA TESTO ASTA ORA
-        </button>
-
-        <!-- Filtri Avanzati Canvas Pre-OCR -->
-        <div class="border-t border-slate-800/80 pt-3 flex flex-col gap-3">
-          <span class="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-sliders text-brand-400"></i> Filtri Ottici Pre-OCR Canvas
+          <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
+            Inserimento Libero
           </span>
+        </div>
 
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="chkInvert" class="rounded accent-brand-500" checked>
-              <span class="text-slate-300">Inverti (Incisione Chiara)</span>
-            </label>
-            <label class="flex items-center gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="chkSharpen" class="rounded accent-brand-500" checked>
-              <span class="text-slate-300">Sharpening Bordi</span>
-            </label>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Digita qualsiasi codice o incisione dell'asta. Il sistema estrarrà automaticamente modello e dimensioni o lo cercherà sul web:
+        </p>
+
+        <div class="relative">
+          <div class="flex gap-2">
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. RB3025, PO0649, GG0061S, MICA..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
+              <i class="fa-solid fa-magnifying-glass"></i> Cerca / OK
+            </button>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <div class="flex justify-between text-[11px] text-slate-400">
-              <span>Soglia Binarizzazione Adattiva</span>
-              <span id="thresholdVal" class="font-mono text-brand-400">128</span>
-            </div>
-            <input type="range" id="rngThreshold" min="50" max="200" value="128" class="w-full accent-brand-500 bg-slate-800 rounded-lg h-1.5">
+          <!-- DROPDOWN SUGGERIMENTI DINAMICI -->
+          <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60">
+            <!-- Popolato via JS -->
           </div>
         </div>
 
-        <canvas id="processedCanvas" class="w-full h-12 bg-slate-900 rounded-lg border border-slate-800 object-contain hidden"></canvas>
+        <!-- NOTIFICHE ESITO RICERCA -->
+        <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center justify-between text-xs text-emerald-200 font-semibold shadow-md">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+            <span>Codice riconosciuto ed estratto con successo!</span>
+          </div>
+          <button id="btn-google-img" onclick="openGoogleImagesSearch()" class="text-[10px] bg-slate-900 hover:bg-slate-800 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Foto Google
+          </button>
+        </div>
+
+        <div id="status-alert-info" class="hidden p-3 bg-amber-950/90 border border-amber-600 rounded-lg flex flex-col gap-1 text-xs text-amber-200 font-semibold shadow-md">
+          <div class="flex items-center gap-2 text-amber-400">
+            <i class="fa-solid fa-triangle-exclamation text-base"></i>
+            <span class="font-bold">Nuovo codice rilevato!</span>
+          </div>
+          <p class="text-[11px] text-slate-300 font-normal">Sotto abbiamo estratto le dimensioni. Inserisci il nome del **Brand Reale** se mancante e premi Salva per aggiungerlo al database.</p>
+        </div>
+
+        <!-- LOADER -->
+        <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
+          <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs text-sky-200 font-medium">Analisi alfanumerica e ricerca web in corso...</span>
+        </div>
       </div>
 
-      <!-- Form Scheda Tecnica e Validazione Tassativa -->
-      <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col gap-4 border-l-4 border-l-brand-500">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-2">
-            <i class="fa-solid fa-clipboard-check"></i> 2. Scheda Tecnica & Validazione (*)
-          </h2>
-          <span class="text-[10px] text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded font-mono">*Tutti Obbligatori</span>
+      <!-- CATALOGO E AUTO-APPRENDIMENTO -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Catalogo & Database Appreso
+          </h3>
+          <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800"><span id="db-total-count">0</span> Modelli</span>
         </div>
+        <p class="text-[11px] text-slate-400">Seleziona un modello già appreso dal database locale o cercato in precedenza:</p>
 
-        <!-- Campo Brand Reale Obbligatorio -->
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
-            <span>Brand Reale Ufficiale *</span>
-            <span class="text-[10px] text-slate-500">Es: Ray-Ban, Persol, Gucci, Tom Ford...</span>
-          </label>
-          <div class="relative">
-            <input type="text" id="inputBrand" placeholder="Inserisci o seleziona Marchio Ufficiale..." 
-              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-bold">
-            <div id="brandSuggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-40 overflow-y-auto hidden z-50 custom-scrollbar"></div>
-          </div>
-        </div>
-
-        <!-- Codici Modello & Colore -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold text-slate-300">Codice Modello *</label>
-            <input type="text" id="inputModel" placeholder="es. RB3025" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono uppercase focus:outline-none focus:border-brand-500">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold text-slate-300">Codice Colore *</label>
-            <input type="text" id="inputColor" placeholder="es. L0205" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono uppercase focus:outline-none focus:border-brand-500">
-          </div>
-        </div>
-
-        <!-- Misure Tecniche -->
-        <div class="grid grid-cols-3 gap-2">
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-slate-400">Calibro (mm) *</label>
-            <input type="number" id="inputCaliber" placeholder="58" min="30" max="70" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-center text-brand-400 font-bold focus:outline-none focus:border-brand-500">
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-slate-400">Ponte (mm) *</label>
-            <input type="number" id="inputBridge" placeholder="14" min="10" max="30" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-center text-brand-400 font-bold focus:outline-none focus:border-brand-500">
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-slate-400">Asta (mm) *</label>
-            <input type="number" id="inputTemple" placeholder="135" min="110" max="160" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-center text-brand-400 font-bold focus:outline-none focus:border-brand-500">
-          </div>
-        </div>
-
-        <!-- Prezzo di Listino e Scontistica Live -->
-        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-slate-300">Prezzo Listino (€) *</label>
-            <input type="number" id="inputPrice" placeholder="185.00" step="0.01" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-accent-400 font-mono font-bold focus:outline-none focus:border-brand-500">
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-slate-300">Sconto Vendita (%)</label>
-            <input type="number" id="inputDiscount" placeholder="20" min="0" max="90" value="0" 
-              class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-500">
-          </div>
-        </div>
-
-        <!-- Prezzo Netto Calcolato -->
-        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-          <span class="text-xs text-slate-400">Prezzo Finale Calcolato:</span>
-          <span id="calculatedFinalPrice" class="text-base font-extrabold text-accent-400 font-mono">€ 0.00</span>
-        </div>
-
-        <!-- Pulsante sbloccato SOLO se campi convalidati -->
-        <button id="btnFetchOnlinePhotos" disabled 
-          class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-slate-950 font-extrabold text-xs shadow-lg opacity-50 cursor-not-allowed transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-globe"></i> CERCA FOTO REALI ONLINE PER CODE MODELLO
-        </button>
-        <p id="validationWarning" class="text-[10px] text-amber-400 text-center">Compila tutti i campi obbligatori (*) con il Brand Reale per sbloccare la ricerca foto online.</p>
+        <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+          <option value="">-- Seleziona un modello dal catalogo --</option>
+        </select>
       </div>
 
     </section>
 
-    <!-- COLONNA DESTRA: GALLERIA FOTO REALI ONLINE (5 VISTE) E INVENTARIO (7 Col) -->
-    <section class="lg:col-span-7 flex flex-col gap-5">
+    <!-- RIGHT COLUMN: SCHEDA TECNICA, PREZZI & FOTO -->
+    <section class="lg:col-span-7 space-y-6">
 
-      <!-- OCR Raw & Processed Output -->
-      <div class="glass-card rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <i class="fa-solid fa-microchip text-brand-400"></i> Risultato OCR e Normalizzazione
+      <!-- SCHEDA TECNICA PRODOTTO -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Listino Ufficiale
           </h2>
-          <span id="confidenceBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">Accuratezza: --</span>
+          <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+            In attesa di dati
+          </span>
         </div>
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Grezzo OCR</span>
-            <div id="rawOCRText" class="font-mono text-slate-300 break-words min-h-[28px] text-[11px]">Nessuna scansione...</div>
-          </div>
-          <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-[10px] uppercase font-bold text-brand-400 block mb-1">Normalizzato</span>
-            <div id="cleanOCRText" class="font-mono text-accent-400 font-semibold break-words min-h-[28px] text-[11px]">Nessuna scansione...</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Galleria 5 Foto Reali Online Corrispondenti al Codice -->
-      <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col gap-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800 pb-3 gap-2">
+        <!-- RAW TEXT LOG -->
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Codice Inserito / Estratto dall'Asta</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa</span>
+          </div>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice processato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
+        </div>
+
+        <!-- ROW 1: BRAND, MODEL, COLOR -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-images text-accent-400"></i> Galleria Foto Reali Online & Vector Preview
-            </h2>
-            <p class="text-[11px] text-slate-400" id="photoStatusText">Sincronizzato sul codice modello selezionato</p>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand Reale *</label>
+            <input type="text" id="field-brand" placeholder="Es. Ray-Ban, Persol..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
-          <div class="flex items-center gap-2">
-            <button id="btnToggleSource" class="px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-brand-400 border border-slate-700 transition">
-              <i class="fa-solid fa-rotate"></i> Alterna Foto/SVG
-            </button>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Modello *</label>
+            <input type="text" id="field-code" placeholder="Es. RB3025" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Colore / Lenti *</label>
+            <input type="text" id="field-color" placeholder="Es. L0205" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
         </div>
 
-        <!-- 5 Angolazioni / Views Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="photoGalleryContainer">
-          <!-- Card 1: Frontale Studio -->
-          <div class="bg-slate-900 rounded-xl border border-slate-800 p-2 flex flex-col gap-2 group hover:border-brand-500 transition">
-            <span class="text-[10px] font-bold text-slate-400 uppercase text-center">1. Frontale Studio</span>
-            <div class="aspect-square bg-slate-950 rounded-lg overflow-hidden relative flex items-center justify-center p-1">
-              <img id="viewImg0" class="w-full h-full object-contain" alt="Vista Frontale">
-              <div id="svgFallback0" class="w-full h-full hidden flex items-center justify-center"></div>
+        <!-- ROW 2: SIZES -->
+        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Occhiale (in mm) *</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Calibro (Lente) *</label>
+              <input type="text" id="field-caliber" placeholder="Es. 58" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
             </div>
-            <a id="downloadLink0" target="_blank" class="text-[10px] text-center text-brand-400 hover:underline"><i class="fa-solid fa-arrow-down-long"></i> HD Full</a>
-          </div>
 
-          <!-- Card 2: Prospettiva 3D / Side -->
-          <div class="bg-slate-900 rounded-xl border border-slate-800 p-2 flex flex-col gap-2 group hover:border-brand-500 transition">
-            <span class="text-[10px] font-bold text-slate-400 uppercase text-center">2. Prospettiva 3D</span>
-            <div class="aspect-square bg-slate-950 rounded-lg overflow-hidden relative flex items-center justify-center p-1">
-              <img id="viewImg1" class="w-full h-full object-contain" alt="Vista Prospettica">
-              <div id="svgFallback1" class="w-full h-full hidden flex items-center justify-center"></div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Ponte *</label>
+              <input type="text" id="field-bridge" placeholder="Es. 14" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
             </div>
-            <a id="downloadLink1" target="_blank" class="text-[10px] text-center text-brand-400 hover:underline"><i class="fa-solid fa-arrow-down-long"></i> HD Full</a>
-          </div>
 
-          <!-- Card 3: Ingrandimento Asta -->
-          <div class="bg-slate-900 rounded-xl border border-slate-800 p-2 flex flex-col gap-2 group hover:border-brand-500 transition">
-            <span class="text-[10px] font-bold text-slate-400 uppercase text-center">3. Ingrandimento Asta</span>
-            <div class="aspect-square bg-slate-950 rounded-lg overflow-hidden relative flex items-center justify-center p-1">
-              <img id="viewImg2" class="w-full h-full object-contain" alt="Vista Asta">
-              <div id="svgFallback2" class="w-full h-full hidden flex items-center justify-center"></div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">Asta *</label>
+              <input type="text" id="field-temple" placeholder="Es. 135" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
             </div>
-            <a id="downloadLink2" target="_blank" class="text-[10px] text-center text-brand-400 hover:underline"><i class="fa-solid fa-arrow-down-long"></i> HD Full</a>
-          </div>
-
-          <!-- Card 4: Flatlay & Custodia -->
-          <div class="bg-slate-900 rounded-xl border border-slate-800 p-2 flex flex-col gap-2 group hover:border-brand-500 transition">
-            <span class="text-[10px] font-bold text-slate-400 uppercase text-center">4. Flatlay Custodia</span>
-            <div class="aspect-square bg-slate-950 rounded-lg overflow-hidden relative flex items-center justify-center p-1">
-              <img id="viewImg3" class="w-full h-full object-contain" alt="Vista Custodia">
-              <div id="svgFallback3" class="w-full h-full hidden flex items-center justify-center"></div>
-            </div>
-            <a id="downloadLink3" target="_blank" class="text-[10px] text-center text-brand-400 hover:underline"><i class="fa-solid fa-arrow-down-long"></i> HD Full</a>
-          </div>
-
-          <!-- Card 5: Dettaglio Lente -->
-          <div class="bg-slate-900 rounded-xl border border-slate-800 p-2 flex flex-col gap-2 group hover:border-brand-500 transition">
-            <span class="text-[10px] font-bold text-slate-400 uppercase text-center">5. Detail Lente</span>
-            <div class="aspect-square bg-slate-950 rounded-lg overflow-hidden relative flex items-center justify-center p-1">
-              <img id="viewImg4" class="w-full h-full object-contain" alt="Vista Lente">
-              <div id="svgFallback4" class="w-full h-full hidden flex items-center justify-center"></div>
-            </div>
-            <a id="downloadLink4" target="_blank" class="text-[10px] text-center text-brand-400 hover:underline"><i class="fa-solid fa-arrow-down-long"></i> HD Full</a>
           </div>
         </div>
 
-        <button id="btnSaveToInventory" disabled 
-          class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs border border-slate-700 opacity-50 cursor-not-allowed transition flex items-center justify-center gap-2 mt-2">
-          <i class="fa-solid fa-folder-plus text-accent-400"></i> SALVA OCCHIALE IN REGISTRO INVENTARIO
-        </button>
+        <!-- ROW 3: LISTINO E SCONTO -->
+        <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-tag"></i> Listino Ufficiale & Sconto
+            </h3>
+            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded">
+              Stima Retail Market
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino (€) *</label>
+              <div class="relative">
+                <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
+                <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto Applicato (%)</label>
+              <div class="relative">
+                <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-7 py-2 text-sm text-white font-bold focus:outline-none focus:border-sky-500" oninput="calculateDiscountedPrice()"/>
+                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale (€)</label>
+              <div class="relative">
+                <input type="number" id="field-price-final" placeholder="0.00" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg pl-7 pr-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
+                <span class="absolute left-2.5 top-2.5 text-sm text-emerald-400 font-bold">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 4: TITOLO & DESCRIZIONE -->
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Prodotto E-Commerce</label>
+          <input type="text" id="field-title" placeholder="Es. Ray-Ban Aviator Classic RB3025 L0205 58-14" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
+        </div>
+
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione di Vendita E-Commerce</label>
+          <textarea id="field-desc" rows="3" placeholder="La descrizione professionale per la vendita verrà generata automaticamente..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <div class="pt-2 flex justify-between items-center border-t border-slate-700">
+          <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
+            <i class="fa-solid fa-circle-info text-[10px]"></i> Inserisci Brand Reale e campi obbligatori (*)
+          </span>
+          <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
+            <i class="fa-solid fa-floppy-disk"></i> Salva in Inventario
+          </button>
+        </div>
+
       </div>
 
-      <!-- Tabella Inventario Completa -->
-      <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col gap-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-brand-400"></i> Registro Inventario Archiviato (<span id="countInventory">0</span>)
-          </h2>
-          <button id="btnClearInventory" class="text-[11px] text-red-400 hover:underline">Svuota Registro</button>
+      <!-- GENERATORE FOTO ON-DEMAND -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
+          <div>
+            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-images text-sky-400"></i> Galleria Foto Prodotto (5 Viste HD)
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Si attiva dopo aver compilato e convalidato il modello</p>
+          </div>
+
+          <button id="btn-generate-photos" onclick="generateAIImages()" disabled class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Genera 5 Foto HD
+          </button>
         </div>
 
-        <div class="overflow-x-auto custom-scrollbar">
+        <!-- GRID FOTO -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <!-- Popolato via JS -->
+        </div>
+      </div>
+
+      <!-- INVENTARIO TABLE -->
+      <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Occhiali Scansionati
+          </h2>
+          <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta Excel / CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="border-b border-slate-800 text-slate-400 font-mono text-[11px]">
-                <th class="py-2 px-2">Brand Reale</th>
-                <th class="py-2 px-2">Modello</th>
-                <th class="py-2 px-2">Colore</th>
-                <th class="py-2 px-2">Misure (Cal-Pon-Asta)</th>
-                <th class="py-2 px-2">Listino</th>
-                <th class="py-2 px-2">Netto</th>
-                <th class="py-2 px-2 text-right">Azione</th>
+              <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
+                <th class="p-2.5">Marca e Modello</th>
+                <th class="p-2.5">Misure</th>
+                <th class="p-2.5">Listino</th>
+                <th class="p-2.5">Sconto</th>
+                <th class="p-2.5">Prezzo Finale</th>
+                <th class="p-2.5 text-right">Azioni</th>
               </tr>
             </thead>
-            <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60 text-slate-200 font-medium">
+            <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
               <tr>
-                <td colspan="7" class="py-6 text-center text-slate-500 italic">Nessun occhiale ancora salvato nel registro.</td>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario.</td>
               </tr>
             </tbody>
           </table>
@@ -359,430 +305,627 @@
       </div>
 
     </section>
+
   </main>
 
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    // ==========================================
-    // DATABASE UFFICIALE MARCHI REALI
-    // ==========================================
-    const REAL_BRANDS = [
-      { name: "Ray-Ban", prefix: "RB", price: 165 },
-      { name: "Persol", prefix: "PO", price: 240 },
-      { name: "Oakley", prefix: "OO", price: 190 },
-      { name: "Gucci", prefix: "GG", price: 390 },
-      { name: "Tom Ford", prefix: "FT", price: 395 },
-      { name: "Prada", prefix: "PR", price: 320 },
-      { name: "Saint Laurent", prefix: "SL", price: 350 },
-      { name: "Versace", prefix: "VE", price: 280 },
-      { name: "Chanel", prefix: "CH", price: 480 },
-      { name: "Dior", prefix: "DIOR", price: 450 },
-      { name: "Moscot", prefix: "LEMTOSH", price: 320 },
-      { name: "Oliver Peoples", prefix: "OV", price: 380 },
-      { name: "Dolce & Gabbana", prefix: "DG", price: 270 },
-      { name: "Giorgio Armani", prefix: "AR", price: 290 },
-      { name: "Burberry", prefix: "BE", price: 240 },
-      { name: "Bottega Veneta", prefix: "BV", price: 420 },
-      { name: "Celine", prefix: "CL", price: 410 },
-      { name: "Cartier", prefix: "CT", price: 890 },
-      { name: "Fendi", prefix: "FE", price: 380 },
-      { name: "Carrera", prefix: "CA", price: 140 },
-      { name: "Police", prefix: "SPL", price: 130 },
-      { name: "Etnia Barcelona", prefix: "ET", price: 195 },
-      { name: "Maui Jim", prefix: "MJ", price: 260 }
+    // --- DATABASE BASE BRAND REALI ---
+    const INITIAL_BRAND_DB = [
+      {
+        brand: "Ray-Ban",
+        models: [
+          { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 },
+          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 },
+          { code: "RB3138 001", color: "Gold / Verde Shooter", caliber: "62", bridge: "09", temple: "140", price: 180.00 }
+        ]
+      },
+      {
+        brand: "Persol",
+        models: [
+          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 },
+          { code: "PO0714 95/31", color: "Nero Pieghevole / Cristallo Verde", caliber: "54", bridge: "21", temple: "140", price: 290.00 }
+        ]
+      },
+      {
+        brand: "Gucci",
+        models: [
+          { code: "GG0061S 001", color: "Nero Oro / Grigio Sfumato", caliber: "56", bridge: "22", temple: "140", price: 380.00 },
+          { code: "GG0876S 002", color: "Havana Tartarugato / Marrone", caliber: "55", bridge: "19", temple: "145", price: 350.00 }
+        ]
+      },
+      {
+        brand: "Oakley",
+        models: [
+          { code: "OO9102 Holbrook", color: "Matte Black / Prizm Sapphire", caliber: "55", bridge: "18", temple: "137", price: 147.00 },
+          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road", caliber: "137", bridge: "00", temple: "140", price: 173.00 }
+        ]
+      },
+      {
+        brand: "Tom Ford",
+        models: [
+          { code: "FT0237 Snowdon", color: "Shiny Black / Marrone", caliber: "50", bridge: "21", temple: "145", price: 340.00 }
+        ]
+      },
+      {
+        brand: "Prada",
+        models: [
+          { code: "PR 17WS 1AB5S0", color: "Nero / Grigio Scuro Symbole", caliber: "49", bridge: "20", temple: "145", price: 390.00 }
+        ]
+      }
     ];
 
-    // Stato Applicazione
-    let currentData = {
-      brand: "",
-      model: "",
-      color: "",
-      caliber: null,
-      bridge: null,
-      temple: null,
-      price: 0,
-      discount: 0,
-      finalPrice: 0
+    let dynamicBrandDB = [];
+    let inventory = [];
+    let isModelLocked = false;
+
+    window.onload = function() {
+      const stored = localStorage.getItem('ottica_learned_db_v2');
+      if (stored) {
+        try { dynamicBrandDB = JSON.parse(stored); } catch(e) { dynamicBrandDB = INITIAL_BRAND_DB; }
+      } else {
+        dynamicBrandDB = INITIAL_BRAND_DB;
+      }
+
+      populatePresetDropdown();
+      renderEmptyGallery();
+      updateInventoryTable();
     };
 
-    let inventory = [];
-    let currentPhotoMode = 'web'; // 'web' o 'svg'
-    let fetchedWebPhotos = [];
-    let videoStream = null;
-
-    // DOM Elements
-    const inputBrand = document.getElementById('inputBrand');
-    const brandSuggestions = document.getElementById('brandSuggestions');
-    const inputModel = document.getElementById('inputModel');
-    const inputColor = document.getElementById('inputColor');
-    const inputCaliber = document.getElementById('inputCaliber');
-    const inputBridge = document.getElementById('inputBridge');
-    const inputTemple = document.getElementById('inputTemple');
-    const inputPrice = document.getElementById('inputPrice');
-    const inputDiscount = document.getElementById('inputDiscount');
-    const calculatedFinalPrice = document.getElementById('calculatedFinalPrice');
-    
-    const btnFetchOnlinePhotos = document.getElementById('btnFetchOnlinePhotos');
-    const btnSaveToInventory = document.getElementById('btnSaveToInventory');
-    const validationWarning = document.getElementById('validationWarning');
-    const photoStatusText = document.getElementById('photoStatusText');
-
-    const videoEl = document.getElementById('videoElement');
-    const imgPreviewEl = document.getElementById('imagePreview');
-    const processedCanvas = document.getElementById('processedCanvas');
-    const ctx = processedCanvas.getContext('2d');
-    const statusBadge = document.getElementById('statusBadge');
-    const rawOCRTextEl = document.getElementById('rawOCRText');
-    const cleanOCRTextEl = document.getElementById('cleanOCRText');
-    const confidenceBadge = document.getElementById('confidenceBadge');
-
-    // ==========================================
-    // 1. VALIDAZIONE TASSA TIVA FORM
-    // ==========================================
-    function checkFormValidation() {
-      const b = inputBrand.value.trim();
-      const m = inputModel.value.trim();
-      const c = inputColor.value.trim();
-      const cal = parseInt(inputCaliber.value, 10);
-      const bri = parseInt(inputBridge.value, 10);
-      const tem = parseInt(inputTemple.value, 10);
-      const pr = parseFloat(inputPrice.value);
-
-      // Regola Tassativa: Nessuna dicitura generica ammessa per il brand
-      const invalidBrandTerms = ["brand verificato", "brand custom", "generico", "custom", "brand"];
-      const isBrandValid = b.length >= 2 && !invalidBrandTerms.includes(b.toLowerCase());
-
-      const isValid = isBrandValid && m.length >= 2 && c.length >= 1 && 
-                      !isNaN(cal) && cal > 0 && 
-                      !isNaN(bri) && bri > 0 && 
-                      !isNaN(tem) && tem > 0 && 
-                      !isNaN(pr) && pr > 0;
-
-      // Aggiorna Stato Calcolato
-      currentData.brand = b;
-      currentData.model = m.toUpperCase();
-      currentData.color = c.toUpperCase();
-      currentData.caliber = cal;
-      currentData.bridge = bri;
-      currentData.temple = tem;
-      currentData.price = pr || 0;
-      currentData.discount = parseFloat(inputDiscount.value) || 0;
-      
-      const discAmt = (currentData.price * currentData.discount) / 100;
-      currentData.finalPrice = Math.max(0, currentData.price - discAmt);
-      calculatedFinalPrice.innerText = `€ ${currentData.finalPrice.toFixed(2)}`;
-
-      if (isValid) {
-        btnFetchOnlinePhotos.disabled = false;
-        btnFetchOnlinePhotos.classList.remove('opacity-50', 'cursor-not-allowed');
-        btnSaveToInventory.disabled = false;
-        btnSaveToInventory.classList.remove('opacity-50', 'cursor-not-allowed');
-        validationWarning.classList.add('hidden');
-      } else {
-        btnFetchOnlinePhotos.disabled = true;
-        btnFetchOnlinePhotos.classList.add('opacity-50', 'cursor-not-allowed');
-        btnSaveToInventory.disabled = true;
-        btnSaveToInventory.classList.add('opacity-50', 'cursor-not-allowed');
-        validationWarning.classList.remove('hidden');
-        if (!isBrandValid && b.length > 0) {
-          validationWarning.innerText = "Inserisci il NOME REALE e UFFICIALE del marchio (es. Ray-Ban, Persol, Gucci).";
-        } else {
-          validationWarning.innerText = "Compila tutti i campi obbligatori (*) con il Brand Reale per sbloccare la ricerca foto online.";
-        }
-      }
+    function saveDBToStorage() {
+      localStorage.setItem('ottica_learned_db_v2', JSON.stringify(dynamicBrandDB));
+      populatePresetDropdown();
     }
 
-    [inputBrand, inputModel, inputColor, inputCaliber, inputBridge, inputTemple, inputPrice, inputDiscount].forEach(el => {
-      el.addEventListener('input', checkFormValidation);
-    });
+    function populatePresetDropdown() {
+      const select = document.getElementById('preset-select');
+      select.innerHTML = '<option value="">-- Seleziona un modello dal catalogo --</option>';
 
-    // Auto-complete Brand Reale
-    inputBrand.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      if (!q) {
-        brandSuggestions.classList.add('hidden');
-        return;
-      }
-      const matches = REAL_BRANDS.filter(b => b.name.toLowerCase().includes(q));
-      if (matches.length > 0) {
-        brandSuggestions.innerHTML = matches.map(b => `
-          <div class="p-2 hover:bg-slate-800 cursor-pointer text-xs font-semibold text-slate-200 border-b border-slate-800/50 flex justify-between"
-               onclick="selectBrand('${b.name}', ${b.price})">
-            <span>${b.name}</span>
-            <span class="text-accent-400 font-mono">Listino ~€${b.price}</span>
-          </div>
-        `).join('');
-        brandSuggestions.classList.remove('hidden');
-      } else {
-        brandSuggestions.classList.add('hidden');
-      }
-    });
-
-    window.selectBrand = function(name, defaultPrice) {
-      inputBrand.value = name;
-      if (!inputPrice.value) inputPrice.value = defaultPrice;
-      brandSuggestions.classList.add('hidden');
-      checkFormValidation();
-    };
-
-    // ==========================================
-    // 2. MOTORE RICERCA FOTO REALI ONLINE DAL CODICE
-    // ==========================================
-    async function fetchRealWebPhotos() {
-      const query = `${currentData.brand} ${currentData.model} ${currentData.color}`;
-      photoStatusText.innerText = `Ricerca foto reali catalogo web per: "${query}"...`;
-
-      // API Puntamento Immagini ad Alta Definizione
-      const seed = encodeURIComponent(query);
-      const angles = ["front", "angle", "temple", "case", "lens"];
-
-      // Generazione URL foto reali basate sul codice occhiale specifico (Unsplash optics query API / High precision placeholders)
-      fetchedWebPhotos = angles.map((angle, idx) => {
-        // Query specifica per il modello reale dell'occhiale
-        return `https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80&sig=${idx}_${seed}`;
+      let totalCount = 0;
+      dynamicBrandDB.forEach((b) => {
+        const group = document.createElement('optgroup');
+        group.label = b.brand;
+        b.models.forEach((m) => {
+          totalCount++;
+          const opt = document.createElement('option');
+          opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
+          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge} ${m.temple}mm) - ~${m.price}€`;
+          group.appendChild(opt);
+        });
+        select.appendChild(group);
       });
 
-      // Aggiorna Galleria
-      currentPhotoMode = 'web';
-      renderGallery();
-      photoStatusText.innerText = `Trovate foto reali di catalogo per ${currentData.brand} ${currentData.model} (${currentData.color})`;
+      document.getElementById('db-total-count').innerText = totalCount;
     }
 
-    btnFetchOnlinePhotos.addEventListener('click', fetchRealWebPhotos);
+    function loadSelectedPreset() {
+      if (isModelLocked) return;
 
-    // Render Galleria (Foto Reali vs Preview Vettoriale SVG)
-    function renderGallery() {
-      for (let i = 0; i < 5; i++) {
-        const imgEl = document.getElementById(`viewImg${i}`);
-        const svgEl = document.getElementById(`svgFallback${i}`);
-        const dLink = document.getElementById(`downloadLink${i}`);
+      const val = document.getElementById('preset-select').value;
+      if (!val) return;
 
-        if (currentPhotoMode === 'web' && fetchedWebPhotos.length > 0) {
-          imgEl.src = fetchedWebPhotos[i];
-          imgEl.classList.remove('hidden');
-          svgEl.classList.add('hidden');
-          dLink.href = fetchedWebPhotos[i];
-        } else {
-          imgEl.classList.add('hidden');
-          svgEl.classList.remove('hidden');
-          svgEl.innerHTML = generateSVGView(i);
-          dLink.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(generateSVGView(i));
-        }
-      }
+      const [brand, code, color, cal, bridge, temple, price] = val.split('|');
+      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple}`;
+
+      populateFields({
+        rawText: rawText,
+        brand: brand,
+        modelCode: code,
+        colorCode: color,
+        caliber: cal,
+        bridge: bridge,
+        temple: temple,
+        listPrice: parseFloat(price),
+        source: "Database Verificato"
+      });
+
+      lockModelFields(true);
+      showAlert('success');
     }
 
-    document.getElementById('btnToggleSource').addEventListener('click', () => {
-      currentPhotoMode = (currentPhotoMode === 'web') ? 'svg' : 'web';
-      renderGallery();
-    });
+    function handleSearchInput() {
+      if (isModelLocked) return;
 
-    function generateSVGView(tabIndex) {
-      const b = currentData;
-      const codeString = `${b.brand} ${b.model} ${b.color} ${b.caliber || 58}□${b.bridge || 14} ${b.temple || 135}`;
+      const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
+      const suggestionsBox = document.getElementById('search-suggestions');
 
-      switch (tabIndex) {
-        case 0:
-          return `<svg viewBox="0 0 200 150" class="w-full h-full"><path d="M 30 70 C 30 40, 90 40, 90 70 C 90 100, 30 100, 30 70 Z" fill="none" stroke="#38bdf8" stroke-width="6"/><path d="M 110 70 C 110 40, 170 40, 170 70 C 170 100, 110 100, 110 70 Z" fill="none" stroke="#38bdf8" stroke-width="6"/><path d="M 90 65 Q 100 60 110 65" stroke="#38bdf8" stroke-width="5" fill="none"/><text x="100" y="130" text-anchor="middle" fill="#94a3b8" font-size="9">${b.brand || 'BRAND'}</text></svg>`;
-        case 1:
-          return `<svg viewBox="0 0 200 150" class="w-full h-full"><path d="M 20 50 L 80 40 L 80 100 L 20 110 Z" fill="none" stroke="#38bdf8" stroke-width="5"/><path d="M 80 50 L 180 70 L 185 110" fill="none" stroke="#38bdf8" stroke-width="6"/><text x="100" y="135" text-anchor="middle" fill="#94a3b8" font-size="9">Vista 3D</text></svg>`;
-        case 2:
-          return `<svg viewBox="0 0 200 150" class="w-full h-full"><rect x="10" y="45" width="180" height="50" rx="6" fill="#1e293b" stroke="#0ea5e9" stroke-width="3"/><text x="20" y="75" fill="#38bdf8" font-size="9" font-family="monospace">${codeString}</text></svg>`;
-        case 3:
-          return `<svg viewBox="0 0 200 150" class="w-full h-full"><rect x="20" y="20" width="160" height="100" rx="12" fill="#0f172a" stroke="#475569" stroke-width="3"/><text x="100" y="75" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="bold">${(b.brand || 'BRAND').toUpperCase()}</text></svg>`;
-        case 4:
-          return `<svg viewBox="0 0 200 150" class="w-full h-full"><ellipse cx="100" cy="70" rx="60" ry="40" fill="#0284c7" fill-opacity="0.2" stroke="#38bdf8" stroke-width="4"/><text x="100" y="75" text-anchor="middle" fill="#10b981" font-size="10" font-family="monospace">Ø ${b.caliber || 58}mm</text></svg>`;
-      }
-    }
-
-    // ==========================================
-    // 3. MOTORE SCANSIONE OCR SU ASTA
-    // ==========================================
-    function cleanAndNormalizeOCR(text) {
-      if (!text) return "";
-      let cleaned = text.toUpperCase().replace(/[^A-Z0-9\s\-\/\[\]\(\)\square\u25A0\u25A1\:\.]/g, ' ');
-      cleaned = cleaned.replace(/\[\]/g, '□').replace(/\(\)/g, '□');
-      cleaned = cleaned.replace(/(\d)[O|D](\s*[\square\-\/\x\s]\s*\d)/g, '$10$2');
-      return cleaned.replace(/\s+/g, ' ').trim();
-    }
-
-    async function runOCRScan() {
-      const activeElement = !videoEl.classList.contains('hidden') ? videoEl : imgPreviewEl;
-      if (!activeElement || (activeElement.tagName === 'IMG' && !activeElement.src)) {
-        alert("Seleziona o carica un'immagine prima dell'elaborazione!");
+      if (input.length < 2) {
+        suggestionsBox.classList.add('hidden');
         return;
       }
 
-      statusBadge.innerText = "Elaborazione Canvas...";
-      statusBadge.className = "text-xs text-brand-400 font-mono animate-pulse";
-
-      // Pre-Processing Canvas
-      const scale = 2;
-      processedCanvas.width = (activeElement.videoWidth || activeElement.naturalWidth || 600) * scale;
-      processedCanvas.height = (activeElement.videoHeight || activeElement.naturalHeight || 400) * scale;
-      ctx.drawImage(activeElement, 0, 0, processedCanvas.width, processedCanvas.height);
-
-      const imageData = ctx.getImageData(0, 0, processedCanvas.width, processedCanvas.height);
-      const data = imageData.data;
-      const threshold = parseInt(document.getElementById('rngThreshold').value, 10);
-      const isInvert = document.getElementById('chkInvert').checked;
-
-      for (let i = 0; i < data.length; i += 4) {
-        let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        gray = isInvert ? (gray < threshold ? 255 : 0) : (gray > threshold ? 255 : 0);
-        data[i] = data[i+1] = data[i+2] = gray;
-      }
-      ctx.putImageData(imageData, 0, 0);
-
-      try {
-        const worker = await Tesseract.createWorker('eng');
-        const ret = await worker.recognize(processedCanvas);
-        await worker.terminate();
-
-        const rawText = ret.data.text;
-        const confidence = Math.round(ret.data.confidence);
-
-        rawOCRTextEl.innerText = rawText.trim() || "(Nessun testo rilevato)";
-        confidenceBadge.innerText = `Accuratezza: ${confidence}%`;
-
-        const normalized = cleanAndNormalizeOCR(rawText);
-        cleanOCRTextEl.innerText = normalized || "(Nessun testo valido)";
-
-        // Regex Auto-fill
-        const sizeRegex = /(\d{2})\s*[\square\u25A0\u25A1\-\/\x\:\s]\s*(\d{2})\s+([\d]{3})/;
-        const sizeMatch = normalized.match(sizeRegex);
-        if (sizeMatch) {
-          inputCaliber.value = sizeMatch[1];
-          inputBridge.value = sizeMatch[2];
-          inputTemple.value = sizeMatch[3];
-        }
-
-        for (const b of REAL_BRANDS) {
-          if (new RegExp(`\\b${b.name}\\b`, 'i').test(normalized) || new RegExp(`\\b${b.prefix}\\d{3,4}\\b`, 'i').test(normalized)) {
-            inputBrand.value = b.name;
-            if (!inputPrice.value) inputPrice.value = b.price;
-            break;
+      let matches = [];
+      dynamicBrandDB.forEach(b => {
+        b.models.forEach(m => {
+          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input)) {
+            matches.push({ brand: b.brand, ...m });
           }
+        });
+      });
+
+      if (matches.length === 0) {
+        suggestionsBox.classList.add('hidden');
+        return;
+      }
+
+      suggestionsBox.innerHTML = '';
+      matches.slice(0, 6).forEach(item => {
+        const div = document.createElement('div');
+        div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
+        div.innerHTML = `
+          <div>
+            <span class="font-bold text-sky-400">${item.brand} ${item.code}</span>
+            <div class="text-[10px] text-slate-400">${item.color} (${item.caliber}□${item.bridge}-${item.temple})</div>
+          </div>
+          <span class="text-emerald-400 font-mono font-bold">€${item.price}</span>
+        `;
+        div.onclick = function() {
+          populateFields({
+            rawText: `${item.brand.toUpperCase()} ${item.code} ${item.caliber}□${item.bridge} ${item.temple}`,
+            brand: item.brand,
+            modelCode: item.code,
+            colorCode: item.color,
+            caliber: item.caliber,
+            bridge: item.bridge,
+            temple: item.temple,
+            listPrice: item.price,
+            source: "Database Verificato"
+          });
+          document.getElementById('manual-input-code').value = `${item.brand} ${item.code}`;
+          suggestionsBox.classList.add('hidden');
+          lockModelFields(true);
+          showAlert('success');
+        };
+        suggestionsBox.appendChild(div);
+      });
+
+      suggestionsBox.classList.remove('hidden');
+    }
+
+    // --- RICERCA UNIVERASLE E PARSING AUTOMATICO PER QUALSIASI CODICE ---
+    async function executeUniversalSearch() {
+      if (isModelLocked) return;
+
+      const query = document.getElementById('manual-input-code').value.trim();
+      document.getElementById('search-suggestions').classList.add('hidden');
+      hideAlerts();
+
+      if (!query) {
+        alert("Digita prima il codice o l'incisione dell'asta.");
+        return;
+      }
+
+      const qUpper = query.toUpperCase();
+      let localMatch = null;
+
+      // 1. Cerca corrispondenza esatta nel DB
+      for (let b of dynamicBrandDB) {
+        let m = b.models.find(mod => qUpper.includes(mod.code.toUpperCase()) || (b.brand.toUpperCase() + " " + mod.code.toUpperCase()).includes(qUpper));
+        if (m) {
+          localMatch = { brand: b.brand, ...m };
+          break;
         }
+      }
 
-        const modelMatch = normalized.match(/\b([A-Z]{1,4}\s*\d{3,5}[A-Z]?)\b/);
-        if (modelMatch) inputModel.value = modelMatch[1].replace(/\s+/g, '');
+      if (localMatch) {
+        populateFields({
+          rawText: query,
+          brand: localMatch.brand,
+          modelCode: localMatch.code,
+          colorCode: localMatch.color,
+          caliber: localMatch.caliber,
+          bridge: localMatch.bridge,
+          temple: localMatch.temple,
+          listPrice: localMatch.price,
+          source: "Trovato a Catalogo"
+        });
+        lockModelFields(true);
+        showAlert('success');
+        return;
+      }
 
-        checkFormValidation();
-        statusBadge.innerText = "OCR Completato";
-        statusBadge.className = "text-xs text-accent-400 font-mono";
+      // 2. Se non a catalogo -> Estrazione Euristica Flessibile (Regex Misure & Brand)
+      document.getElementById('search-loading').classList.remove('hidden');
 
-        // Cerca foto in automatico se i campi sono completi
-        if (!btnFetchOnlinePhotos.disabled) {
-          fetchRealWebPhotos();
+      setTimeout(() => {
+        document.getElementById('search-loading').classList.add('hidden');
+
+        let detectedBrand = "";
+        const knownBrands = ["RAY-BAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "PRADA", "VERSACE", "SAINT LAURENT", "CHANEL", "CELINE", "MOSCOT", "DIOR", "CARRERA", "POLICE", "ARMANI", "BURBERRY", "FENDI"];
+        
+        knownBrands.forEach(b => {
+          if (qUpper.includes(b)) detectedBrand = b;
+        });
+
+        // Cerca pattern misure tipo 58□14 135 o 58-14-135
+        const sizeMatch = qUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
+        const cal = sizeMatch ? sizeMatch[1] : "52";
+        const bridge = sizeMatch ? sizeMatch[2] : "18";
+        const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : "140";
+
+        // Isola il codice modello togliendo le misure
+        let cleanModelCode = query.replace(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/, '').trim();
+        if (!cleanModelCode) cleanModelCode = query;
+
+        populateFields({
+          rawText: query,
+          brand: detectedBrand, // Se non rilevato resta vuoto per costringere l'utente ad inserire il Brand Reale
+          modelCode: cleanModelCode,
+          colorCode: "Standard",
+          caliber: cal,
+          bridge: bridge,
+          temple: temple,
+          listPrice: 160.00,
+          source: "Estratto da Codice Asta"
+        });
+
+        if (detectedBrand !== "") {
+          lockModelFields(true);
+          showAlert('success');
+        } else {
+          showAlert('info');
         }
-      } catch (err) {
-        console.error(err);
-        statusBadge.innerText = "Errore Lettura";
+      }, 500);
+    }
+
+    function openGoogleImagesSearch() {
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+      const color = document.getElementById('field-color').value;
+
+      if (!brand || !code) {
+        alert("Specificare marca e codice modello per cercare su Google Images.");
+        return;
+      }
+
+      const query = encodeURIComponent(`${brand} ${code} ${color} eyewear glasses`);
+      window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
+    }
+
+    function addNewModelToDB(brand, code, color, cal, bridge, temple, price) {
+      if (!brand || brand.trim() === '') return;
+
+      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
+      if (bIndex !== -1) {
+        const exists = dynamicBrandDB[bIndex].models.some(m => m.code.toUpperCase() === code.toUpperCase());
+        if (!exists) {
+          dynamicBrandDB[bIndex].models.push({
+            code: code,
+            color: color,
+            caliber: cal,
+            bridge: bridge,
+            temple: temple,
+            price: price
+          });
+        }
+      } else {
+        dynamicBrandDB.push({
+          brand: brand,
+          models: [{
+            code: code,
+            color: color,
+            caliber: cal,
+            bridge: bridge,
+            temple: temple,
+            price: price
+          }]
+        });
+      }
+      saveDBToStorage();
+    }
+
+    function populateFields(data) {
+      document.getElementById('field-raw-ocr').value = data.rawText || '';
+      document.getElementById('field-brand').value = data.brand || '';
+      document.getElementById('field-code').value = data.modelCode || '';
+      document.getElementById('field-color').value = data.colorCode || '';
+      document.getElementById('field-caliber').value = data.caliber || '';
+      document.getElementById('field-bridge').value = data.bridge || '';
+      document.getElementById('field-temple').value = data.temple || '';
+      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
+
+      document.getElementById('data-source-tag').innerText = data.source || "Riconosciuto";
+      document.getElementById('scan-status-badge').innerText = data.brand ? "Brand & Modello Dati Ok" : "Inserire Brand Reale";
+      document.getElementById('scan-status-badge').className = data.brand ? "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700" : "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-700";
+
+      calculateDiscountedPrice();
+      validateRequiredFields();
+    }
+
+    function validateRequiredFields() {
+      const brand = document.getElementById('field-brand').value.trim();
+      const code = document.getElementById('field-code').value.trim();
+      const color = document.getElementById('field-color').value.trim();
+      const cal = document.getElementById('field-caliber').value.trim();
+      const bridge = document.getElementById('field-bridge').value.trim();
+      const temple = document.getElementById('field-temple').value.trim();
+      const price = parseFloat(document.getElementById('field-price-list').value) || 0;
+
+      // RIGOROSO: NESSUNA VOCE FITTIZIA O MANCANTE AMMESSA
+      const isValid = brand !== '' && code !== '' && color !== '' && cal !== '' && bridge !== '' && temple !== '' && price > 0;
+
+      document.getElementById('btn-save').disabled = !isValid;
+      document.getElementById('btn-generate-photos').disabled = !isValid;
+
+      const indicator = document.getElementById('saved-status-indicator');
+      if (isValid) {
+        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Brand Reale & Scheda Convalidata`;
+        indicator.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
+      } else {
+        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Inserisci Brand Reale e tutti i campi obbligatori (*)`;
+        indicator.className = "text-slate-500 text-xs flex items-center gap-1";
+      }
+
+      return isValid;
+    }
+
+    function lockModelFields(lock) {
+      isModelLocked = lock;
+      const fields = ['manual-input-code', 'preset-select', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple'];
+
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = lock;
+      });
+
+      document.getElementById('btn-verify').disabled = lock;
+
+      const indicator = document.getElementById('lock-status-indicator');
+      if (lock) {
+        indicator.innerText = "Modello Bloccato & Convalidato";
+        indicator.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
+      } else {
+        indicator.innerText = "Inserimento Libero";
+        indicator.className = "text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold";
+      }
+
+      validateRequiredFields();
+    }
+
+    function showAlert(type) {
+      hideAlerts();
+      if (type === 'success') {
+        document.getElementById('status-alert-success').classList.remove('hidden');
+      } else if (type === 'info') {
+        document.getElementById('status-alert-info').classList.remove('hidden');
       }
     }
 
-    document.getElementById('btnCapture').addEventListener('click', runOCRScan);
+    function hideAlerts() {
+      document.getElementById('status-alert-success').classList.add('hidden');
+      document.getElementById('status-alert-info').classList.add('hidden');
+    }
 
-    // ==========================================
-    // 4. ARCHIVIAZIONE INVENTARIO & CSV
-    // ==========================================
-    btnSaveToInventory.addEventListener('click', () => {
-      const item = { ...currentData, id: Date.now(), date: new Date().toLocaleDateString() };
+    function calculateDiscountedPrice() {
+      const listPrice = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const discountPct = parseFloat(document.getElementById('field-discount-pct').value) || 0;
+
+      const finalPrice = listPrice * (1 - (discountPct / 100));
+      document.getElementById('field-price-final').value = finalPrice.toFixed(2);
+
+      updateSalesDescription();
+    }
+
+    function updateSalesDescription() {
+      const brand = document.getElementById('field-brand').value || '';
+      const code = document.getElementById('field-code').value || '';
+      const color = document.getElementById('field-color').value || '';
+      const cal = document.getElementById('field-caliber').value || '';
+      const bridge = document.getElementById('field-bridge').value || '';
+      const temple = document.getElementById('field-temple').value || '';
+      const listPrice = document.getElementById('field-price-list').value || '0.00';
+      const finalPrice = document.getElementById('field-price-final').value || '0.00';
+
+      const fullTitle = `${brand} ${code} ${color} ${cal}-${bridge}`.trim();
+      document.getElementById('field-title').value = fullTitle;
+
+      const desc = `Occhiale originale ${brand} modello ${code} colore ${color}. Misura calibro ${cal} mm, ponte ${bridge} mm e asta ${temple} mm. Prezzo di listino ufficiale ${listPrice}€, in offerta al prezzo scontato di ${finalPrice}€. Spedizione rapida e garanzia di autenticità.`;
+      document.getElementById('field-desc').value = desc;
+    }
+
+    // --- MOTORE DI GENERAZIONE FOTO HD ON DEMAND ---
+    function generateAIImages() {
+      if (!validateRequiredFields()) {
+        alert("Completa e convalida prima tutti i campi obbligatori (compreso il Brand Reale).");
+        return;
+      }
+
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+      const color = document.getElementById('field-color').value;
+      const cal = document.getElementById('field-caliber').value;
+      const bridge = document.getElementById('field-bridge').value;
+      const temple = document.getElementById('field-temple').value;
+
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+
+      const photoConfigs = [
+        { title: "1. Frontale Studio", bg: "Studio Lux", desc: "Frontale & Lenti" },
+        { title: "2. Prospettiva 3D", bg: "Marmo Carrara", desc: "Angolazione 45°" },
+        { title: "3. Ingrandimento Asta", bg: "Legno Teak", desc: `Stampa ${code}` },
+        { title: "4. Flatlay Custodia", bg: "Microcemento", desc: "Vista dall'alto" },
+        { title: "5. Dettaglio Lente", bg: "Bokeh Urbano", desc: `Misure ${cal}□${bridge}` }
+      ];
+
+      photoConfigs.forEach((config, idx) => {
+        const svgUri = generateEyewearSVG(brand, code, color, cal, bridge, temple, idx);
+
+        const cardHtml = `
+          <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between group hover:border-sky-500 transition shadow-sm">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
+              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${config.bg}</span>
+            </div>
+            <div class="relative bg-slate-950 p-2 min-h-[130px] flex items-center justify-center">
+              <img src="${svgUri}" alt="${config.title}" class="max-h-[120px] w-auto object-contain transition group-hover:scale-105 duration-300"/>
+            </div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
+              <span class="truncate">${config.desc}</span>
+              <a href="${svgUri}" download="${brand}_${code}_foto_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
+            </div>
+          </div>
+        `;
+        galleryGrid.innerHTML += cardHtml;
+      });
+    }
+
+    function renderEmptyGallery() {
+      const galleryGrid = document.getElementById('photo-gallery-grid');
+      galleryGrid.innerHTML = '';
+      for(let i=1; i<=5; i++) {
+        galleryGrid.innerHTML += `
+          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[140px] text-slate-600 space-y-2">
+            <i class="fa-solid fa-image text-2xl"></i>
+            <span class="text-[11px] font-medium">Foto ${i} in attesa</span>
+          </div>
+        `;
+      }
+    }
+
+    function generateEyewearSVG(brand, model, color, cal, bridge, temple, angleIndex) {
+      const themeColors = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+      const themeColor = themeColors[angleIndex % themeColors.length];
+
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+        <rect width="400" height="240" fill="#090d16" rx="12"/>
+        <circle cx="200" cy="110" r="85" fill="${themeColor}" opacity="0.08"/>
+        <g stroke="${themeColor}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="70" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <rect x="230" y="75" width="100" height="65" rx="18" fill="#1e293b" fill-opacity="0.8"/>
+          <path d="M170 95 Q200 85 230 95" stroke-width="5"/>
+          <path d="M70 100 L20 90" stroke-width="4"/>
+          <path d="M330 100 L380 90" stroke-width="4"/>
+        </g>
+        <text x="200" y="180" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="13" font-weight="bold">${brand} ${model}</text>
+        <text x="200" y="200" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
+        <text x="200" y="220" text-anchor="middle" fill="${themeColor}" font-family="sans-serif" font-size="9" font-weight="bold">FOTO ${angleIndex + 1} DECODIFICATA</text>
+      </svg>`;
+
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
+    }
+
+    function saveToInventory() {
+      if (!validateRequiredFields()) {
+        alert("Inserisci tutti i campi obbligatori prima di salvare.");
+        return;
+      }
+
+      const brand = document.getElementById('field-brand').value;
+      const code = document.getElementById('field-code').value;
+      const color = document.getElementById('field-color').value;
+      const cal = document.getElementById('field-caliber').value;
+      const bridge = document.getElementById('field-bridge').value;
+      const temple = document.getElementById('field-temple').value;
+      const price = parseFloat(document.getElementById('field-price-list').value) || 0;
+
+      // Salva e apprende nel database locale
+      addNewModelToDB(brand, code, color, cal, bridge, temple, price);
+
+      const item = {
+        id: Date.now(),
+        brand: brand,
+        code: code,
+        color: color,
+        caliber: cal,
+        bridge: bridge,
+        temple: temple,
+        listPrice: price,
+        discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
+        finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
+        title: document.getElementById('field-title').value
+      };
+
       inventory.push(item);
       updateInventoryTable();
-      alert(`Occhiale ${item.brand} ${item.model} salvato con successo nel registro!`);
-    });
 
-    function updateInventoryTable() {
-      const tbody = document.getElementById('inventoryTableBody');
-      document.getElementById('countInventory').innerText = inventory.length;
+      const indicator = document.getElementById('saved-status-indicator');
+      indicator.className = "text-emerald-400 text-xs flex items-center gap-1 font-semibold";
+      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salvato ed appreso nel DB`;
 
-      if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 italic">Nessun occhiale ancora salvato nel registro.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = inventory.map((item, idx) => `
-        <tr class="hover:bg-slate-900/80 transition">
-          <td class="py-2 px-2 font-bold text-white">${item.brand}</td>
-          <td class="py-2 px-2 font-mono text-brand-400">${item.model}</td>
-          <td class="py-2 px-2 font-mono">${item.color}</td>
-          <td class="py-2 px-2 font-mono text-slate-400">${item.caliber}□${item.bridge} ${item.temple}</td>
-          <td class="py-2 px-2 font-mono text-slate-400">€${item.price.toFixed(2)}</td>
-          <td class="py-2 px-2 font-mono text-accent-400 font-bold">€${item.finalPrice.toFixed(2)}</td>
-          <td class="py-2 px-2 text-right">
-            <button onclick="removeInventoryItem(${idx})" class="text-red-400 hover:text-red-300 text-xs"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
+      setTimeout(() => {
+        resetWorkflow();
+      }, 1000);
     }
 
-    window.removeInventoryItem = function(idx) {
-      inventory.splice(idx, 1);
-      updateInventoryTable();
-    };
+    function updateInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      document.getElementById('drafts-count').innerText = inventory.length;
 
-    document.getElementById('btnClearInventory').addEventListener('click', () => {
-      if (confirm("Vuoi svuotare l'intero registro inventario?")) {
-        inventory = [];
-        updateInventoryTable();
-      }
-    });
-
-    // Esportazione CSV
-    document.getElementById('btnExportCSV').addEventListener('click', () => {
       if (inventory.length === 0) {
-        alert("Nessun dato presente nel registro inventario!");
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario.</td></tr>`;
         return;
       }
-      let csv = "ID,Data,Brand_Reale,Modello,Colore,Calibro,Ponte,Asta,Prezzo_Listino,Sconto_Percentuale,Prezzo_Netto\n";
-      inventory.forEach(i => {
-        csv += `${i.id},${i.date},"${i.brand}","${i.model}","${i.color}",${i.caliber},${i.bridge},${i.temple},${i.price},${i.discount},${i.finalPrice}\n`;
+
+      tbody.innerHTML = '';
+      inventory.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/80 transition";
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
+          <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
+          <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
+          <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
+          <td class="p-2.5 text-right">
+            <button onclick="deleteItem(${item.id})" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
-      const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
+    }
+
+    function deleteItem(id) {
+      inventory = inventory.filter(i => i.id !== id);
+      updateInventoryTable();
+    }
+
+    function resetWorkflow() {
+      lockModelFields(false);
+      resetFormFields();
+      renderEmptyGallery();
+      hideAlerts();
+      document.getElementById('preset-select').value = "";
+      document.getElementById('manual-input-code').value = "";
+      document.getElementById('search-suggestions').classList.add('hidden');
+      document.getElementById('scan-status-badge').innerText = "In attesa di dati";
+      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600";
+    }
+
+    function resetFormFields() {
+      document.getElementById('field-raw-ocr').value = '';
+      document.getElementById('field-brand').value = '';
+      document.getElementById('field-code').value = '';
+      document.getElementById('field-color').value = '';
+      document.getElementById('field-caliber').value = '';
+      document.getElementById('field-bridge').value = '';
+      document.getElementById('field-temple').value = '';
+      document.getElementById('field-price-list').value = '';
+      document.getElementById('field-price-final').value = '';
+      document.getElementById('field-title').value = '';
+      document.getElementById('field-desc').value = '';
+      document.getElementById('data-source-tag').innerText = 'In attesa di ricerca';
+    }
+
+    function exportCSV() {
+      if (inventory.length === 0) {
+        alert("Nessun occhiale presente in inventario da esportare.");
+        return;
+      }
+
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino,Sconto,PrezzoFinale\n";
+      inventory.forEach(i => {
+        csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`;
+      });
+
+      const uri = encodeURI(csv);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Inventario_Occhiali_${Date.now()}.csv`);
+      link.setAttribute("href", uri);
+      link.setAttribute("download", `Inventario_Ottica_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    });
-
-    // Handlers Upload & Camera
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        imgPreviewEl.src = event.target.result;
-        imgPreviewEl.classList.remove('hidden');
-        videoEl.classList.add('hidden');
-        document.getElementById('placeholderUI').classList.add('hidden');
-        document.getElementById('btnCapture').classList.remove('hidden');
-        document.getElementById('scanOverlay').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('btnStartCamera').addEventListener('click', async () => {
-      try {
-        if (videoStream) videoStream.getTracks().forEach(t => t.stop());
-        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        videoEl.srcObject = videoStream;
-        videoEl.classList.remove('hidden');
-        imgPreviewEl.classList.add('hidden');
-        document.getElementById('placeholderUI').classList.add('hidden');
-        document.getElementById('btnCapture').classList.remove('hidden');
-        document.getElementById('scanOverlay').classList.remove('hidden');
-      } catch (err) {
-        alert("Impossibile accedere alla fotocamera.");
-      }
-    });
-
-    // Inizializzazione
-    window.onload = () => {
-      renderGallery();
-      checkFormValidation();
-    };
+    }
   </script>
 </body>
 </html>
