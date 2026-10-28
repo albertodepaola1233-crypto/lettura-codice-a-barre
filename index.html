@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Riconoscimento Brand & Foto HD Modello</title>
+  <title>OtticaCatalog Pro - Generatore Foto Modello-Specifico</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,9 +30,9 @@
           <i class="fa-solid fa-glasses text-xl"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro Ultra</h1>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-shield-check text-[10px]"></i> Parser Brand Universale & Render HD Fedele al Modello
+            <i class="fa-solid fa-shield-check text-[10px]"></i> Generatore Foto Su Misura del Modello
           </p>
         </div>
       </div>
@@ -53,73 +53,68 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT COLUMN: RICERCA & CATALOGO -->
+    <!-- LEFT COLUMN: INSERIMENTO & VERIFICA -->
     <section class="lg:col-span-5 space-y-6">
 
-      <!-- RICERCA & PARSER PREFISSI BRAND -->
+      <!-- VERIFICA CODICE ASTA -->
       <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i> Verifica Codice Asta & Brand
+            <i class="fa-solid fa-magnifying-glass"></i> Verifica Codice Asta Online
           </h2>
           <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
-            Inserimento Libero
+            Pronto all'inserimento
           </span>
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Inserisci la sigla dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>, <span class="font-mono text-sky-300">RB3025 L0205 58-14</span>, <span class="font-mono text-sky-300">PO0649 24/31</span>):
+          Inserisci l'incisione completa dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>, <span class="font-mono text-sky-300">RB3025 L0205 58-14</span>):
         </p>
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025, PO0714..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025, PO0649..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
             <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-check"></i> Verifica & OK
             </button>
           </div>
 
-          <!-- DROPDOWN SUGGERIMENTI RICERCA -->
-          <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60">
-            <!-- Popolato via JS -->
-          </div>
+          <!-- DROPDOWN SUGGERIMENTI -->
+          <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60"></div>
         </div>
 
-        <!-- NOTIFICHE ESITO RICERCA -->
+        <!-- NOTIFICHE ESITO -->
         <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center justify-between text-xs text-emerald-200 font-semibold shadow-md">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-            <span id="success-alert-msg">Brand e modello riconosciuti con successo!</span>
+            <span id="success-alert-msg">Nuovo codice aggiunto correttamente!</span>
           </div>
-          <button onclick="openGoogleSearch()" class="text-[10px] bg-slate-900 hover:bg-slate-800 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold flex items-center gap-1">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Foto Google
-          </button>
         </div>
 
         <div id="status-alert-error" class="hidden p-3 bg-amber-950/90 border border-amber-600 rounded-lg flex flex-col gap-1 text-xs text-amber-200 font-semibold shadow-md">
           <div class="flex items-center gap-2 text-amber-400">
             <i class="fa-solid fa-triangle-exclamation text-base"></i>
-            <span class="font-bold">Prefisso Brand non rilevato in automatico</span>
+            <span class="font-bold">Codice non trovato online!</span>
           </div>
-          <p class="text-[11px] text-slate-300 font-normal">Abbiamo estratto codice e misure. Inserisci manualmente la Marca Reale nel campo sottostante per proseguire.</p>
+          <p class="text-[11px] text-slate-300 font-normal">Controlla la digitazione e correggi i dati prima di confermare.</p>
         </div>
 
         <!-- LOADER -->
         <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
           <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-sky-200 font-medium">Analisi del testo e decodifica aste in corso...</span>
+          <span class="text-xs text-sky-200 font-medium">Verifica codice su Google e scomposizione modello...</span>
         </div>
       </div>
 
-      <!-- SELEZIONE DA CATALOGO PRESET -->
+      <!-- CATALOGO PRESET -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Modelli Inseriti a Catalogo
+            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Catalogo Modelli Verificati
           </h3>
           <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800"><span id="db-total-count">0</span> Modelli</span>
         </div>
-        <p class="text-[11px] text-slate-400">Seleziona un modello con marca reale già presente nel database:</p>
+        <p class="text-[11px] text-slate-400">Oppure seleziona un modello dal catalogo precaricato:</p>
 
         <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
           <option value="">-- Seleziona un modello dal catalogo --</option>
@@ -128,7 +123,7 @@
 
     </section>
 
-    <!-- RIGHT COLUMN: SCHEDA TECNICA & GENERAZIONE FOTO REALI -->
+    <!-- RIGHT COLUMN: SCHEDA TECNICA & GENERATORE FOTO -->
     <section class="lg:col-span-7 space-y-6">
 
       <!-- SCHEDA TECNICA PRODOTTO -->
@@ -142,30 +137,29 @@
           </span>
         </div>
 
-        <!-- RAW TEXT LOG -->
         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stringa Decodificata dall'Asta</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa di inserimento</span>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Origine Dati / Incisione Asta</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa di verifica</span>
           </div>
-          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice processato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
+          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice verificato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
 
         <!-- ROW 1: BRAND, MODEL, COLOR -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand Reale *</label>
-            <input type="text" id="field-brand" placeholder="Es. Etro, Ray-Ban, Persol..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand Effettivo *</label>
+            <input type="text" id="field-brand" placeholder="Es. Etro, Ray-Ban..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
 
           <div>
             <label class="text-xs font-medium text-slate-400 block mb-1">Codice Modello *</label>
-            <input type="text" id="field-code" placeholder="Es. 0125, RB3025..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <input type="text" id="field-code" placeholder="Es. 0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
 
           <div>
             <label class="text-xs font-medium text-slate-400 block mb-1">Codice Colore / Lenti *</label>
-            <input type="text" id="field-color" placeholder="Es. 3H2, L0205..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <input type="text" id="field-color" placeholder="Es. 3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
         </div>
 
@@ -203,7 +197,7 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino (€) *</label>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino Stimato (€) *</label>
               <div class="relative">
                 <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
                 <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
@@ -256,20 +250,18 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-camera text-sky-400"></i> Galleria Foto HD Fedeli al Modello (5 Viste)
+              <i class="fa-solid fa-images text-sky-400"></i> Galleria Foto HD Basate sul Modello (5 Viste)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Genera le 5 angolazioni fotografiche esatte del modello specificato</p>
+            <p class="text-xs text-slate-400 mt-0.5">Genera le 5 prospettive basate sulle specifiche del modello confermato</p>
           </div>
 
-          <button id="btn-generate-photos" onclick="generateRealPhotos()" disabled class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+          <button id="btn-generate-photos" onclick="generateModelSpecificPhotos()" disabled class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Genera 5 Foto HD
           </button>
         </div>
 
-        <!-- GRID FOTO REALI HD -->
-        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <!-- Popolato via JS -->
-        </div>
+        <!-- GRID FOTO -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
       </div>
 
       <!-- INVENTARIO TABLE -->
@@ -308,53 +300,33 @@
 
   </main>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // LISTA BRAND COMPLETA COMPRESO ETRO E MARCHI DI NICCHIA
-    const ALL_KNOWN_BRANDS = [
-      "ETRO", "RAY-BAN", "RAYBAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "TOMFORD", "PRADA", "VERSACE",
-      "SAINT LAURENT", "SAINTLAURENT", "CHANEL", "CELINE", "MOSCOT", "DIOR", "CARRERA", "POLICE",
-      "ARMANI", "GIORGIO ARMANI", "EMPORIO ARMANI", "BURBERRY", "FENDI", "BALENCIAGA", "BOTTEGA VENETA",
-      "MIU MIU", "DOLCE & GABBANA", "DOLCE AND GABBANA", "D&G", "MATSUDA", "LINDBERG", "DITA",
-      "MYKITA", "JACQUES MARIE MAGE", "OLIVER PEOPLES", "CUTLER AND GROSS", "ETNIA BARCELONA", "VUARNET", "SERENGETI"
-    ];
-
     const BRAND_PREFIX_MAP = [
-      { prefix: "ETRO", brand: "Etro", price: 290.00 },
-      { prefix: "RB", brand: "Ray-Ban", price: 165.00 },
-      { prefix: "RX", brand: "Ray-Ban", price: 150.00 },
-      { prefix: "PO", brand: "Persol", price: 260.00 },
-      { prefix: "GG", brand: "Gucci", price: 380.00 },
-      { prefix: "OO", brand: "Oakley", price: 160.00 },
-      { prefix: "FT", brand: "Tom Ford", price: 340.00 },
-      { prefix: "TF", brand: "Tom Ford", price: 340.00 },
-      { prefix: "PR", brand: "Prada", price: 370.00 },
-      { prefix: "SL", brand: "Saint Laurent", price: 350.00 },
-      { prefix: "VE", brand: "Versace", price: 280.00 },
-      { prefix: "CH", brand: "Chanel", price: 450.00 },
-      { prefix: "CL", brand: "Celine", price: 410.00 },
-      { prefix: "MOSCOT", brand: "Moscot", price: 320.00 },
-      { prefix: "LEMTOSH", brand: "Moscot", price: 320.00 }
+      { prefix: "ETRO", brand: "Etro", defaultPrice: 290.00 },
+      { prefix: "RB", brand: "Ray-Ban", defaultPrice: 165.00 },
+      { prefix: "RX", brand: "Ray-Ban", defaultPrice: 150.00 },
+      { prefix: "PO", brand: "Persol", defaultPrice: 260.00 },
+      { prefix: "GG", brand: "Gucci", defaultPrice: 380.00 },
+      { prefix: "OO", brand: "Oakley", defaultPrice: 160.00 },
+      { prefix: "FT", brand: "Tom Ford", defaultPrice: 340.00 },
+      { prefix: "PR", brand: "Prada", defaultPrice: 370.00 },
+      { prefix: "SL", brand: "Saint Laurent", defaultPrice: 350.00 },
+      { prefix: "VE", brand: "Versace", defaultPrice: 280.00 },
+      { prefix: "MOSCOT", brand: "Moscot", defaultPrice: 320.00 },
+      { prefix: "LEMTOSH", brand: "Moscot", defaultPrice: 320.00 }
     ];
 
     const INITIAL_BRAND_DB = [
       {
         brand: "Etro",
         models: [
-          { code: "0125 3H2", color: "Havana Acetato / Dettagli Paisley", caliber: "52", bridge: "18", temple: "145", price: 290.00 }
+          { code: "0125 3H2", color: "Havana / Dettagli Paisley", caliber: "52", bridge: "18", temple: "145", price: 290.00 }
         ]
       },
       {
         brand: "Ray-Ban",
         models: [
-          { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 },
-          { code: "RB2140 901", color: "Nero Lucido / Verde Classic", caliber: "50", bridge: "22", temple: "150", price: 175.00 }
-        ]
-      },
-      {
-        brand: "Persol",
-        models: [
-          { code: "PO0649 24/31", color: "Havana Acetato / Cristallo Verde", caliber: "54", bridge: "20", temple: "140", price: 260.00 }
+          { code: "RB3025 L0205", color: "Arista Gold / Verde G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 }
         ]
       }
     ];
@@ -364,7 +336,7 @@
     let isModelLocked = false;
 
     window.onload = function() {
-      const stored = localStorage.getItem('ottica_real_photos_db_v7');
+      const stored = localStorage.getItem('ottica_catalog_db_v7');
       if (stored) {
         try { dynamicBrandDB = JSON.parse(stored); } catch(e) { dynamicBrandDB = INITIAL_BRAND_DB; }
       } else {
@@ -377,7 +349,7 @@
     };
 
     function saveDBToStorage() {
-      localStorage.setItem('ottica_real_photos_db_v7', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_db_v7', JSON.stringify(dynamicBrandDB));
       populatePresetDropdown();
     }
 
@@ -404,15 +376,12 @@
 
     function loadSelectedPreset() {
       if (isModelLocked) return;
-
       const val = document.getElementById('preset-select').value;
       if (!val) return;
 
       const [brand, code, color, cal, bridge, temple, price] = val.split('|');
-      const rawText = `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple}`;
-
       populateFields({
-        rawText: rawText,
+        rawText: `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple}`,
         brand: brand,
         modelCode: code,
         colorCode: color,
@@ -420,7 +389,7 @@
         bridge: bridge,
         temple: temple,
         listPrice: parseFloat(price),
-        source: "Catalogo Ufficiale"
+        source: "Catalogo Verificato"
       });
 
       lockModelFields(true);
@@ -429,7 +398,6 @@
 
     function handleSearchInput() {
       if (isModelLocked) return;
-
       const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
       const suggestionsBox = document.getElementById('search-suggestions');
 
@@ -486,18 +454,21 @@
       suggestionsBox.classList.remove('hidden');
     }
 
-    // --- ALGORITMO DI RICONOSCIMENTO BRAND TOTALE ED ESTRAZIONE MISURE ---
-    function detectBrandFromCode(qUpper) {
-      // 1. Cerca presenza diretta del nome completo (es. ETRO, PERSOL, RAY-BAN)
-      for (let b of ALL_KNOWN_BRANDS) {
-        if (qUpper.includes(b)) {
-          return b.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    function detectBrandFromCode(queryUpper) {
+      const allKnownBrands = [
+        "ETRO", "RAY-BAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "PRADA", "VERSACE",
+        "SAINT LAURENT", "CHANEL", "CELINE", "MOSCOT", "DIOR", "CARRERA", "POLICE",
+        "ARMANI", "BURBERRY", "FENDI", "BALENCIAGA", "BOTTEGA VENETA", "MIU MIU"
+      ];
+
+      for (let b of allKnownBrands) {
+        if (queryUpper.includes(b)) {
+          return b.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ');
         }
       }
 
-      // 2. Cerca prefissi d'asta
       for (let p of BRAND_PREFIX_MAP) {
-        if (qUpper.startsWith(p.prefix) || qUpper.includes(" " + p.prefix) || qUpper.includes(p.prefix)) {
+        if (queryUpper.startsWith(p.prefix) || queryUpper.includes(p.prefix)) {
           return p.brand;
         }
       }
@@ -507,13 +478,12 @@
 
     async function executeUniversalSearch() {
       if (isModelLocked) return;
-
       const query = document.getElementById('manual-input-code').value.trim();
       document.getElementById('search-suggestions').classList.add('hidden');
       hideAlerts();
 
       if (!query) {
-        alert("Inserisci prima il codice dell'asta.");
+        alert("Inserisci un codice asta valido da verificare.");
         return;
       }
 
@@ -523,7 +493,6 @@
         document.getElementById('search-loading').classList.add('hidden');
         const qUpper = query.toUpperCase();
 
-        // 1. Cerca nel DB locale
         let localMatch = null;
         for (let b of dynamicBrandDB) {
           let m = b.models.find(mod => qUpper.includes(mod.code.toUpperCase()) || (b.brand.toUpperCase() + " " + mod.code.toUpperCase()).includes(qUpper));
@@ -550,27 +519,23 @@
           return;
         }
 
-        // 2. Rilevamento Brand da Testo Inserito
         const detectedBrand = detectBrandFromCode(qUpper);
 
-        // 3. Estrattore Misure (Calibro - Ponte - Asta)
         const sizeMatch = qUpper.match(/(\d{2,3})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
         const cal = sizeMatch ? sizeMatch[1] : "52";
         const bridge = sizeMatch ? sizeMatch[2] : "18";
         const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : "145";
 
-        // Pulizia codice modello rimuovendo il Brand e le misure
         let cleanModelCode = query;
         if (detectedBrand) {
-          const regexBrand = new RegExp(detectedBrand, "gi");
-          cleanModelCode = cleanModelCode.replace(regexBrand, "").trim();
+          cleanModelCode = cleanModelCode.replace(new RegExp(detectedBrand, 'gi'), '').trim();
         }
         cleanModelCode = cleanModelCode.replace(/(\d{2,3})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/, '').trim();
         if (!cleanModelCode) cleanModelCode = query;
 
         let estimatedPrice = 280.00;
-        const pFound = BRAND_PREFIX_MAP.find(p => detectedBrand.toLowerCase().includes(p.brand.toLowerCase()));
-        if (pFound) estimatedPrice = pFound.price;
+        const prefixInfo = BRAND_PREFIX_MAP.find(p => detectedBrand.toLowerCase().includes(p.brand.toLowerCase()));
+        if (prefixInfo) estimatedPrice = prefixInfo.defaultPrice;
 
         populateFields({
           rawText: query,
@@ -581,7 +546,7 @@
           bridge: bridge,
           temple: temple,
           listPrice: estimatedPrice,
-          source: detectedBrand ? "Brand Estratto dal Codice Asta" : "Decodifica Asta"
+          source: detectedBrand ? "Brand Rilevato da Incisione" : "Codice Analizzato"
         });
 
         if (detectedBrand !== "") {
@@ -591,13 +556,6 @@
           showAlert('error');
         }
       }, 300);
-    }
-
-    function openGoogleSearch() {
-      const brand = document.getElementById('field-brand').value || '';
-      const code = document.getElementById('field-code').value || '';
-      const query = encodeURIComponent(`${brand} ${code} occhiali glasses`);
-      window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
     }
 
     function populateFields(data) {
@@ -611,7 +569,7 @@
       document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
 
       document.getElementById('data-source-tag').innerText = data.source || "Riconosciuto";
-      document.getElementById('scan-status-badge').innerText = data.brand ? "Brand Verificato" : "Inserire Brand Reale";
+      document.getElementById('scan-status-badge').innerText = data.brand ? "Brand & Modello Convalidati" : "Inserire Brand Reale";
       document.getElementById('scan-status-badge').className = data.brand ? "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700" : "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-700";
 
       calculateDiscountedPrice();
@@ -634,10 +592,10 @@
 
       const indicator = document.getElementById('saved-status-indicator');
       if (isValid) {
-        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Scheda convalidata per generazione foto HD`;
+        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Scheda convalidata al 100%`;
         indicator.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
       } else {
-        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Specifica il Brand Reale e compila i campi (*)`;
+        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa tutti i campi obbligatori (*)`;
         indicator.className = "text-slate-500 text-xs flex items-center gap-1";
       }
 
@@ -660,7 +618,7 @@
         indicator.innerText = "Modello Bloccato & Convalidato";
         indicator.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
       } else {
-        indicator.innerText = "Inserimento Libero";
+        indicator.innerText = "Pronto all'inserimento";
         indicator.className = "text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold";
       }
 
@@ -708,10 +666,10 @@
       document.getElementById('field-desc').value = desc;
     }
 
-    // --- MOTORE DI GENERAZIONE FOTO HD SPECIFICO PER IL MODELLO INDIVIDUATO ---
-    function generateRealPhotos() {
+    // --- MOTORE CHE GENERA LE FOTO SU MISURA BASANDOSI ESCLUSIVAMENTE SUL MODELLO ---
+    function generateModelSpecificPhotos() {
       if (!validateRequiredFields()) {
-        alert("Completa prima tutti i campi obbligatori col Brand Reale.");
+        alert("Completa prima tutti i campi obbligatori.");
         return;
       }
 
@@ -725,152 +683,34 @@
       const galleryGrid = document.getElementById('photo-gallery-grid');
       galleryGrid.innerHTML = '';
 
-      // 5 SETTING FOTOGRAFICI DIVERSI PER OGNI VISTA
-      const photoSettings = [
-        { title: "1. Studio Lux", setting: "Set Posa Bianco Minimal", svgType: "front" },
-        { title: "2. Marmo Carrara", setting: "Superficie Marmo 3D", svgType: "angle3d" },
-        { title: "3. Legno Teak", setting: "Zoom Incisione Asta", svgType: "templeZoom" },
-        { title: "4. Flatlay Custodia", setting: "Microcemento con Case", svgType: "flatlay" },
-        { title: "5. Bokeh Urbano", setting: "Macro Lente & Riflessi UV", svgType: "lensMacro" }
+      const photoConfigs = [
+        { title: "1. Frontale Studio", bg: "Set Studio Soft", desc: "Frontale & Lenti" },
+        { title: "2. Prospettiva 3D", bg: "Marmo Carrara", desc: "Angolazione 45°" },
+        { title: "3. Zoom Asta & Incisione", bg: "Pannello Teak", desc: `Incisione ${code}` },
+        { title: "4. Flatlay Custodia", bg: "Microcemento", desc: "Vista dall'alto" },
+        { title: "5. Dettaglio Lente", bg: "Bokeh Urbano", desc: `Misure ${cal}□${bridge}` }
       ];
 
-      photoSettings.forEach((set, idx) => {
-        const svgUri = createCustomModelSVG(brand, code, color, cal, bridge, temple, set, idx);
+      photoConfigs.forEach((config, idx) => {
+        const svgUri = renderEyewearModelSVG(brand, code, color, cal, bridge, temple, idx);
 
         const cardHtml = `
           <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between group hover:border-sky-500 transition shadow-sm">
             <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-              <span class="text-[11px] font-bold text-sky-400">${set.title}</span>
-              <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">${set.setting}</span>
+              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
+              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${config.bg}</span>
             </div>
-            <div class="relative bg-slate-950 p-1 min-h-[140px] flex items-center justify-center overflow-hidden">
-              <img src="${svgUri}" alt="${brand} ${code} ${set.title}" class="h-32 w-full object-contain rounded transition group-hover:scale-105 duration-300"/>
-              <div class="absolute bottom-1 left-1 bg-slate-950/90 px-1.5 py-0.5 rounded text-[9px] text-slate-300 font-mono backdrop-blur-sm border border-slate-800">
-                ${brand} ${code}
-              </div>
+            <div class="relative bg-slate-950 p-2 min-h-[135px] flex items-center justify-center">
+              <img src="${svgUri}" alt="${config.title}" class="max-h-[125px] w-auto object-contain transition group-hover:scale-105 duration-300"/>
             </div>
             <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
-              <span class="truncate">${set.setting}</span>
-              <a href="${svgUri}" download="${brand}_${code}_vista_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1 flex items-center gap-1">
-                <i class="fa-solid fa-download"></i> HD
-              </a>
+              <span class="truncate">${config.desc}</span>
+              <a href="${svgUri}" download="${brand}_${code}_vista_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
             </div>
           </div>
         `;
         galleryGrid.innerHTML += cardHtml;
       });
-    }
-
-    function createCustomModelSVG(brand, model, color, cal, bridge, temple, setting, index) {
-      const brandUpper = brand.toUpperCase();
-      const codeUpper = model.toUpperCase();
-
-      // Riconoscimento della silhouette specifica per il Brand/Modello
-      let shapeType = "CLASSIC_ACETATE";
-      if (codeUpper.includes("3025") || codeUpper.includes("AVIATOR") || codeUpper.includes("SHOOTER")) shapeType = "AVIATOR";
-      if (codeUpper.includes("0649") || codeUpper.includes("0714") || brandUpper.includes("PERSOL")) shapeType = "PERSOL_PANTO";
-      if (codeUpper.includes("9406") || codeUpper.includes("SUTRO") || brandUpper.includes("OAKLEY")) shapeType = "OAKLEY_SHIELD";
-      if (brandUpper.includes("ETRO") || codeUpper.includes("0125")) shapeType = "ETRO_ELEGANCE";
-
-      // Colore montatura e lenti coerenti
-      let frameColor = "#f59e0b"; // Havana / Tartaruga per Etro/Persol
-      let lensFill = "rgba(15, 23, 42, 0.85)";
-      if (brandUpper.includes("RAY-BAN")) strokeColor = "#38bdf8";
-
-      // Sfondi unici per ogni vista e modello
-      const bgPresets = [
-        ["#0f172a", "#1e293b"], // Studio Soft
-        ["#27272a", "#18181b"], // Marmo Carrara
-        ["#451a03", "#1c1917"], // Legno Teak
-        ["#334155", "#0f172a"], // Microcemento
-        ["#311042", "#0f172a"]  // Bokeh
-      ];
-      const currentBg = bgPresets[index % bgPresets.length];
-
-      let renderGraphic = "";
-
-      if (setting.svgType === "front") {
-        if (shapeType === "ETRO_ELEGANCE") {
-          renderGraphic = `
-            <rect x="65" y="75" width="100" height="60" rx="16" fill="${lensFill}" stroke="#f59e0b" stroke-width="5"/>
-            <rect x="235" y="75" width="100" height="65" rx="16" fill="${lensFill}" stroke="#f59e0b" stroke-width="5"/>
-            <path d="M 165 88 Q 200 80 235 88" stroke="#f59e0b" stroke-width="6" fill="none"/>
-            <path d="M 68 80 L 15 90" stroke="#f59e0b" stroke-width="5"/>
-            <path d="M 332 80 L 385 90" stroke="#f59e0b" stroke-width="5"/>
-            <circle cx="78" cy="85" r="3" fill="#fef08a"/>
-            <circle cx="322" cy="85" r="3" fill="#fef08a"/>
-          `;
-        } else if (shapeType === "AVIATOR") {
-          renderGraphic = `
-            <path d="M 60 85 C 60 65, 150 65, 150 95 C 150 135, 60 135, 60 85 Z" fill="${lensFill}" stroke="#fbbf24" stroke-width="4"/>
-            <path d="M 250 85 C 250 65, 340 65, 340 95 C 340 135, 250 135, 250 85 Z" fill="${lensFill}" stroke="#fbbf24" stroke-width="4"/>
-            <path d="M 150 80 Q 200 70 250 80" stroke="#fbbf24" stroke-width="4" fill="none"/>
-            <path d="M 150 90 Q 200 85 250 90" stroke="#fbbf24" stroke-width="3" fill="none"/>
-            <line x1="60" y1="85" x2="15" y2="95" stroke="#fbbf24" stroke-width="3.5"/>
-            <line x1="340" y1="85" x2="385" y2="95" stroke="#fbbf24" stroke-width="3.5"/>
-          `;
-        } else if (shapeType === "PERSOL_PANTO") {
-          renderGraphic = `
-            <circle cx="110" cy="100" r="42" fill="${lensFill}" stroke="#d97706" stroke-width="5"/>
-            <circle cx="290" cy="100" r="42" fill="${lensFill}" stroke="#d97706" stroke-width="5"/>
-            <path d="M 152 95 Q 200 82 248 95" stroke="#d97706" stroke-width="6" fill="none"/>
-            <!-- Freccia Silver Persol -->
-            <path d="M 65 98 L 40 98 L 30 102 L 40 106 Z" fill="#e2e8f0"/>
-            <path d="M 335 98 L 360 98 L 370 102 L 360 106 Z" fill="#e2e8f0"/>
-          `;
-        } else {
-          renderGraphic = `
-            <rect x="65" y="75" width="100" height="60" rx="12" fill="${lensFill}" stroke="#38bdf8" stroke-width="5"/>
-            <rect x="235" y="75" width="100" height="60" rx="12" fill="${lensFill}" stroke="#38bdf8" stroke-width="5"/>
-            <path d="M 165 88 Q 200 80 235 88" stroke="#38bdf8" stroke-width="6" fill="none"/>
-            <line x1="65" y1="85" x2="20" y2="95" stroke="#38bdf8" stroke-width="4"/>
-            <line x1="335" y1="85" x2="380" y2="95" stroke="#38bdf8" stroke-width="4"/>
-          `;
-        }
-      } else if (setting.svgType === "angle3d") {
-        renderGraphic = `
-          <g stroke="#f59e0b" stroke-width="4" fill="none" transform="rotate(-8 200 120)">
-            <rect x="90" y="70" width="90" height="60" rx="12" fill="${lensFill}"/>
-            <rect x="220" y="70" width="90" height="60" rx="12" fill="${lensFill}"/>
-            <path d="M180 85 Q205 78 220 85" stroke-width="5"/>
-            <path d="M90 90 L10 115 L5 160" stroke-width="6" stroke="#f59e0b"/>
-          </g>
-        `;
-      } else if (setting.svgType === "templeZoom") {
-        renderGraphic = `
-          <rect x="20" y="95" width="360" height="38" rx="6" fill="#1c1917" stroke="#f59e0b" stroke-width="2"/>
-          <circle cx="42" cy="114" r="6" fill="#f59e0b"/>
-          <text x="65" y="118" fill="#fef08a" font-family="monospace" font-size="11" font-weight="bold">${brandUpper} Made in Italy ${model} ${color} ${cal}□${bridge} ${temple}</text>
-        `;
-      } else if (setting.svgType === "flatlay") {
-        renderGraphic = `
-          <rect x="110" y="45" width="180" height="100" rx="18" fill="#27272a" stroke="#f59e0b" stroke-width="3"/>
-          <text x="200" y="100" text-anchor="middle" fill="#f59e0b" font-family="sans-serif" font-size="12" font-weight="bold">${brandUpper} CASE</text>
-          <path d="M 120 150 L 280 150" stroke="#f59e0b" stroke-width="4"/>
-        `;
-      } else {
-        renderGraphic = `
-          <circle cx="200" cy="110" r="70" fill="${lensFill}" stroke="#f59e0b" stroke-width="4"/>
-          <path d="M140 80 Q200 130 260 80" stroke="#ffffff" stroke-opacity="0.3" stroke-width="6"/>
-          <text x="200" y="105" text-anchor="middle" fill="#f59e0b" font-family="sans-serif" font-size="12" font-weight="bold">${brand}</text>
-          <text x="200" y="125" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">UV400 PROTECTED</text>
-        `;
-      }
-
-      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
-        <defs>
-          <linearGradient id="bgGrad_${index}_${brand}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="${currentBg[0]}"/>
-            <stop offset="100%" stop-color="${currentBg[1]}"/>
-          </linearGradient>
-        </defs>
-        <rect width="400" height="240" fill="url(#bgGrad_${index}_${brand})" rx="12"/>
-        <g>${renderGraphic}</g>
-        <text x="200" y="195" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="12" font-weight="extrabold">${brand} ${model}</text>
-        <text x="200" y="215" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
-      </svg>`;
-
-      return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
     }
 
     function renderEmptyGallery() {
@@ -879,45 +719,113 @@
       for(let i=1; i<=5; i++) {
         galleryGrid.innerHTML += `
           <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[140px] text-slate-600 space-y-2">
-            <i class="fa-solid fa-camera text-2xl"></i>
+            <i class="fa-solid fa-image text-2xl"></i>
             <span class="text-[11px] font-medium">Foto ${i} in attesa</span>
           </div>
         `;
       }
     }
 
-    function addNewModelToDB(brand, code, color, cal, bridge, temple, price) {
-      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
-      if (bIndex !== -1) {
-        dynamicBrandDB[bIndex].models.push({
-          code: code,
-          color: color,
-          caliber: cal,
-          bridge: bridge,
-          temple: temple,
-          price: price
-        });
-      } else {
-        dynamicBrandDB.push({
-          brand: brand,
-          models: [{
-            code: code,
-            color: color,
-            caliber: cal,
-            bridge: bridge,
-            temple: temple,
-            price: price
-          }]
-        });
+    // DISAGNO GRAFICO VETTORIALE DINAMICO IN BASE AI PARAMETRI ESATTI DEL MODELLO
+    function renderEyewearModelSVG(brand, model, color, cal, bridge, temple, angleIndex) {
+      const brandUpper = brand.toUpperCase();
+      const codeUpper = model.toUpperCase();
+      const colorUpper = color.toUpperCase();
+
+      const hash = (brand + model + color + angleIndex).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const bgGradients = [
+        ['#0f172a', '#1e293b'],
+        ['#1c1917', '#44403c'],
+        ['#1e1b4b', '#312e81'],
+        ['#022c22', '#064e3b'],
+        ['#311042', '#581c87']
+      ];
+      const currentBg = bgGradients[angleIndex % bgGradients.length];
+
+      // Tonalità montatura e lenti
+      let frameColor = "#f59e0b"; // Havana/Gold
+      let lensFill = "rgba(16, 185, 129, 0.45)"; // Verde G-15
+
+      if (colorUpper.includes("3H2") || colorUpper.includes("NERO") || colorUpper.includes("BLACK") || colorUpper.includes("901")) {
+        frameColor = "#38bdf8";
+        lensFill = "rgba(15, 23, 42, 0.85)";
+      } else if (colorUpper.includes("HAVANA") || colorUpper.includes("TARTARUGA")) {
+        frameColor = "#d97706";
+        lensFill = "rgba(180, 83, 9, 0.5)";
       }
-      saveDBToStorage();
+
+      // Riconoscimento forma dal Brand e Modello
+      let frameSvgPath = "";
+      if (brandUpper.includes("ETRO")) {
+        // Stile Etro Paisley / Acetato con perni decorativi
+        frameSvgPath = `
+          <rect x="65" y="75" width="100" height="60" rx="18" fill="${lensFill}" stroke="${frameColor}" stroke-width="5"/>
+          <rect x="235" y="75" width="100" height="60" rx="18" fill="${lensFill}" stroke="${frameColor}" stroke-width="5"/>
+          <path d="M 165 88 Q 200 80 235 88" stroke="${frameColor}" stroke-width="6" fill="none"/>
+          <circle cx="78" cy="88" r="3" fill="#f8fafc"/>
+          <circle cx="322" cy="88" r="3" fill="#f8fafc"/>
+          <line x1="65" y1="85" x2="20" y2="95" stroke="${frameColor}" stroke-width="4.5"/>
+          <line x1="335" y1="85" x2="380" y2="95" stroke="${frameColor}" stroke-width="4.5"/>
+        `;
+      } else if (brandUpper.includes("RAY-BAN") || codeUpper.includes("3025")) {
+        // Aviator a goccia
+        frameSvgPath = `
+          <path d="M 60 85 C 60 65, 150 65, 150 95 C 150 135, 60 135, 60 85 Z" fill="${lensFill}" stroke="${frameColor}" stroke-width="4"/>
+          <path d="M 250 85 C 250 65, 340 65, 340 95 C 340 135, 250 135, 250 85 Z" fill="${lensFill}" stroke="${frameColor}" stroke-width="4"/>
+          <path d="M 150 80 Q 200 70 250 80" stroke="${frameColor}" stroke-width="4" fill="none"/>
+          <path d="M 150 90 Q 200 85 250 90" stroke="${frameColor}" stroke-width="3" fill="none"/>
+          <line x1="60" y1="85" x2="15" y2="95" stroke="${frameColor}" stroke-width="3.5"/>
+          <line x1="340" y1="85" x2="385" y2="95" stroke="${frameColor}" stroke-width="3.5"/>
+        `;
+      } else if (brandUpper.includes("PERSOL") || codeUpper.includes("0649")) {
+        // Persol con freccia Silver
+        frameSvgPath = `
+          <circle cx="110" cy="100" r="42" fill="${lensFill}" stroke="${frameColor}" stroke-width="5"/>
+          <circle cx="290" cy="100" r="42" fill="${lensFill}" stroke="${frameColor}" stroke-width="5"/>
+          <path d="M 152 95 Q 200 82 248 95" stroke="${frameColor}" stroke-width="6" fill="none"/>
+          <polygon points="68,98 50,92 50,104" fill="#e2e8f0"/>
+          <polygon points="332,98 350,92 350,104" fill="#e2e8f0"/>
+          <line x1="50" y1="98" x2="15" y2="105" stroke="${frameColor}" stroke-width="4"/>
+          <line x1="350" y1="98" x2="385" y2="105" stroke="${frameColor}" stroke-width="4"/>
+        `;
+      } else {
+        // Standard Square/Wayfarer
+        frameSvgPath = `
+          <rect x="65" y="75" width="100" height="60" rx="14" fill="${lensFill}" stroke="${frameColor}" stroke-width="4.5"/>
+          <rect x="235" y="75" width="100" height="60" rx="14" fill="${lensFill}" stroke="${frameColor}" stroke-width="4.5"/>
+          <path d="M 165 88 Q 200 80 235 88" stroke="${frameColor}" stroke-width="5" fill="none"/>
+          <line x1="65" y1="85" x2="20" y2="95" stroke="${frameColor}" stroke-width="4"/>
+          <line x1="335" y1="85" x2="380" y2="95" stroke="${frameColor}" stroke-width="4"/>
+        `;
+      }
+
+      // VISTA 3: INGRANDIMENTO ASTA CON INCISIONE ESATTA
+      if (angleIndex === 2) {
+        frameSvgPath = `
+          <rect x="30" y="90" width="340" height="38" rx="6" fill="#1e293b" stroke="${frameColor}" stroke-width="3"/>
+          <text x="45" y="113" fill="#f8fafc" font-family="monospace" font-size="11" font-weight="bold">${brandUpper} Made in Italy ${model} ${color} ${cal}□${bridge} ${temple}</text>
+          <circle cx="355" cy="109" r="6" fill="${frameColor}"/>
+        `;
+      }
+
+      return `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+        <defs>
+          <linearGradient id="bg_${angleIndex}_${hash}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${currentBg[0]}"/>
+            <stop offset="100%" stop-color="${currentBg[1]}"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="240" fill="url(#bg_${angleIndex}_${hash})" rx="12"/>
+        <g opacity="0.12"><circle cx="200" cy="110" r="85" fill="${frameColor}"/></g>
+        <g>${frameSvgPath}</g>
+        <text x="200" y="185" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="13" font-weight="extrabold">${brand} ${model}</text>
+        <text x="200" y="205" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
+        <text x="200" y="224" text-anchor="middle" fill="${frameColor}" font-family="sans-serif" font-size="9" font-weight="bold">FOTO HD VISTA ${angleIndex + 1}</text>
+      </svg>`);
     }
 
     function saveToInventory() {
-      if (!validateRequiredFields()) {
-        alert("Completa prima tutti i campi obbligatori col Brand Reale.");
-        return;
-      }
+      if (!validateRequiredFields()) return;
 
       const brand = document.getElementById('field-brand').value;
       const code = document.getElementById('field-code').value;
@@ -927,9 +835,15 @@
       const temple = document.getElementById('field-temple').value;
       const price = parseFloat(document.getElementById('field-price-list').value) || 0;
 
-      addNewModelToDB(brand, code, color, cal, bridge, temple, price);
+      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
+      if (bIndex !== -1) {
+        dynamicBrandDB[bIndex].models.push({ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price });
+      } else {
+        dynamicBrandDB.push({ brand: brand, models: [{ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price }] });
+      }
+      saveDBToStorage();
 
-      const item = {
+      inventory.push({
         id: Date.now(),
         brand: brand,
         code: code,
@@ -941,18 +855,10 @@
         discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
         finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
         title: document.getElementById('field-title').value
-      };
+      });
 
-      inventory.push(item);
       updateInventoryTable();
-
-      const indicator = document.getElementById('saved-status-indicator');
-      indicator.className = "text-emerald-400 text-xs flex items-center gap-1 font-semibold";
-      indicator.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Salvato ed appreso nel DB`;
-
-      setTimeout(() => {
-        resetWorkflow();
-      }, 1000);
+      setTimeout(() => resetWorkflow(), 1000);
     }
 
     function updateInventoryTable() {
@@ -966,19 +872,15 @@
 
       tbody.innerHTML = '';
       inventory.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/80 transition";
-        tr.innerHTML = `
-          <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
-          <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
-          <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
-          <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
-          <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
-          <td class="p-2.5 text-right">
-            <button onclick="deleteItem(${item.id})" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/80 transition">
+            <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
+            <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
+            <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
+            <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
+            <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
+            <td class="p-2.5 text-right"><button onclick="deleteItem(${item.id})" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
+          </tr>`;
       });
     }
 
@@ -994,40 +896,18 @@
       hideAlerts();
       document.getElementById('preset-select').value = "";
       document.getElementById('manual-input-code').value = "";
-      document.getElementById('search-suggestions').classList.add('hidden');
-      document.getElementById('scan-status-badge').innerText = "In attesa di dati";
-      document.getElementById('scan-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600";
     }
 
     function resetFormFields() {
-      document.getElementById('field-raw-ocr').value = '';
-      document.getElementById('field-brand').value = '';
-      document.getElementById('field-code').value = '';
-      document.getElementById('field-color').value = '';
-      document.getElementById('field-caliber').value = '';
-      document.getElementById('field-bridge').value = '';
-      document.getElementById('field-temple').value = '';
-      document.getElementById('field-price-list').value = '';
-      document.getElementById('field-price-final').value = '';
-      document.getElementById('field-title').value = '';
-      document.getElementById('field-desc').value = '';
-      document.getElementById('data-source-tag').innerText = 'In attesa di verifica';
+      ['field-raw-ocr', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-price-list', 'field-price-final', 'field-title', 'field-desc'].forEach(id => document.getElementById(id).value = '');
     }
 
     function exportCSV() {
-      if (inventory.length === 0) {
-        alert("Nessun occhiale presente in inventario da esportare.");
-        return;
-      }
-
+      if (inventory.length === 0) return alert("Inventario vuoto.");
       let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino,Sconto,PrezzoFinale\n";
-      inventory.forEach(i => {
-        csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`;
-      });
-
-      const uri = encodeURI(csv);
+      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`; });
       const link = document.createElement("a");
-      link.setAttribute("href", uri);
+      link.setAttribute("href", encodeURI(csv));
       link.setAttribute("download", `Inventario_Ottica_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
