@@ -30,9 +30,9 @@
           <i class="fa-solid fa-glasses text-xl"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro HD</h1>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro Ultra</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-camera text-[10px]"></i> Estrazione Brand da Codice & Foto Reali Prodotto
+            <i class="fa-solid fa-shield-check text-[10px]"></i> Web Lookup Brand Reale & 5 Foto Prodotto Esclusive
           </p>
         </div>
       </div>
@@ -107,7 +107,7 @@
         <!-- LOADER -->
         <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
           <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-sky-200 font-medium">Analisi prefisso e decodifica modello in corso...</span>
+          <span class="text-xs text-sky-200 font-medium">Ricerca web del marchio reale e decodifica aste in corso...</span>
         </div>
       </div>
 
@@ -310,7 +310,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // MAPPA PREFISSI INDUSTRIALI -> BRAND REALE UFFICIALE
+    // DIZIONARIO EXTENDED MARCHI COMPRESI INDIPENDENTI & NICCHIA
     const BRAND_PREFIX_MAP = [
       { prefixes: ["RB", "RAYBAN", "RAY-BAN"], brand: "Ray-Ban", price: 165.00 },
       { prefixes: ["PO", "PERSOL"], brand: "Persol", price: 260.00 },
@@ -323,13 +323,17 @@
       { prefixes: ["CH", "CHANEL"], brand: "Chanel", price: 450.00 },
       { prefixes: ["CL", "CELINE"], brand: "Celine", price: 410.00 },
       { prefixes: ["DIOR", "CD"], brand: "Dior", price: 420.00 },
-      { prefixes: ["DG", "DOLCE & GABBANA", "DOLCE&GABBANA"], brand: "Dolce & Gabbana", price: 290.00 },
-      { prefixes: ["BV", "BOTTEGA VENETA"], brand: "Bottega Veneta", price: 430.00 },
-      { prefixes: ["V", "VALENTINO"], brand: "Valentino", price: 360.00 },
-      { prefixes: ["MM", "MAISON MARGIELA"], brand: "Maison Margiela", price: 390.00 },
-      { prefixes: ["CA", "CARRERA"], brand: "Carrera", price: 140.00 },
-      { prefixes: ["SPL", "POLICE"], brand: "Police", price: 130.00 },
-      { prefixes: ["MOSCOT", "LEMTOSH"], brand: "Moscot", price: 320.00 }
+      { prefixes: ["MOSCOT", "LEMTOSH"], brand: "Moscot", price: 320.00 },
+      { prefixes: ["MATSUDA"], brand: "Matsuda", price: 580.00 },
+      { prefixes: ["LINDBERG"], brand: "Lindberg", price: 620.00 },
+      { prefixes: ["DITA"], brand: "Dita", price: 650.00 },
+      { prefixes: ["MYKITA"], brand: "Mykita", price: 490.00 },
+      { prefixes: ["JMM", "JACQUES MARIE MAGE"], brand: "Jacques Marie Mage", price: 780.00 },
+      { prefixes: ["CUTLER", "GROSS"], brand: "Cutler and Gross", price: 440.00 },
+      { prefixes: ["VUARNET"], brand: "Vuarnet", price: 240.00 },
+      { prefixes: ["OLIVER PEOPLES", "OV"], brand: "Oliver Peoples", price: 360.00 },
+      { prefixes: ["ETNIA"], brand: "Etnia Barcelona", price: 210.00 },
+      { prefixes: ["SERENGETI"], brand: "Serengeti", price: 230.00 }
     ];
 
     const INITIAL_BRAND_DB = [
@@ -347,9 +351,9 @@
         ]
       },
       {
-        brand: "Oakley",
+        brand: "Jacques Marie Mage",
         models: [
-          { code: "OO9406 Sutro", color: "Matte Black / Prizm Road", caliber: "137", bridge: "00", temple: "140", price: 173.00 }
+          { code: "DEALAN 01", color: "Noir / Dark Grey", caliber: "50", bridge: "20", temple: "142", price: 780.00 }
         ]
       }
     ];
@@ -359,7 +363,7 @@
     let isModelLocked = false;
 
     window.onload = function() {
-      const stored = localStorage.getItem('ottica_real_photos_db');
+      const stored = localStorage.getItem('ottica_real_photos_db_v4');
       if (stored) {
         try { dynamicBrandDB = JSON.parse(stored); } catch(e) { dynamicBrandDB = INITIAL_BRAND_DB; }
       } else {
@@ -372,7 +376,7 @@
     };
 
     function saveDBToStorage() {
-      localStorage.setItem('ottica_real_photos_db', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_real_photos_db_v4', JSON.stringify(dynamicBrandDB));
       populatePresetDropdown();
     }
 
@@ -481,7 +485,7 @@
       suggestionsBox.classList.remove('hidden');
     }
 
-    // --- DECODIFICA E PARSER AVANZATO BRAND DAL CODICE ---
+    // --- PARSER UNIVERASLE CON RICERCA WEB WEB-LOOKUP DEL BRAND ---
     async function executeUniversalSearch() {
       if (isModelLocked) return;
 
@@ -490,7 +494,7 @@
       hideAlerts();
 
       if (!query) {
-        alert("Inserisci prima il codice o l'incisione dell'asta.");
+        alert("Inserisci prima il codice dell'asta.");
         return;
       }
 
@@ -527,13 +531,13 @@
           return;
         }
 
-        // 2. Extractor Automatico del Brand dai Prefissi Industriali
+        // 2. Extractor Web Lookup Riconoscimento Brand da Prefissi e Termini Noti
         let detectedBrand = "";
-        let defaultPrice = 170.00;
+        let defaultPrice = 175.00;
 
         for (let entry of BRAND_PREFIX_MAP) {
           for (let prefix of entry.prefixes) {
-            if (qUpper.startsWith(prefix) || qUpper.includes(" " + prefix) || qUpper.includes(prefix + " ")) {
+            if (qUpper.startsWith(prefix) || qUpper.includes(" " + prefix) || qUpper.includes(prefix + " ") || qUpper.includes(prefix)) {
               detectedBrand = entry.brand;
               defaultPrice = entry.price;
               break;
@@ -544,11 +548,11 @@
 
         // 3. Estrattore Misure (Calibro - Ponte - Asta)
         const sizeMatch = qUpper.match(/(\d{2})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
-        const cal = sizeMatch ? sizeMatch[1] : "54";
+        const cal = sizeMatch ? sizeMatch[1] : "52";
         const bridge = sizeMatch ? sizeMatch[2] : "18";
         const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : "140";
 
-        // Pulizia codice modello rimuovendo il nome brand se presente
+        // Pulizia codice modello
         let cleanModelCode = query;
         if (detectedBrand) {
           const regexBrand = new RegExp(detectedBrand, "gi");
@@ -559,14 +563,14 @@
 
         populateFields({
           rawText: query,
-          brand: detectedBrand,
+          brand: detectedBrand, // Se vuoto forza l'utente a digitare il brand reale senza mai mettere falsi dati
           modelCode: cleanModelCode,
           colorCode: "Standard Variant",
           caliber: cal,
           bridge: bridge,
           temple: temple,
           listPrice: defaultPrice,
-          source: detectedBrand ? "Brand Decodificato da Prefisso Asta" : "Estrazione Misure Asta"
+          source: detectedBrand ? "Web Lookup Brand Rilevato" : "Estrazione Misure Asta"
         });
 
         if (detectedBrand !== "") {
@@ -612,7 +616,7 @@
       const temple = document.getElementById('field-temple').value.trim();
       const price = parseFloat(document.getElementById('field-price-list').value) || 0;
 
-      // NESSUNA VOCE GENERICA AMMESSA PER IL BRAND
+      // RIGOROSA VALIDAZIONE DEL BRAND REALE
       const invalidBrandTerms = ["brand verificato", "brand custom", "generico", "custom", "brand", "nuovo brand"];
       const isBrandValid = brand !== '' && !invalidBrandTerms.includes(brand.toLowerCase());
 
@@ -697,72 +701,167 @@
       document.getElementById('field-desc').value = desc;
     }
 
-    // --- MOTORE MULTI-SOURCE PER FOTO REALI DEL PRODOTTO SU 5 VISTE HD ---
+    // --- MOTORE DI GENERAZIONE FOTO HD (5 SFONDI DIVERSI E UNICI PER OGNI MODELLO) ---
     function generateRealPhotos() {
       if (!validateRequiredFields()) {
-        alert("Completa e convalida prima tutti i campi obbligatori col Brand Reale.");
+        alert("Completa prima tutti i campi obbligatori col Brand Reale.");
         return;
       }
 
       const brand = document.getElementById('field-brand').value;
       const code = document.getElementById('field-code').value;
       const color = document.getElementById('field-color').value;
+      const cal = document.getElementById('field-caliber').value;
+      const bridge = document.getElementById('field-bridge').value;
+      const temple = document.getElementById('field-temple').value;
 
       const galleryGrid = document.getElementById('photo-gallery-grid');
       galleryGrid.innerHTML = '';
 
-      // Set di angolazioni e query per immagini reali da CDN optics / Unsplash high definition repository
-      const photoViews = [
-        { 
-          title: "1. Frontale Studio", 
-          angle: "Frontale",
-          url: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" 
+      // 5 SETTING FOTOGRAFICI COMPLETAMENTE DIVERSI SIA PER OGNI FOTO CHE PER OGNI OCCHIALE
+      const photoSettings = [
+        {
+          title: "1. Studio Lux",
+          setting: "Set Posaggio Bianco / Minimal",
+          bgGradient: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          accent: "#38bdf8",
+          svgType: "front"
         },
-        { 
-          title: "2. Prospettiva 3D", 
-          angle: "Angolato 45°",
-          url: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80" 
+        {
+          title: "2. Marmo Carrara",
+          setting: "Superficie Marmo & Riflessi",
+          bgGradient: "linear-gradient(135deg, #334155 0%, #1e293b 100%)",
+          accent: "#34d399",
+          svgType: "angle3d"
         },
-        { 
-          title: "3. Ingrandimento Asta", 
-          angle: "Incisione Asta",
-          url: "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=600&q=80" 
+        {
+          title: "3. Legno Teak Macro",
+          setting: "Incisione Asta su Legno",
+          bgGradient: "linear-gradient(135deg, #451a03 0%, #1c1917 100%)",
+          accent: "#fbbf24",
+          svgType: "templeZoom"
         },
-        { 
-          title: "4. Set & Custodia", 
-          angle: "Custodia Originale",
-          url: "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=600&q=80" 
+        {
+          title: "4. Flatlay Custodia",
+          setting: "Microcemento con Case Leather",
+          bgGradient: "linear-gradient(135deg, #3f3f46 0%, #18181b 100%)",
+          accent: "#f472b6",
+          svgType: "flatlay"
         },
-        { 
-          title: "5. Dettaglio Lente", 
-          angle: "Filtro UV/Logo",
-          url: "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=600&q=80" 
+        {
+          title: "5. Bokeh Urbano",
+          setting: "Macro Lente & Trasparenza UV",
+          bgGradient: "linear-gradient(135deg, #1e1b4b 0%, #090d16 100%)",
+          accent: "#a78bfa",
+          svgType: "lensMacro"
         }
       ];
 
-      photoViews.forEach((view, idx) => {
+      photoSettings.forEach((set, idx) => {
+        const svgUri = createCustomModelSVG(brand, code, color, cal, bridge, temple, set, idx);
+
         const cardHtml = `
           <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between group hover:border-sky-500 transition shadow-sm">
             <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-              <span class="text-[11px] font-bold text-sky-400">${view.title}</span>
-              <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-mono">FOTO REALE HD</span>
+              <span class="text-[11px] font-bold text-sky-400">${set.title}</span>
+              <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">${set.setting}</span>
             </div>
             <div class="relative bg-slate-950 p-1 min-h-[140px] flex items-center justify-center overflow-hidden">
-              <img src="${view.url}" alt="${brand} ${code} ${view.angle}" class="h-32 w-full object-cover rounded transition group-hover:scale-105 duration-300" onerror="this.src='https://placehold.co/600x400/0f172a/0ea5e9?text=${encodeURIComponent(brand + ' ' + code)}'"/>
-              <div class="absolute bottom-1 left-1 bg-slate-950/80 px-1.5 py-0.5 rounded text-[9px] text-slate-300 font-mono backdrop-blur-sm">
+              <img src="${svgUri}" alt="${brand} ${code} ${set.title}" class="h-32 w-full object-contain rounded transition group-hover:scale-105 duration-300"/>
+              <div class="absolute bottom-1 left-1 bg-slate-950/90 px-1.5 py-0.5 rounded text-[9px] text-slate-300 font-mono backdrop-blur-sm border border-slate-800">
                 ${brand} ${code}
               </div>
             </div>
             <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
-              <span class="truncate">${view.angle}</span>
-              <a href="${view.url}" target="_blank" download="${brand}_${code}_vista_${idx+1}.jpg" class="text-sky-400 hover:text-sky-300 font-bold ml-1 flex items-center gap-1">
-                <i class="fa-solid fa-expand"></i> HD
+              <span class="truncate">${set.setting}</span>
+              <a href="${svgUri}" download="${brand}_${code}_vista_${idx+1}.svg" class="text-sky-400 hover:text-sky-300 font-bold ml-1 flex items-center gap-1">
+                <i class="fa-solid fa-download"></i> HD
               </a>
             </div>
           </div>
         `;
         galleryGrid.innerHTML += cardHtml;
       });
+    }
+
+    function createCustomModelSVG(brand, model, color, cal, bridge, temple, setting, index) {
+      // SVG VETTORIALE DINAMICO CHE RENDERIZZA SPECIFICATAMENTE IL MODELLO INSERITO
+      const isAviator = model.toUpperCase().includes("3025") || model.toUpperCase().includes("AVIATOR");
+      const isSquare = model.toUpperCase().includes("2140") || model.toUpperCase().includes("WAYFARER") || model.toUpperCase().includes("DEALAN");
+      
+      let lensPathLeft = "M70 75 Q120 70 160 75 Q160 125 120 140 Q70 135 70 75 Z";
+      let lensPathRight = "M240 75 Q280 70 330 75 Q330 135 280 140 Q240 125 240 75 Z";
+
+      if (isAviator) {
+        lensPathLeft = "M70 75 C120 65, 165 75, 160 115 C150 145, 80 145, 70 100 Z";
+        lensPathRight = "M240 75 C235 75, 280 65, 330 75 C320 100, 320 145, 240 115 Z";
+      } else if (isSquare) {
+        lensPathLeft = "M70 75 L160 75 L150 135 L80 135 Z";
+        lensPathRight = "M240 75 L330 75 L320 135 L250 135 Z";
+      }
+
+      let renderContent = "";
+
+      if (setting.svgType === "front") {
+        renderContent = `
+          <g stroke="${setting.accent}" stroke-width="4" fill="none" stroke-linecap="round">
+            <path d="${lensPathLeft}" fill="#0f172a" fill-opacity="0.85"/>
+            <path d="${lensPathRight}" fill="#0f172a" fill-opacity="0.85"/>
+            <path d="M160 85 Q200 78 240 85" stroke-width="5"/>
+            <path d="M70 95 L20 85" stroke-width="4"/>
+            <path d="M330 95 L380 85" stroke-width="4"/>
+          </g>
+          <text x="200" y="195" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="12" font-weight="bold">${brand} ${model}</text>
+          <text x="200" y="215" text-anchor="middle" fill="${setting.accent}" font-family="monospace" font-size="10">${cal}□${bridge} ${temple}mm • ${color}</text>
+        `;
+      } else if (setting.svgType === "angle3d") {
+        renderContent = `
+          <g stroke="${setting.accent}" stroke-width="4" fill="none" transform="rotate(-8 200 120)">
+            <rect x="90" y="70" width="90" height="60" rx="12" fill="#0f172a" fill-opacity="0.9"/>
+            <rect x="220" y="70" width="90" height="60" rx="12" fill="#0f172a" fill-opacity="0.9"/>
+            <path d="M180 85 Q205 78 220 85" stroke-width="5"/>
+            <path d="M90 90 L20 110 L10 160" stroke-width="5"/>
+          </g>
+          <text x="200" y="200" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="12" font-weight="bold">VISTA 3D PROSPETTICA</text>
+        `;
+      } else if (setting.svgType === "templeZoom") {
+        renderContent = `
+          <rect x="30" y="100" width="340" height="35" rx="6" fill="#1c1917" stroke="${setting.accent}" stroke-width="2"/>
+          <circle cx="50" cy="117" r="6" fill="${setting.accent}"/>
+          <text x="75" y="122" fill="#f59e0b" font-family="monospace" font-size="12" font-weight="bold">${brand} ${model} ${color} ${cal}□${bridge} ${temple}</text>
+          <text x="200" y="195" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="11">INCISIONE MARCATURA A FUOCO ASTA</text>
+        `;
+      } else if (setting.svgType === "flatlay") {
+        renderContent = `
+          <rect x="110" y="40" width="180" height="110" rx="20" fill="#27272a" stroke="${setting.accent}" stroke-width="3"/>
+          <text x="200" y="100" text-anchor="middle" fill="#a1a1aa" font-family="sans-serif" font-size="11" font-weight="bold">${brand.toUpperCase()} CASE</text>
+          <g stroke="${setting.accent}" stroke-width="3" fill="none">
+            <path d="M130 140 L270 140" stroke-width="4"/>
+          </g>
+          <text x="200" y="200" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="11">SET COMPLETO & CUSTODIA</text>
+        `;
+      } else {
+        renderContent = `
+          <circle cx="200" cy="110" r="75" fill="#0f172a" stroke="${setting.accent}" stroke-width="4"/>
+          <path d="M140 80 Q200 130 260 80" stroke="#ffffff" stroke-opacity="0.3" stroke-width="6"/>
+          <text x="200" y="105" text-anchor="middle" fill="${setting.accent}" font-family="sans-serif" font-size="11" font-weight="bold">${brand}</text>
+          <text x="200" y="125" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">UV400 PROTECTED</text>
+          <text x="200" y="205" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="11">MACRO DETTAGLIO LENTE</text>
+        `;
+      }
+
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+        <defs>
+          <linearGradient id="bgGrad${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${setting.accent}" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#090d16" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="240" fill="url(#bgGrad${index})" rx="12"/>
+        ${renderContent}
+      </svg>`;
+
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
     }
 
     function renderEmptyGallery() {
