@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Verified Real Photo Studio</title>
+  <title>OtticaCatalog Pro - Studio Renderer HD</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,7 +36,7 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-shield-check text-[10px]"></i> Cloud Firestore & Verified Studio Renderer
+            <i class="fa-solid fa-shield-check text-[10px]"></i> Cloud Firestore & Studio Renderer
           </p>
         </div>
       </div>
@@ -94,12 +94,12 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Inserisci il nome della marca completo o il codice dell'asta (es. <span class="font-mono text-sky-300 font-bold">Tom Ford TF554</span>, <span class="font-mono text-sky-300 font-bold">Cartier Eyewear</span>):
+          Inserisci il nome della marca e del modello (es. <span class="font-mono text-sky-300 font-bold">Tom Ford TF554</span> o <span class="font-mono text-sky-300 font-bold">Etro 0125</span>):
         </p>
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. Tom Ford, Cartier, Ray-Ban..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. Tom Ford TF554, Gucci GG0036S..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
             <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-magnifying-glass font-bold"></i> Cerca
             </button>
@@ -183,12 +183,12 @@
 
         <div>
           <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Annuncio E-Commerce *</label>
-          <input type="text" id="field-title" placeholder="Es. Occhiali da Vista Tom Ford TF554 Colore 001" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
+          <input type="text" id="field-title" placeholder="Es. Occhiali Tom Ford TF554 Colore 001" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Brand / Marca *</label>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand *</label>
             <input type="text" id="field-brand" placeholder="Tom Ford" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
           <div>
@@ -242,14 +242,14 @@
         </div>
       </div>
 
-      <!-- GENERATORE 5 FOTO STUDIO HD CON DOWNLOAD DIRETTO -->
+      <!-- GENERATORE 5 FOTO STUDIO HD -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste Studio HD
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Renderizza lo scatto reale in 5 set puliti con pulsante di download immediato</p>
+            <p class="text-xs text-slate-400 mt-0.5">Renderizza lo scatto reale in 5 set puliti e scaricabili in HD</p>
           </div>
 
           <button id="btn-generate-photos" onclick="generateVerifiedStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
@@ -293,16 +293,15 @@
   </main>
 
   <script>
-    // DATABASE ESTESO CON NOMI DI MARCA COMPLETI E PRINCIPALI BRAND DI OTTICA
     let dynamicBrandDB = [
       { brand: "Etro Eyewear", models: [{ code: "0125", color: "3H2", caliber: "52", bridge: "18", temple: "145", price: 290.00 }] },
       { brand: "Gucci Eyewear", models: [{ code: "GG0036S", color: "001", caliber: "54", bridge: "22", temple: "140", price: 320.00 }] },
-      { brand: "Ray-Ban Official", models: [{ code: "RB3025 Aviator", color: "001/51", caliber: "58", bridge: "14", temple: "135", price: 160.00 }] },
-      { brand: "Tom Ford Luxury", models: [{ code: "TF554", color: "001", caliber: "52", bridge: "19", temple: "145", price: 340.00 }] },
-      { brand: "Persol Heritage", models: [{ code: "PO0714", color: "24/31", caliber: "54", bridge: "21", temple: "140", price: 280.00 }] },
+      { brand: "Ray-Ban", models: [{ code: "RB3025 Aviator", color: "001/51", caliber: "58", bridge: "14", temple: "135", price: 160.00 }] },
+      { brand: "Tom Ford", models: [{ code: "TF554", color: "001", caliber: "52", bridge: "19", temple: "145", price: 340.00 }] },
+      { brand: "Persol", models: [{ code: "PO0714", color: "24/31", caliber: "54", bridge: "21", temple: "140", price: 280.00 }] },
       { brand: "Prada Eyewear", models: [{ code: "PR 17WS", color: "1AB5SO", caliber: "51", bridge: "19", temple: "145", price: 310.00 }] },
       { brand: "Giorgio Armani", models: [{ code: "GA 5083", color: "3001", caliber: "50", bridge: "20", temple: "145", price: 260.00 }] },
-      { brand: "Cartier Eyewear", models: [{ code: "CT0035S", color: "001", caliber: "56", bridge: "18", temple: "140", price: 890.00 }] }
+      { brand: "Cartier", models: [{ code: "CT0035S", color: "001", caliber: "56", bridge: "18", temple: "140", price: 890.00 }] }
     ];
 
     let inventory = [];
@@ -318,17 +317,17 @@
     };
 
     function loadData() {
-      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v16');
+      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v17');
       dynamicBrandDB = storedDb ? JSON.parse(storedDb) : dynamicBrandDB;
-      const storedInv = localStorage.getItem('ottica_catalog_inventory_v16');
+      const storedInv = localStorage.getItem('ottica_catalog_inventory_v17');
       inventory = storedInv ? JSON.parse(storedInv) : [];
       populatePresetDropdown();
       updateInventoryTable();
     }
 
     function saveData() {
-      localStorage.setItem('ottica_catalog_cloud_db_v16', JSON.stringify(dynamicBrandDB));
-      localStorage.setItem('ottica_catalog_inventory_v16', JSON.stringify(inventory));
+      localStorage.setItem('ottica_catalog_cloud_db_v17', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_inventory_v17', JSON.stringify(inventory));
       populatePresetDropdown();
     }
 
@@ -399,7 +398,7 @@
       calculateDiscountedPrice();
       updateSalesDescription();
       lockModelFields(true);
-      showAlert('success', `Modello ${brand} selezionato!`);
+      showAlert('success', `Modello ${brand} ${code} selezionato!`);
     }
 
     function handleSearchInput() {
@@ -440,7 +439,7 @@
       suggestionsBox.classList.remove('hidden');
     }
 
-    // --- VERIFICA AUTOMATICA MARCA / BRAND SCONOSCIUTO ---
+    // --- PARSING INTELLIGENTE PER SEPARARE MARCA E MODELLO ---
     async function executeUniversalSearch() {
       const input = document.getElementById('manual-input-code').value.trim();
       if (!input) return;
@@ -469,30 +468,38 @@
         return;
       }
 
-      // Se non trovato nel DB locale, interroga Gemini per estrarre la marca completa
       await verifyNewBrandOnline(input);
     }
 
-    async function verifyNewBrandOnline(queryCode) {
+    async function verifyNewBrandOnline(queryText) {
       const btn = document.getElementById('btn-verify');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifica...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Cerca...`;
+
+      // Logica locale di separazione sicura Marca / Modello se privo di API Key o fallimento rete
+      const parseLocal = (text) => {
+        const parts = text.trim().split(/\s+/);
+        if (parts.length === 1) {
+          return { brand: parts[0], code: "Modello Standard" };
+        } else {
+          return { brand: parts[0], code: parts.slice(1).join(' ') };
+        }
+      };
 
       if (!geminiApiKey) {
-        // Fallback se API Key non inserita
-        const cleanBrand = queryCode.charAt(0).toUpperCase() + queryCode.slice(1);
-        addNewBrandToCatalog(cleanBrand, "Modello Standard", "001", "52", "18", "145", 260.00);
+        const res = parseLocal(queryText);
+        addNewBrandToCatalog(res.brand, res.code, "001", "52", "18", "145", 260.00);
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-magnifying-glass font-bold"></i> Cerca`;
         return;
       }
 
       try {
-        const prompt = `L'utente ha inserito questa marca o codice occhiale: "${queryCode}". 
-Esegui una ricerca e restituisci SOLO in formato JSON i dati completi stimati o reali:
+        const prompt = `Analizza questo testo inserito dall'utente per un occhiale: "${queryText}".
+Separa la MARCA dal MODELLO e rispondi ESCLUSIVAMENTE in formato JSON pulito:
 {
-  "brand": "Nome Completo della Marca (es. Prada Eyewear, Armani, ecc.)",
-  "code": "Codice o Serie Modello",
+  "brand": "Marca (es. Tom Ford, Etro, Gucci)",
+  "code": "Codice Modello (es. TF554, 0125)",
   "color": "001",
   "caliber": "52",
   "bridge": "18",
@@ -500,24 +507,25 @@ Esegui una ricerca e restituisci SOLO in formato JSON i dati completi stimati o 
   "price": 280.00
 }`;
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
 
-        const data = await res.json();
-        const text = data.candidates[0].content.parts[0].text;
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const data = await response.json();
+        const rawText = data.candidates[0].content.parts[0].text;
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
         const parsed = JSON.parse(jsonMatch[0]);
 
         addNewBrandToCatalog(parsed.brand, parsed.code, parsed.color, parsed.caliber, parsed.bridge, parsed.temple, parsed.price);
-        showAlert('success', `Nuova marca "${parsed.brand}" verificata e aggiunta al catalogo!`);
+        showAlert('success', `Marca "${parsed.brand}" e Modello "${parsed.code}" verificati!`);
 
       } catch (err) {
         console.error(err);
-        addNewBrandToCatalog(queryCode, "Modello Principale", "001", "52", "18", "145", 250.00);
-        showAlert('success', `Aggiunto nuovo brand personalizzato!`);
+        const res = parseLocal(queryText);
+        addNewBrandToCatalog(res.brand, res.code, "001", "52", "18", "145", 250.00);
+        showAlert('success', `Aggiunto al catalogo!`);
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-magnifying-glass font-bold"></i> Cerca`;
@@ -599,8 +607,8 @@ Esegui una ricerca e restituisci SOLO in formato JSON i dati completi stimati o 
       document.getElementById('field-price-final').value = (list * (1 - disc / 100)).toFixed(2);
     }
 
-    // --- GENERATORE 5 FOTO STUDIO HD CON PULSANTE DOWNLOAD DIRETTO ---
-    function generateVerifiedStudioPhotos() {
+    // --- AMBIENTAZIONE E RENDERING STUDIO PROPRIETARIO ANTI-SCHERMO NERO ---
+    async function generateVerifiedStudioPhotos() {
       if (!referencePhotoBase64) return alert("Carica prima la foto reale dell'occhiale.");
       
       const gallery = document.getElementById('photo-gallery-grid');
@@ -632,8 +640,12 @@ Esegui una ricerca e restituisci SOLO in formato JSON i dati completi stimati o 
         `;
       });
 
-      const img = new Image();
-      img.onload = function() {
+      // Caricamento asincrono sicuro via ImageBitmap
+      try {
+        const response = await fetch(referencePhotoBase64);
+        const blob = await response.Blob ? await response.blob() : await (await fetch(referencePhotoBase64)).blob();
+        const imgBitmap = await createImageBitmap(blob);
+
         viewConfigs.forEach((cfg, idx) => {
           const canvas = document.getElementById(`canvas-view-${idx}`);
           if (!canvas) return;
@@ -642,31 +654,36 @@ Esegui una ricerca e restituisci SOLO in formato JSON i dati completi stimati o 
           canvas.width = 600;
           canvas.height = 450;
 
+          // Disegna Sfondo Studio
           ctx.fillStyle = cfg.bg;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+          // Applicazione Ombra Proiettata
           ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = 16;
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 8;
 
-          const hRatio = canvas.width / img.width;
-          const vRatio = canvas.height / img.height;
+          // Calcolo Scala e Centratura
+          const hRatio = canvas.width / imgBitmap.width;
+          const vRatio = canvas.height / imgBitmap.height;
           const ratio = Math.min(hRatio, vRatio) * 0.82;
-          const centerShiftX = (canvas.width - img.width * ratio) / 2;
-          const centerShiftY = (canvas.height - img.height * ratio) / 2;
+          const centerShiftX = (canvas.width - imgBitmap.width * ratio) / 2;
+          const centerShiftY = (canvas.height - imgBitmap.height * ratio) / 2;
 
-          ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
+          ctx.drawImage(imgBitmap, 0, 0, imgBitmap.width, imgBitmap.height, centerShiftX, centerShiftY, imgBitmap.width * ratio, imgBitmap.height * ratio);
 
-          // Assegna il link di download diretto dell'immagine generata
+          // Assegnazione Link Download Immagine HD Reale
           const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
           const dlLink = document.getElementById(`download-link-${idx}`);
           const brandName = document.getElementById('field-brand').value.trim() || 'Occhiale';
+          const modelName = document.getElementById('field-code').value.trim() || 'Modello';
           dlLink.href = dataUrl;
-          dlLink.download = `${brandName}_Vista_${idx + 1}.jpg`;
+          dlLink.download = `${brandName}_${modelName}_Vista_${idx + 1}.jpg`;
         });
-      };
-      img.src = referencePhotoBase64;
+      } catch (e) {
+        console.error("Errore rendering canvas:", e);
+      }
     }
 
     function renderEmptyGallery() {
