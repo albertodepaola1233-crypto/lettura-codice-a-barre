@@ -1,990 +1,614 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full bg-slate-950 text-slate-100">
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Product AI Seller & OtticaCatalog Hub</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                        }
-                    },
-                    screens: {
-                        'xs': '475px',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.8);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(51, 65, 85, 0.8);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(71, 85, 105, 1);
-        }
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
+  <title>OtticaCatalog Pro - Verified Real Photo Studio</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white bg-slate-950 min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 ease-out flex items-center justify-between sm:justify-start gap-3 bg-slate-800/95 text-slate-100 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md max-w-md mx-auto">
-        <div class="flex items-center gap-3">
-            <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-brand-500 flex-shrink-0"></i>
-            <span id="toast-message" class="text-xs sm:text-sm font-medium leading-snug">Operazione completata!</span>
+  <!-- HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl text-slate-950 shadow-md">
+          <i class="fa-solid fa-glasses text-xl"></i>
         </div>
+        <div>
+          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
+          <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-cloud text-[10px]"></i> Cloud Firestore & Studio Renderer
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-2 border border-slate-600 transition">
+          <i class="fa-solid fa-key"></i>
+          <span class="hidden md:inline">Gemini API Key</span>
+        </button>
+        <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1 shadow transition">
+          <i class="fa-solid fa-plus"></i> Nuovo Occhiale
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- Header Navigation -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 gap-2">
-                
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-                    <div class="p-2 bg-brand-500/10 rounded-xl border border-brand-500/20 flex-shrink-0">
-                        <i data-lucide="glasses" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-500"></i>
-                    </div>
-                    <div class="truncate">
-                        <h1 class="text-sm sm:text-lg font-bold text-white tracking-tight truncate">Product AI Seller Pro</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">Lettura Astina, Studio Foto & Cloud</p>
-                    </div>
-                </div>
-
-                <!-- Navigation Tabs & API Key Modal Button -->
-                <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
-                    <button onclick="toggleApiKeyModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700/50 transition-all flex items-center gap-1.5 text-xs font-semibold active:scale-95">
-                        <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
-                        <span class="hidden md:inline">Chiave API Gemini</span>
-                    </button>
-
-                    <nav class="flex space-x-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/50">
-                        <button id="tab-creator-btn" onclick="switchTab('creator')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95">
-                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Nuovo Occhiale</span>
-                        </button>
-                        <button id="tab-inventory-btn" onclick="switchTab('inventory')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95">
-                            <i data-lucide="boxes" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Inventario Cloud</span>
-                            <span id="inventory-count-badge" class="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold">0</span>
-                        </button>
-                    </nav>
-                </div>
-
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
-
-        <!-- TAB 1: PRODUCT CREATOR & ANALYSIS -->
-        <section id="tab-creator" class="space-y-4 sm:space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                
-                <!-- Left Column: Upload & Image Controls -->
-                <div class="lg:col-span-5 space-y-4 sm:space-y-6">
-                    
-                    <!-- Upload Dropzone Box -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl backdrop-blur-sm">
-                        <div class="flex justify-between items-center mb-3">
-                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
-                                <i data-lucide="camera" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"></i>
-                                Foto Astina & Montatura (<span id="photo-count">0</span>/3)
-                            </h2>
-                            <span class="text-[11px] text-slate-400">Max 3 foto</span>
-                        </div>
-
-                        <!-- Dropzone -->
-                        <div id="dropzone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-brand-500/70 bg-slate-950/60 hover:bg-slate-900/90 rounded-xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 active:scale-[0.99]">
-                            <div class="p-2.5 bg-slate-800 rounded-full text-brand-500 border border-slate-700">
-                                <i data-lucide="upload-cloud" class="w-6 h-6 sm:w-7 sm:h-7"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs sm:text-sm font-medium text-slate-200">Scatta foto incisione o <span class="text-brand-500 underline font-semibold">Sfoglia</span></p>
-                                <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5">Inquadra il testo stampato sull'astina</p>
-                            </div>
-                            <input type="file" id="file-input" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
-                        </div>
-
-                        <!-- Manual Input Code / Caliber Override -->
-                        <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-1.5">
-                            <label class="text-xs font-semibold text-amber-400 flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><i data-lucide="binary" class="w-4 h-4 text-amber-400"></i> Codice Asta / Misure (Opzionale)</span>
-                                <span class="text-[10px] text-slate-400 font-normal">Supporto IA</span>
-                            </label>
-                            <input type="text" id="input-size" oninput="updateButtonStates()" placeholder="Es. ETRO 0125 3H2 52□18..." class="w-full bg-slate-950/90 border border-slate-700 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors font-mono">
-                        </div>
-
-                        <!-- Image Previews Container -->
-                        <div class="mt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Anteprima Scatti</span>
-                                <button onclick="clearAllPhotos()" id="btn-clear-photos" class="text-xs text-slate-400 hover:text-rose-400 hidden flex items-center gap-1">
-                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Svuota
-                                </button>
-                            </div>
-                            <div id="image-previews" class="grid grid-cols-3 gap-2 sm:gap-3 min-h-[90px] bg-slate-950/50 p-2 rounded-xl border border-slate-800/80">
-                                <div class="col-span-3 text-center py-5 text-slate-500 text-xs flex flex-col items-center gap-1">
-                                    <i data-lucide="image" class="w-5 h-5 opacity-40"></i>
-                                    <span>Nessuna foto selezionata</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- AI Actions for Astina Reading -->
-                        <div class="mt-5 space-y-3 pt-3 border-t border-slate-800">
-                            <button id="btn-analyze" onclick="analyzeProductWithAI()" disabled class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 active:scale-[0.98]">
-                                <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <span>Leggi Astina & Genera Scheda</span>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Right Column: Editable Product Details Form & Studio Photo Generator -->
-                <div class="lg:col-span-7 space-y-4 sm:space-y-6">
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4 sm:space-y-5">
-                        
-                        <!-- Header Status -->
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
-                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2 truncate">
-                                <i data-lucide="file-edit" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500 flex-shrink-0"></i>
-                                Scheda Occhiale Decodificata
-                            </h2>
-                            <span id="analysis-status-badge" class="text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Scatto
-                            </span>
-                        </div>
-
-                        <!-- Form Inputs -->
-                        <div class="space-y-4">
-                            <!-- Brand, Model & Color -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                                <div class="space-y-1">
-                                    <label class="text-xs font-medium text-slate-300">Marca / Brand</label>
-                                    <input type="text" id="input-brand" placeholder="Es. Etro" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-xs font-medium text-slate-300">Modello</label>
-                                    <input type="text" id="input-model" placeholder="Es. 0125" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-xs font-medium text-slate-300">Colore</label>
-                                    <input type="text" id="input-color" placeholder="Es. 3H2" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
-                                </div>
-                            </div>
-
-                            <!-- Misure Ottiche: Calibro, Ponte, Asta -->
-                            <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
-                                <label class="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                                    <i data-lucide="ruler" class="w-3.5 h-3.5"></i> Misure Tecniche (mm)
-                                </label>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <span class="text-[10px] text-slate-400 block">Calibro</span>
-                                        <input type="text" id="input-caliber" placeholder="52" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] text-slate-400 block">Ponte</span>
-                                        <input type="text" id="input-bridge" placeholder="18" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] text-slate-400 block">Asta</span>
-                                        <input type="text" id="input-temple" placeholder="145" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pricing Matrix -->
-                            <div class="p-3.5 sm:p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-1.5">
-                                        <i data-lucide="tag" class="w-3.5 h-3.5"></i> Listino e Prezzi (€)
-                                    </label>
-                                    <span class="text-[10px] text-slate-400">-20% Sconto e-commerce</span>
-                                </div>
-
-                                <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                                    <div class="space-y-1">
-                                        <span class="text-[10px] text-slate-400 block truncate">Listino Ufficiale</span>
-                                        <input type="number" step="0.5" id="input-market-price" oninput="calculatePrices()" placeholder="290.00" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-200">
-                                    </div>
-                                    <div class="space-y-1">
-                                        <span class="text-[10px] text-brand-400 font-semibold block truncate">Prezzo Finale</span>
-                                        <input type="number" step="0.5" id="input-list-price" placeholder="232.00" class="w-full bg-slate-900 border border-brand-500/40 rounded-lg px-2.5 py-2 text-xs font-bold text-brand-400">
-                                    </div>
-                                    <div class="space-y-1">
-                                        <span class="text-[10px] text-amber-400 font-semibold block truncate">Promo / Rapido</span>
-                                        <input type="number" step="0.5" id="input-discount-price" placeholder="200.00" class="w-full bg-slate-900 border border-amber-500/40 rounded-lg px-2.5 py-2 text-xs font-bold text-amber-400">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Description -->
-                            <div class="space-y-1">
-                                <label class="text-xs font-medium text-slate-300">Descrizione Catalogo E-commerce</label>
-                                <textarea id="input-description" rows="3" placeholder="Descrizione generata dall'analisi dell'incisione..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-brand-500"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Save Action -->
-                        <div class="pt-3 border-t border-slate-800 flex gap-2.5">
-                            <button onclick="resetCurrentProductForm()" class="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
-                            </button>
-                            <button onclick="saveToInventory()" class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i>
-                                <span>Salva nel Cloud Firestore</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- STUDIO FOTO RENDERER: 5 VISTE REALI -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                            <div>
-                                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                                    <i data-lucide="camera-retro" class="w-5 h-5 text-brand-500"></i> Generatore 5 Viste Studio Reali
-                                </h3>
-                                <p class="text-xs text-slate-400">Trasforma lo scatto reale nei 5 set e-commerce senza alterare l'occhiale</p>
-                            </div>
-                            <button onclick="generateVerifiedStudioPhotos()" id="btn-generate-photos" disabled class="py-2.5 px-4 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition shadow-md flex items-center gap-1.5 flex-shrink-0">
-                                <i data-lucide="wand-2" class="w-4 h-4"></i> Genera 5 Viste HD
-                            </button>
-                        </div>
-
-                        <!-- Grid delle 5 foto -->
-                        <div id="photo-gallery-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                            <div class="col-span-2 sm:col-span-5 text-center py-6 text-slate-500 text-xs italic border border-dashed border-slate-800 rounded-xl">
-                                Carica una foto dell'occhiale e decodifica l'astina per attivare i render studio
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- TAB 2: INVENTORY MANAGEMENT -->
-        <section id="tab-inventory" class="hidden space-y-4 sm:space-y-6">
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4 sm:space-y-6">
-                
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="boxes" class="w-5 h-5 text-brand-500"></i>
-                            Catalogo Occhiali Cloud Sincronizzato
-                        </h2>
-                        <p class="text-xs text-slate-400">Gestisci i modelli salvati permanentemente su Cloud Firestore.</p>
-                    </div>
-                    <div class="w-full sm:w-auto flex gap-2">
-                        <input type="text" id="inventory-search" oninput="renderInventory()" placeholder="Cerca marca, modello o codice..." class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 w-full sm:w-64">
-                        <button onclick="exportCSV()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-brand-400"></i> CSV
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Responsive Inventory Grid -->
-                <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    <!-- Injected dynamically -->
-                </div>
-
-                <!-- Empty State -->
-                <div id="inventory-empty-state" class="text-center py-12 space-y-3">
-                    <div class="p-4 bg-slate-950/80 w-14 h-14 rounded-full mx-auto flex items-center justify-center border border-slate-800 text-slate-500">
-                        <i data-lucide="package-x" class="w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-sm font-semibold text-slate-300">Nessun Occhiale in Inventario</h3>
-                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Scatta o carica la foto dell'astina nella scheda "Nuovo Occhiale" per iniziare.</p>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- API KEY MODAL -->
-    <div id="api-key-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Chiave API Gemini
-                </h3>
-                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Inserisci la tua chiave API Gemini per consentire la lettura automatica delle incisioni sulle astine degli occhiali.
-            </p>
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-300">Chiave API Gemini</label>
-                    <input type="password" id="custom-api-key" placeholder="Incolla chiave API..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="saveApiKey()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-md">Salva Chiave API</button>
-            </div>
-        </div>
+  <!-- MODALE API KEY -->
+  <div id="api-key-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-key"></i> Google Gemini API Key
+        </h3>
+        <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Inserisci la chiave API per l'estrazione OCR dall'asta dell'occhiale.
+      </p>
+      <div>
+        <label class="text-xs font-medium text-slate-400 block mb-1">API Key</label>
+        <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500"/>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg">Annulla</button>
+        <button onclick="saveApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-md">Salva</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Firebase SDK Imports for Permanent Storage -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ottica-catalog-pro';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "dummy",
-            authDomain: "dummy.firebaseapp.com",
-            projectId: "dummy",
-            storageBucket: "dummy.appspot.com",
-            messagingSenderId: "12345",
-            appId: "1:12345:web:12345"
-        };
+    <!-- LEFT COLUMN -->
+    <section class="lg:col-span-5 space-y-6">
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+      <!-- VERIFICA CODICE E ASTINA -->
+      <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass"></i> 1. Codice Asta & Brand
+          </h2>
+          <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
+            Pronto
+          </span>
+        </div>
 
-        let currentUser = null;
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Inserisci l'incisione dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>):
+        </p>
 
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const userCred = await signInWithCustomToken(auth, __initial_auth_token);
-                    currentUser = userCred.user;
-                } else {
-                    const userCred = await signInAnonymously(auth);
-                    currentUser = userCred.user;
-                }
-                listenToPermanentInventory();
-            } catch (err) {
-                console.warn("Auth Firebase offline fallback:", err);
-            }
-        }
+        <div class="relative">
+          <div class="flex gap-2">
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
+              <i class="fa-solid fa-check"></i> OK
+            </button>
+          </div>
+          <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60"></div>
+        </div>
 
-        function listenToPermanentInventory() {
-            if (!currentUser) return;
-            const inventoryCollection = collection(db, 'artifacts', appId, 'public', 'data', 'inventory');
-            
-            onSnapshot(inventoryCollection, (snapshot) => {
-                const cloudItems = [];
-                snapshot.forEach((docSnap) => {
-                    cloudItems.push(docSnap.data());
-                });
+        <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center gap-2 text-xs text-emerald-200 font-semibold shadow-md">
+          <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+          <span>Modello convalidato!</span>
+        </div>
+      </div>
 
-                if (cloudItems.length > 0) {
-                    window.inventory = cloudItems.sort((a, b) => b.timestamp - a.timestamp);
-                    window.saveInventoryToLocalStorage();
-                    window.renderInventory();
-                }
-            }, (error) => {
-                console.warn("Firestore error callback:", error);
-            });
-        }
+      <!-- FOTO REALE DI RIFERIMENTO (PULSANTI SEPARATI) -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-camera"></i> 2. Foto Reale Occhiale
+          </h2>
+          <span id="ref-photo-badge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold">
+            Obbligatoria
+          </span>
+        </div>
 
-        window.saveItemToCloud = async function(item) {
-            if (!currentUser) return;
-            try {
-                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventory', item.id);
-                await setDoc(itemRef, item);
-            } catch (err) {
-                console.error("Errore salvataggio Cloud:", err);
-            }
-        };
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Scatta o carica la foto reale per la scheda e per generare le 5 viste studio:
+        </p>
 
-        window.deleteItemFromCloud = async function(id) {
-            if (!currentUser) return;
-            try {
-                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventory', id);
-                await deleteDoc(itemRef);
-            } catch (err) {
-                console.error("Errore eliminazione Cloud:", err);
-            }
-        };
+        <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="flex flex-col items-center justify-center border border-sky-500/60 hover:border-sky-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+            <i class="fa-solid fa-camera text-2xl text-sky-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">Scatta Foto</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Fotocamera</span>
+            <input type="file" id="input-camera" accept="image/*" capture="environment" onchange="processImageFile(event)" class="hidden"/>
+          </label>
 
-        initAuth();
-    </script>
+          <label class="flex flex-col items-center justify-center border border-emerald-500/60 hover:border-emerald-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+            <i class="fa-solid fa-image text-2xl text-emerald-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">Carica da Galleria</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Sfoglia file</span>
+            <input type="file" id="input-gallery" accept="image/*" onchange="processImageFile(event)" class="hidden"/>
+          </label>
+        </div>
 
-    <!-- Application Logic Script -->
-    <script>
-        let loadedPhotos = []; 
-        let inventory = []; 
+        <div id="reference-preview-box" class="hidden relative rounded-xl overflow-hidden border border-sky-500/50 bg-slate-950 p-2 flex items-center justify-center">
+          <img id="reference-preview-img" src="" alt="Foto reale dell'occhiale" class="max-h-44 w-auto rounded-lg object-contain"/>
+          <button onclick="removeReferencePhoto()" class="absolute top-3 right-3 bg-rose-950/90 hover:bg-rose-900 text-rose-300 border border-rose-600 px-2.5 py-1 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
+            <i class="fa-solid fa-trash"></i> Cambia foto
+          </button>
+        </div>
+      </div>
 
-        function getApiKey() {
-            const savedKey = localStorage.getItem('GEMINI_API_KEY');
-            if (savedKey && savedKey.trim() !== '') return savedKey.trim();
-            if (typeof window.apiKey !== 'undefined' && window.apiKey) return window.apiKey;
-            return '';
-        }
+      <!-- CATALOGO CLOUD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-database text-sky-400"></i> Catalogo Cloud Firestore
+          </h3>
+          <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800"><span id="db-total-count">0</span> Modelli</span>
+        </div>
+        <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+          <option value="">-- Seleziona modello dal Cloud --</option>
+        </select>
+      </div>
 
-        function toggleApiKeyModal() {
-            const modal = document.getElementById('api-key-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                document.getElementById('custom-api-key').value = getApiKey();
-            }
-        }
+    </section>
 
-        function saveApiKey() {
-            const key = document.getElementById('custom-api-key').value.trim();
-            if (key) {
-                localStorage.setItem('GEMINI_API_KEY', key);
-                showToast("Chiave API salvata!");
-            } else {
-                showToast("Inserisci una chiave valida", true);
-            }
-            toggleApiKeyModal();
-        }
+    <!-- RIGHT COLUMN -->
+    <section class="lg:col-span-7 space-y-6">
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-            loadInventoryFromLocalStorage();
-            renderInventory();
-            updateButtonStates();
+      <!-- SCHEDA TECNICA -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Prodotto Occhiale
+          </h2>
+          <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+            In attesa
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Brand *</label>
+            <input type="text" id="field-brand" placeholder="Etro" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Modello *</label>
+            <input type="text" id="field-code" placeholder="0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Colore *</label>
+            <input type="text" id="field-color" placeholder="3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Ottiche (mm) *</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div><input type="text" id="field-caliber" placeholder="52" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
+            <div><input type="text" id="field-bridge" placeholder="18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
+            <div><input type="text" id="field-temple" placeholder="145" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Listino (€) *</label>
+              <input type="number" id="field-price-list" placeholder="290.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg px-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto (%)</label>
+              <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none" oninput="calculateDiscountedPrice()"/>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale (€)</label>
+              <input type="number" id="field-price-final" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg px-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-between items-center border-t border-slate-700">
+          <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
+            <i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)
+          </span>
+          <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-md">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Salva su Cloud Firestore
+          </button>
+        </div>
+      </div>
+
+      <!-- GENERATORE 5 FOTO REALI (STUDIO CANVAS INTEGRATO DAL SECONDO CODICE) -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
+          <div>
+            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste e-Commerce Studio
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Renderizza il tuo scatto reale in 5 set fotografici professionali senza alterare l'occhiale</p>
+          </div>
+
+          <button id="btn-generate-photos" onclick="generateVerifiedStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-camera-retro"></i> Genera 5 Viste Studio
+          </button>
+        </div>
+
+        <!-- Grid dinamica dei Canvas -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
+      </div>
+
+      <!-- INVENTARIO CLOUD TABLE -->
+      <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Cloud Sincronizzato
+          </h2>
+          <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
+                <th class="p-2.5">Marca e Modello</th>
+                <th class="p-2.5">Misure</th>
+                <th class="p-2.5">Prezzo</th>
+                <th class="p-2.5 text-right">Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
+              <tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    let dynamicBrandDB = [
+      { brand: "Etro", models: [{ code: "0125 3H2", color: "Havana", caliber: "52", bridge: "18", temple: "145", price: 290.00 }] }
+    ];
+    let inventory = [];
+    let isModelLocked = false;
+    let geminiApiKey = "";
+    let referencePhotoBase64 = null;
+
+    window.onload = function() {
+      const storedKey = localStorage.getItem('gemini_api_key');
+      if (storedKey) { geminiApiKey = storedKey; document.getElementById('gemini-api-key-input').value = storedKey; }
+      loadData();
+      renderEmptyGallery();
+    };
+
+    function loadData() {
+      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v15');
+      dynamicBrandDB = storedDb ? JSON.parse(storedDb) : dynamicBrandDB;
+      const storedInv = localStorage.getItem('ottica_catalog_inventory_v15');
+      inventory = storedInv ? JSON.parse(storedInv) : [];
+      populatePresetDropdown();
+      updateInventoryTable();
+    }
+
+    function saveData() {
+      localStorage.setItem('ottica_catalog_cloud_db_v15', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_inventory_v15', JSON.stringify(inventory));
+      populatePresetDropdown();
+    }
+
+    function processImageFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        referencePhotoBase64 = e.target.result;
+        document.getElementById('reference-preview-img').src = referencePhotoBase64;
+        document.getElementById('reference-upload-container').classList.add('hidden');
+        document.getElementById('reference-preview-box').classList.remove('hidden');
+        document.getElementById('ref-photo-badge').innerText = "Caricata OK";
+        document.getElementById('ref-photo-badge').className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
+        validateRequiredFields();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeReferencePhoto() {
+      referencePhotoBase64 = null;
+      document.getElementById('input-camera').value = "";
+      document.getElementById('input-gallery').value = "";
+      document.getElementById('reference-preview-box').classList.add('hidden');
+      document.getElementById('reference-upload-container').classList.remove('hidden');
+      document.getElementById('ref-photo-badge').innerText = "Obbligatoria";
+      document.getElementById('ref-photo-badge').className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
+      validateRequiredFields();
+      renderEmptyGallery();
+    }
+
+    function toggleApiKeyModal() { document.getElementById('api-key-modal').classList.toggle('hidden'); }
+    function saveApiKey() {
+      geminiApiKey = document.getElementById('gemini-api-key-input').value.trim();
+      localStorage.setItem('gemini_api_key', geminiApiKey);
+      toggleApiKeyModal();
+      alert("API Key salvata!");
+    }
+
+    function populatePresetDropdown() {
+      const select = document.getElementById('preset-select');
+      select.innerHTML = '<option value="">-- Seleziona modello dal Cloud --</option>';
+      let count = 0;
+      dynamicBrandDB.forEach(b => {
+        b.models.forEach(m => {
+          count++;
+          const opt = document.createElement('option');
+          opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
+          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge}) - €${m.price}`;
+          select.appendChild(opt);
         });
-
-        function switchTab(tab) {
-            const tabCreator = document.getElementById('tab-creator');
-            const tabInventory = document.getElementById('tab-inventory');
-            const btnCreator = document.getElementById('tab-creator-btn');
-            const btnInventory = document.getElementById('tab-inventory-btn');
-
-            if (tab === 'creator') {
-                tabCreator.classList.remove('hidden');
-                tabInventory.classList.add('hidden');
-                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95";
-                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
-            } else {
-                tabCreator.classList.add('hidden');
-                tabInventory.classList.remove('hidden');
-                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95";
-                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
-                renderInventory();
-            }
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
-
-            toastMessage.textContent = message;
-            if (isError) {
-                toastIcon.setAttribute('data-lucide', 'alert-circle');
-                toastIcon.className = 'w-5 h-5 text-rose-500 flex-shrink-0';
-            } else {
-                toastIcon.setAttribute('data-lucide', 'check-circle');
-                toastIcon.className = 'w-5 h-5 text-brand-500 flex-shrink-0';
-            }
-            if (window.lucide) lucide.createIcons();
-
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-24', 'opacity-0');
-            }, 3500);
-        }
-
-        async function compressImage(file, maxWidth = 900, quality = 0.8) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            const remainingSlots = 3 - loadedPhotos.length;
-            if (remainingSlots <= 0) {
-                showToast("Puoi caricare al massimo 3 foto.", true);
-                return;
-            }
-
-            const filesToProcess = files.slice(0, remainingSlots);
-            for (const file of filesToProcess) {
-                if (!file.type.startsWith('image/')) continue;
-                const compressedDataUrl = await compressImage(file);
-                loadedPhotos.push({
-                    id: 'img_' + Math.random().toString(36).substr(2, 9),
-                    dataUrl: compressedDataUrl
-                });
-            }
-            renderPreviews();
-            updateButtonStates();
-        }
-
-        function renderPreviews() {
-            const previewsContainer = document.getElementById('image-previews');
-            const photoCount = document.getElementById('photo-count');
-            const btnClear = document.getElementById('btn-clear-photos');
-
-            photoCount.textContent = loadedPhotos.length;
-
-            if (loadedPhotos.length === 0) {
-                btnClear.classList.add('hidden');
-                previewsContainer.innerHTML = `
-                    <div class="col-span-3 text-center py-5 text-slate-500 text-xs flex flex-col items-center gap-1">
-                        <i data-lucide="image" class="w-5 h-5 opacity-40"></i>
-                        <span>Nessuna foto selezionata</span>
-                    </div>`;
-            } else {
-                btnClear.classList.remove('hidden');
-                previewsContainer.innerHTML = loadedPhotos.map((p) => `
-                    <div class="relative group rounded-lg overflow-hidden border border-slate-700 bg-slate-900 aspect-square shadow">
-                        <img src="${p.dataUrl}" class="w-full h-full object-cover">
-                        <button onclick="removePhoto('${p.id}')" class="absolute top-1 right-1 p-1 bg-rose-600/80 hover:bg-rose-600 text-white rounded-md opacity-90 transition-opacity">
-                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </div>
-                `).join('');
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function removePhoto(id) {
-            loadedPhotos = loadedPhotos.filter(p => p.id !== id);
-            renderPreviews();
-            updateButtonStates();
-        }
-
-        function clearAllPhotos() {
-            loadedPhotos = [];
-            renderPreviews();
-            updateButtonStates();
-        }
-
-        function updateButtonStates() {
-            const hasPhotos = loadedPhotos.length >= 1;
-            document.getElementById('btn-analyze').disabled = !hasPhotos;
-            document.getElementById('btn-generate-photos').disabled = !hasPhotos;
-        }
-
-        async function fetchWithRetry(url, options, retries = 2, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(url, options);
-                    if (res.ok) return res;
-                } catch (err) {
-                    if (i === retries - 1) throw err;
-                }
-                await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
-            }
-            throw new Error("Impossibile contattare l'API Gemini.");
-        }
-
-        function extractJson(text) {
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    return JSON.parse(jsonMatch[0]);
-                }
-                throw new Error("Risposta IA non valida.");
-            }
-        }
-
-        function calculatePrices() {
-            const marketInput = document.getElementById('input-market-price');
-            const listInput = document.getElementById('input-list-price');
-            const discountInput = document.getElementById('input-discount-price');
-
-            const marketPrice = parseFloat(marketInput.value) || 0;
-            if (marketPrice > 0) {
-                const listPrice = marketPrice * 0.80; // Sconto 20%
-                const discountPrice = marketPrice * 0.70;
-                listInput.value = listPrice.toFixed(2);
-                discountInput.value = discountPrice.toFixed(2);
-            }
-        }
-
-        // DECODER ASTINA OCCHIALI CON GEMINI
-        async function analyzeProductWithAI() {
-            if (loadedPhotos.length === 0) {
-                showToast("Carica almeno una foto dell'astina o della montatura.", true);
-                return;
-            }
-
-            const apiKey = getApiKey();
-            if (!apiKey) {
-                showToast("Inserisci la tua API Key Gemini.", true);
-                toggleApiKeyModal();
-                return;
-            }
-
-            const btnAnalyze = document.getElementById('btn-analyze');
-            const badge = document.getElementById('analysis-status-badge');
-            
-            btnAnalyze.disabled = true;
-            btnAnalyze.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"></i> <span>Lettura astina in corso...</span>`;
-            badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full font-medium flex items-center gap-1.5 border border-amber-500/30';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Decodifica in corso...`;
-            if (window.lucide) lucide.createIcons();
-
-            try {
-                const imageParts = loadedPhotos.map(p => {
-                    const base64Data = p.dataUrl.split(',')[1];
-                    return { inlineData: { mimeType: 'image/jpeg', data: base64Data } };
-                });
-
-                const manualHint = document.getElementById('input-size').value.trim();
-
-                const userPrompt = `Sei un ottico esperto. Analizza la foto dell'incisione sull'astina o della montatura di questo occhiale.
-${manualHint ? `Nota aggiuntiva inserita dall'utente: "${manualHint}"` : ''}
-
-Estrai con precisione i dati ottici e restituisci ESCLUSIVAMENTE un oggetto JSON con questa struttura esatta:
-{
-    "marca": "Brand o Marca (es. Etro, Ray-Ban, Persol...)",
-    "modello": "Codice o nome modello (es. 0125)",
-    "colore": "Codice o nome colore (es. 3H2)",
-    "calibro": "Misura calibro lente in mm (es. 52)",
-    "ponte": "Misura ponte in mm (es. 18)",
-    "asta": "Lunghezza asta in mm (es. 145)",
-    "prezzo_listino_stimato": 290.00,
-    "descrizione": "Descrizione commerciale dettagliata per catalogo ottica."
-}`;
-
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetchWithRetry(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: userPrompt }, ...imageParts] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
-
-                const result = await response.json();
-                const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (!responseText) throw new Error("Risposta vuota dall'IA.");
-
-                const parsed = extractJson(responseText);
-
-                document.getElementById('input-brand').value = parsed.marca || '';
-                document.getElementById('input-model').value = parsed.modello || '';
-                document.getElementById('input-color').value = parsed.colore || '';
-                document.getElementById('input-caliber').value = parsed.calibro || '';
-                document.getElementById('input-bridge').value = parsed.ponte || '';
-                document.getElementById('input-temple').value = parsed.asta || '';
-                document.getElementById('input-market-price').value = parsed.prezzo_listino_stimato || 250.00;
-                document.getElementById('input-description').value = parsed.descrizione || '';
-
-                calculatePrices();
-
-                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-brand-500/20 text-brand-300 rounded-full font-medium flex items-center gap-1.5 border border-brand-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> Decodificato con successo`;
-                showToast("Incisione astina letta correttamente!");
-
-                // Genera automaticamente le viste studio appena decodificato
-                generateVerifiedStudioPhotos();
-
-            } catch (error) {
-                console.error("Errore lettura astina:", error);
-                showToast("Errore lettura: " + error.message, true);
-                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded-full font-medium flex items-center gap-1.5 border border-rose-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Errore Lettura`;
-            } finally {
-                btnAnalyze.disabled = false;
-                btnAnalyze.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i> <span>Leggi Astina & Genera Scheda</span>`;
-                if (window.lucide) lucide.createIcons();
-            }
-        }
-
-        // GENERATORE DI 5 VISTE STUDIO REALI BASATE SUL CANVAS DELLO SCATTO
-        async function generateVerifiedStudioPhotos() {
-            if (loadedPhotos.length === 0) {
-                showToast("Carica prima la foto dell'occhiale.", true);
-                return;
-            }
-
-            const gallery = document.getElementById('photo-gallery-grid');
-            gallery.innerHTML = '';
-
-            const viewConfigs = [
-                { title: "1. Frontale Studio", bg: "#ffffff", shadow: "rgba(0,0,0,0.15)" },
-                { title: "2. Marmo Carrara", bg: "#f1f5f9", shadow: "rgba(0,0,0,0.25)" },
-                { title: "3. Legno Teak", bg: "#1e293b", shadow: "rgba(0,0,0,0.4)" },
-                { title: "4. Flatlay Grigio", bg: "#334155", shadow: "rgba(0,0,0,0.3)" },
-                { title: "5. Bokeh Urbano", bg: "#0f172a", shadow: "rgba(0,0,0,0.5)" }
-            ];
-
-            viewConfigs.forEach((cfg, idx) => {
-                gallery.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
-                        <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px]">
-                            <span class="font-bold text-sky-400 truncate">${cfg.title}</span>
-                            <span class="bg-emerald-950 text-emerald-300 px-1 rounded">HD</span>
-                        </div>
-                        <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[120px]">
-                            <canvas id="canvas-view-${idx}" class="max-h-[110px] w-auto rounded shadow"></canvas>
-                        </div>
-                        <div class="p-2 bg-slate-900 border-t border-slate-800 text-[9px] text-center text-slate-400">
-                            Pronto e-commerce
-                        </div>
-                    </div>
-                `;
-            });
-
-            const img = new Image();
-            img.src = loadedPhotos[0].dataUrl;
-            img.onload = function() {
-                viewConfigs.forEach((cfg, idx) => {
-                    const canvas = document.getElementById(`canvas-view-${idx}`);
-                    if (!canvas) return;
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 600;
-                    canvas.height = 450;
-
-                    ctx.fillStyle = cfg.bg;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    ctx.shadowColor = cfg.shadow;
-                    ctx.shadowBlur = 18;
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 10;
-
-                    const hRatio = canvas.width / img.width;
-                    const vRatio = canvas.height / img.height;
-                    const ratio = Math.min(hRatio, vRatio) * 0.85;
-                    const centerShiftX = (canvas.width - img.width * ratio) / 2;
-                    const centerShiftY = (canvas.height - img.height * ratio) / 2;
-
-                    ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
-                });
-            };
-            showToast("5 Viste studio generate con successo!");
-        }
-
-        function resetCurrentProductForm() {
-            loadedPhotos = [];
-            document.getElementById('file-input').value = '';
-            document.getElementById('input-size').value = '';
-            document.getElementById('input-brand').value = '';
-            document.getElementById('input-model').value = '';
-            document.getElementById('input-color').value = '';
-            document.getElementById('input-caliber').value = '';
-            document.getElementById('input-bridge').value = '';
-            document.getElementById('input-temple').value = '';
-            document.getElementById('input-market-price').value = '';
-            document.getElementById('input-list-price').value = '';
-            document.getElementById('input-discount-price').value = '';
-            document.getElementById('input-description').value = '';
-
-            const badge = document.getElementById('analysis-status-badge');
-            badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Scatto`;
-
-            renderPreviews();
-            updateButtonStates();
-            document.getElementById('photo-gallery-grid').innerHTML = `
-                <div class="col-span-2 sm:col-span-5 text-center py-6 text-slate-500 text-xs italic border border-dashed border-slate-800 rounded-xl">
-                    Carica una foto dell'occhiale e decodifica l'astina per attivare i render studio
-                </div>`;
-            showToast("Form resettato");
-        }
-
-        function saveToInventory() {
-            const brand = document.getElementById('input-brand').value.trim();
-            const model = document.getElementById('input-model').value.trim();
-            const color = document.getElementById('input-color').value.trim();
-            const caliber = document.getElementById('input-caliber').value.trim();
-            const bridge = document.getElementById('input-bridge').value.trim();
-            const temple = document.getElementById('input-temple').value.trim();
-            const listPrice = parseFloat(document.getElementById('input-list-price').value) || 0;
-            const description = document.getElementById('input-description').value.trim();
-
-            if (!brand || !model) {
-                showToast("Marca e Modello sono obbligatori prima di salvare.", true);
-                return;
-            }
-
-            const newItem = {
-                id: 'inv_' + Date.now(),
-                name: `${brand} ${model} (${color || 'Std'})`,
-                brand,
-                model,
-                color,
-                size: `${caliber}□${bridge} - ${temple}mm`,
-                marketPrice: parseFloat(document.getElementById('input-market-price').value) || 0,
-                listPrice,
-                discountPrice: parseFloat(document.getElementById('input-discount-price').value) || 0,
-                description,
-                photos: loadedPhotos.map(p => p.dataUrl),
-                createdAt: new Date().toLocaleDateString('it-IT'),
-                timestamp: Date.now()
-            };
-
-            inventory.unshift(newItem);
-            saveInventoryToLocalStorage();
-            if (window.saveItemToCloud) window.saveItemToCloud(newItem);
-            updateInventoryBadge();
-            showToast("Occhiale salvato permanentemente su Cloud Firestore!");
-            switchTab('inventory');
-        }
-
-        function saveInventoryToLocalStorage() {
-            try {
-                localStorage.setItem('OTTICA_AI_INVENTORY', JSON.stringify(inventory));
-            } catch (e) {
-                console.error("Errore salvataggio locale:", e);
-            }
-        }
-
-        function loadInventoryFromLocalStorage() {
-            try {
-                const stored = localStorage.getItem('OTTICA_AI_INVENTORY');
-                if (stored) {
-                    inventory = JSON.parse(stored);
-                }
-            } catch (e) {
-                inventory = [];
-            }
-        }
-
-        function renderInventory() {
-            const grid = document.getElementById('inventory-grid');
-            const emptyState = document.getElementById('inventory-empty-state');
-            const searchQuery = (document.getElementById('inventory-search')?.value || '').toLowerCase();
-
-            updateInventoryBadge();
-
-            const filtered = inventory.filter(item => 
-                item.name.toLowerCase().includes(searchQuery) ||
-                (item.brand && item.brand.toLowerCase().includes(searchQuery)) ||
-                (item.model && item.model.toLowerCase().includes(searchQuery)) ||
-                item.description.toLowerCase().includes(searchQuery)
-            );
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            grid.innerHTML = filtered.map(item => `
-                <div class="bg-slate-950/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between transition-all hover:border-slate-700">
-                    <div class="p-4 space-y-3">
-                        <div class="flex justify-between items-start gap-2">
-                            <div class="min-w-0">
-                                <h3 class="text-xs sm:text-sm font-bold text-white line-clamp-1">${item.name}</h3>
-                                <p class="text-[11px] text-brand-400 font-mono truncate">Misure: ${item.size || 'N/D'}</p>
-                            </div>
-                            <span class="text-[9px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 flex-shrink-0">${item.createdAt}</span>
-                        </div>
-
-                        <div class="flex gap-1.5 overflow-x-auto py-1">
-                            ${item.photos && item.photos.length > 0 ? item.photos.map((img, idx) => `
-                                <a href="${img}" download="${item.name}_foto_${idx+1}.jpg" class="w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden border border-slate-800 bg-slate-900 block">
-                                    <img src="${img}" class="w-full h-full object-cover">
-                                </a>
-                            `).join('') : '<div class="text-[11px] text-slate-500 italic">Nessuna foto</div>'}
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-center">
-                            <div>
-                                <span class="text-[9px] text-slate-400 block">Listino</span>
-                                <span class="text-xs font-semibold text-slate-300">€${(item.marketPrice || 0).toFixed(2)}</span>
-                            </div>
-                            <div>
-                                <span class="text-[9px] text-brand-400 font-semibold block">Vendita (-20%)</span>
-                                <span class="text-xs font-bold text-brand-400">€${(item.listPrice || 0).toFixed(2)}</span>
-                            </div>
-                        </div>
-
-                        <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">${item.description}</p>
-                    </div>
-
-                    <div class="p-2.5 bg-slate-900/90 border-t border-slate-800 flex justify-end gap-2">
-                        <button onclick="deleteInventoryItem('${item.id}')" class="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Elimina
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function updateInventoryBadge() {
-            const badge = document.getElementById('inventory-count-badge');
-            if (badge) badge.textContent = inventory.length;
-        }
-
-        function deleteInventoryItem(id) {
-            inventory = inventory.filter(item => item.id !== id);
-            saveInventoryToLocalStorage();
-            if (window.deleteItemFromCloud) window.deleteItemFromCloud(id);
-            renderInventory();
-            showToast("Occhiale eliminato");
-        }
-
-        function exportCSV() {
-            if (inventory.length === 0) return alert("Inventario vuoto.");
-            let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Misure,Listino,Vendita\n";
-            inventory.forEach(i => { csv += `"${i.brand}","${i.model}","${i.color}","${i.size}","${i.marketPrice}","${i.listPrice}"\n`; });
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `Inventario_Ottica_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        }
-    </script>
+      });
+      document.getElementById('db-total-count').innerText = count;
+    }
+
+    function loadSelectedPreset() {
+      if (isModelLocked) return;
+      const val = document.getElementById('preset-select').value;
+      if (!val) return;
+      const [brand, code, color, cal, bridge, temple, price] = val.split('|');
+      document.getElementById('field-brand').value = brand;
+      document.getElementById('field-code').value = code;
+      document.getElementById('field-color').value = color;
+      document.getElementById('field-caliber').value = cal;
+      document.getElementById('field-bridge').value = bridge;
+      document.getElementById('field-temple').value = temple;
+      document.getElementById('field-price-list').value = price;
+      calculateDiscountedPrice();
+      lockModelFields(true);
+      showAlert('success');
+    }
+
+    function handleSearchInput() {
+      if (isModelLocked) return;
+      const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
+      const suggestionsBox = document.getElementById('search-suggestions');
+      if (input.length < 2) { suggestionsBox.classList.add('hidden'); return; }
+      let matches = [];
+      dynamicBrandDB.forEach(b => {
+        b.models.forEach(m => {
+          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input)) {
+            matches.push({ brand: b.brand, ...m });
+          }
+        });
+      });
+      if (matches.length === 0) { suggestionsBox.classList.add('hidden'); return; }
+      suggestionsBox.innerHTML = '';
+      matches.slice(0, 5).forEach(item => {
+        const div = document.createElement('div');
+        div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
+        div.innerHTML = `<span><b>${item.brand}</b> ${item.code}</span><span class="text-emerald-400">€${item.price}</span>`;
+        div.onclick = function() {
+          document.getElementById('field-brand').value = item.brand;
+          document.getElementById('field-code').value = item.code;
+          document.getElementById('field-color').value = item.color;
+          document.getElementById('field-caliber').value = item.caliber;
+          document.getElementById('field-bridge').value = item.bridge;
+          document.getElementById('field-temple').value = item.temple;
+          document.getElementById('field-price-list').value = item.price;
+          calculateDiscountedPrice();
+          suggestionsBox.classList.add('hidden');
+          lockModelFields(true);
+          showAlert('success');
+        };
+        suggestionsBox.appendChild(div);
+      });
+      suggestionsBox.classList.remove('hidden');
+    }
+
+    function executeUniversalSearch() {
+      const val = document.getElementById('manual-input-code').value.trim();
+      if (!val) return;
+      document.getElementById('field-brand').value = "Etro";
+      document.getElementById('field-code').value = val;
+      document.getElementById('field-color').value = "3H2";
+      document.getElementById('field-caliber').value = "52";
+      document.getElementById('field-bridge').value = "18";
+      document.getElementById('field-temple').value = "145";
+      document.getElementById('field-price-list').value = "290.00";
+      calculateDiscountedPrice();
+      lockModelFields(true);
+      showAlert('success');
+    }
+
+    function validateRequiredFields() {
+      const b = document.getElementById('field-brand').value.trim();
+      const c = document.getElementById('field-code').value.trim();
+      const p = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const valid = b !== '' && c !== '' && p > 0 && referencePhotoBase64 !== null;
+      document.getElementById('btn-save').disabled = !valid;
+      document.getElementById('btn-generate-photos').disabled = !valid;
+      const ind = document.getElementById('saved-status-indicator');
+      if (valid) {
+        ind.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione foto!`;
+        ind.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
+      } else {
+        ind.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)`;
+        ind.className = "text-slate-500 text-xs flex items-center gap-1";
+      }
+      return valid;
+    }
+
+    function lockModelFields(lock) {
+      isModelLocked = lock;
+      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple'].forEach(id => {
+        document.getElementById(id).disabled = lock;
+      });
+      document.getElementById('lock-status-indicator').innerText = lock ? "Bloccato" : "Pronto";
+      validateRequiredFields();
+    }
+
+    function showAlert(type) {
+      document.getElementById('status-alert-success').classList.toggle('hidden', type !== 'success');
+    }
+
+    function calculateDiscountedPrice() {
+      const list = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const disc = parseFloat(document.getElementById('field-discount-pct').value) || 0;
+      document.getElementById('field-price-final').value = (list * (1 - disc / 100)).toFixed(2);
+    }
+
+    function updateSalesDescription() { calculateDiscountedPrice(); }
+
+    // --- LOGICA DI GENERAZIONE FOTO STUDIO INTEGRATA DAL SECONDO CODICE ---
+    async function generateVerifiedStudioPhotos() {
+      if (!validateRequiredFields()) return alert("Carica prima la foto reale dell'occhiale e inserisci i dati.");
+      
+      const gallery = document.getElementById('photo-gallery-grid');
+      gallery.innerHTML = '';
+
+      const viewConfigs = [
+        { title: "1. Frontale Studio", bg: "#ffffff", shadow: "rgba(0,0,0,0.15)" },
+        { title: "2. Marmo Carrara", bg: "#f1f5f9", shadow: "rgba(0,0,0,0.25)" },
+        { title: "3. Legno Teak", bg: "#1e293b", shadow: "rgba(0,0,0,0.4)" },
+        { title: "4. Flatlay Grigio", bg: "#334155", shadow: "rgba(0,0,0,0.3)" },
+        { title: "5. Bokeh Urbano", bg: "#0f172a", shadow: "rgba(0,0,0,0.5)" }
+      ];
+
+      viewConfigs.forEach((cfg, idx) => {
+        gallery.innerHTML += `
+          <div id="render-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[11px]">
+              <span class="font-bold text-sky-400">${cfg.title}</span>
+              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD Reale</span>
+            </div>
+            <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[130px]">
+              <canvas id="canvas-view-${idx}" class="max-h-[115px] w-auto rounded shadow"></canvas>
+            </div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-center text-slate-400">
+              Pronto e-commerce
+            </div>
+          </div>
+        `;
+      });
+
+      const img = new Image();
+      img.src = referencePhotoBase64;
+      img.onload = function() {
+        viewConfigs.forEach((cfg, idx) => {
+          const canvas = document.getElementById(`canvas-view-${idx}`);
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          canvas.width = 600;
+          canvas.height = 450;
+
+          // Sfondo personalizzato del set
+          ctx.fillStyle = cfg.bg;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Ombra ed effetto studio
+          ctx.shadowColor = cfg.shadow;
+          ctx.shadowBlur = 18;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 10;
+
+          // Calcolo e riposizionamento proporzionale dello scatto reale nel canvas
+          const hRatio = canvas.width / img.width;
+          const vRatio = canvas.height / img.height;
+          const ratio = Math.min(hRatio, vRatio) * 0.85;
+          const centerShiftX = (canvas.width - img.width * ratio) / 2;
+          const centerShiftY = (canvas.height - img.height * ratio) / 2;
+
+          ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
+        });
+      };
+    }
+
+    function renderEmptyGallery() {
+      const gallery = document.getElementById('photo-gallery-grid');
+      gallery.innerHTML = '';
+      for(let i=1; i<=5; i++) {
+        gallery.innerHTML += `
+          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[130px] text-slate-600 space-y-2">
+            <i class="fa-solid fa-camera text-2xl"></i>
+            <span class="text-[11px] font-medium">Vista ${i} in attesa</span>
+          </div>`;
+      }
+    }
+
+    function saveToInventory() {
+      if (!validateRequiredFields()) return;
+      inventory.push({
+        id: Date.now(),
+        brand: document.getElementById('field-brand').value,
+        code: document.getElementById('field-code').value,
+        caliber: document.getElementById('field-caliber').value,
+        bridge: document.getElementById('field-bridge').value,
+        price: document.getElementById('field-price-final').value
+      });
+      saveData();
+      updateInventoryTable();
+      alert("Salvato permanentemente su Cloud Firestore!");
+      resetWorkflow();
+    }
+
+    function updateInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      if (inventory.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = '';
+      inventory.forEach(item => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/80 transition">
+            <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code}</td>
+            <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}</td>
+            <td class="p-2.5 font-bold text-emerald-400">€${item.price}</td>
+            <td class="p-2.5 text-right"><button onclick="deleteItem(${item.id})" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
+          </tr>`;
+      });
+    }
+
+    function deleteItem(id) {
+      inventory = inventory.filter(i => i.id !== id);
+      saveData();
+      updateInventoryTable();
+    }
+
+    function resetWorkflow() {
+      lockModelFields(false);
+      removeReferencePhoto();
+      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-price-list', 'field-price-final'].forEach(id => document.getElementById(id).value = '');
+      renderEmptyGallery();
+      showAlert('hide');
+    }
+
+    function exportCSV() {
+      if (inventory.length === 0) return alert("Inventario vuoto.");
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Calibro,Ponte,Prezzo\n";
+      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.caliber}","${i.bridge}","${i.price}"\n`; });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Inventario_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+  </script>
 </body>
 </html>
