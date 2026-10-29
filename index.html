@@ -1,343 +1,948 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full bg-slate-900 text-slate-100">
+<html lang="it" class="h-full bg-slate-950 text-slate-100">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Studio Renderer</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-  <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Optical Code Decoder & Eyewear AI Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        optics: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    screens: {
+                        'xs': '475px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+        * { -webkit-tap-highlight-color: transparent; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-16 selection:bg-sky-500 selection:text-white">
+<body class="h-full flex flex-col font-sans antialiased selection:bg-optics-500 selection:text-white bg-slate-950 min-h-screen text-slate-100">
 
-  <!-- HEADER -->
-  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl text-slate-950 shadow-md">
-          <i class="fa-solid fa-glasses text-xl"></i>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 ease-out flex items-center justify-between sm:justify-start gap-3 bg-slate-900/95 text-slate-100 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md max-w-md mx-auto">
+        <div class="flex items-center gap-3">
+            <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-optics-400 flex-shrink-0"></i>
+            <span id="toast-message" class="text-xs sm:text-sm font-medium leading-snug">Operazione completata!</span>
         </div>
-        <div>
-          <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
-          <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-camera text-[10px]"></i> Studio Renderer & Cloud Firestore
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1 shadow transition">
-          <i class="fa-solid fa-plus"></i> Nuovo Occhiale
-        </button>
-      </div>
     </div>
-  </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-2">
+                
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-optics-500/10 rounded-xl border border-optics-500/30 flex-shrink-0">
+                        <i data-lucide="glasses" class="w-6 h-6 text-optics-400"></i>
+                    </div>
+                    <div class="truncate">
+                        <h1 class="text-sm sm:text-lg font-bold text-white tracking-tight truncate flex items-center gap-2">
+                            Eyewear Decoder Pro <span class="bg-optics-500/20 text-optics-400 text-[10px] px-2 py-0.5 rounded-full border border-optics-500/30">AI Lab</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">Decodifica Astine, Verifica Google & Foto IA Studio</p>
+                    </div>
+                </div>
 
-    <!-- LEFT COLUMN -->
-    <section class="lg:col-span-5 space-y-6">
+                <!-- Controls & Navigation -->
+                <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
+                    <button onclick="toggleApiKeyModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition-all flex items-center gap-1.5 text-xs font-semibold active:scale-95">
+                        <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
+                        <span class="hidden md:inline">Chiave API Gemini</span>
+                    </button>
 
-      <!-- VERIFICA CODICE E BRAND -->
-      <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i> 1. Marca & Modello
-          </h2>
-          <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
-            Pronto
-          </span>
-        </div>
+                    <nav class="flex space-x-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/50">
+                        <button id="tab-creator-btn" onclick="switchTab('creator')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-optics-600 text-white shadow-sm active:scale-95">
+                            <i data-lucide="scan" class="w-4 h-4"></i>
+                            <span class="hidden xs:inline">Analisi & Decodifica</span>
+                        </button>
+                        <button id="tab-inventory-btn" onclick="switchTab('inventory')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95">
+                            <i data-lucide="archive" class="w-4 h-4"></i>
+                            <span class="hidden xs:inline">Inventario</span>
+                            <span id="inventory-count-badge" class="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold">0</span>
+                        </button>
+                    </nav>
+                </div>
 
-        <p class="text-xs text-slate-300 leading-relaxed">
-          Inserisci la marca e il modello (es. <span class="font-mono text-sky-300 font-bold">Etro 0125</span> o <span class="font-mono text-sky-300 font-bold">Tom Ford TF554</span>):
-        </p>
-
-        <div class="relative">
-          <div class="flex gap-2">
-            <input type="text" id="manual-input-code" placeholder="Es. Etro 0125, Tom Ford TF554..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
-            <button onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-check font-bold"></i> Imposta
-            </button>
-          </div>
-        </div>
-
-        <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center gap-2 text-xs text-emerald-200 font-semibold shadow-md">
-          <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-          <span id="status-alert-success-text">Modello impostato correttamente!</span>
-        </div>
-      </div>
-
-      <!-- FOTO REALE DI RIFERIMENTO -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-camera"></i> 2. Foto Reale Occhiale
-          </h2>
-          <span id="ref-photo-badge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold">
-            Obbligatoria
-          </span>
-        </div>
-
-        <p class="text-xs text-slate-300 leading-relaxed">
-          Carica la foto reale dell'occhiale (come quella scattata in negozio):
-        </p>
-
-        <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label class="flex flex-col items-center justify-center border border-sky-500/60 hover:border-sky-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
-            <i class="fa-solid fa-camera text-2xl text-sky-400 mb-2"></i>
-            <span class="text-xs font-bold text-white">Scatta Foto</span>
-            <input type="file" id="input-camera" accept="image/*" capture="environment" onchange="processImageFile(event)" class="hidden"/>
-          </label>
-
-          <label class="flex flex-col items-center justify-center border border-emerald-500/60 hover:border-emerald-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
-            <i class="fa-solid fa-image text-2xl text-emerald-400 mb-2"></i>
-            <span class="text-xs font-bold text-white">Carica da Galleria</span>
-            <input type="file" id="input-gallery" accept="image/*" onchange="processImageFile(event)" class="hidden"/>
-          </label>
-        </div>
-
-        <div id="reference-preview-box" class="hidden relative rounded-xl overflow-hidden border border-sky-500/50 bg-slate-950 p-2 flex items-center justify-center">
-          <img id="reference-preview-img" src="" alt="Foto reale dell'occhiale" class="max-h-44 w-auto rounded-lg object-contain"/>
-          <button onclick="removeReferencePhoto()" class="absolute top-3 right-3 bg-rose-950/90 hover:bg-rose-900 text-rose-300 border border-rose-600 px-2.5 py-1 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
-            <i class="fa-solid fa-trash"></i> Cambia foto
-          </button>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- RIGHT COLUMN -->
-    <section class="lg:col-span-7 space-y-6">
-
-      <!-- SCHEDA TECNICA E TITOLO -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
-        <h2 class="text-base font-semibold text-slate-200 border-b border-slate-700 pb-3 flex items-center gap-2">
-          <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Prodotto Occhiale
-        </h2>
-
-        <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Annuncio E-Commerce *</label>
-          <input type="text" id="field-title" placeholder="Es. Occhiali Etro 0125 Colore 3H2" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand *</label>
-            <input type="text" id="field-brand" placeholder="Etro" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription()"/>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Modello *</label>
-            <input type="text" id="field-code" placeholder="0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription()"/>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Colore *</label>
-            <input type="text" id="field-color" placeholder="3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription()"/>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3 bg-slate-900 p-3 rounded-lg border border-slate-700">
-          <div>
-            <label class="text-xs text-slate-400 block">Calibro (mm)</label>
-            <input type="text" id="field-caliber" value="52" class="w-full bg-slate-950 text-xs text-white p-1.5 rounded border border-slate-700 mt-1" oninput="updateSalesDescription()"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block">Ponte (mm)</label>
-            <input type="text" id="field-bridge" value="18" class="w-full bg-slate-950 text-xs text-white p-1.5 rounded border border-slate-700 mt-1" oninput="updateSalesDescription()"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block">Asta (mm)</label>
-            <input type="text" id="field-temple" value="145" class="w-full bg-slate-950 text-xs text-white p-1.5 rounded border border-slate-700 mt-1" oninput="updateSalesDescription()"/>
-          </div>
-        </div>
-      </div>
-
-      <!-- GENERATORE 5 FOTO STUDIO E-COMMERCE -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
-          <div>
-            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste Studio E-Commerce
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Inserisce la foto reale in 5 set puliti con luce professionale e download HD</p>
-          </div>
-
-          <button id="btn-generate-photos" onclick="generateStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
-            <i class="fa-solid fa-camera-retro"></i> Genera Set Studio
-          </button>
-        </div>
-
-        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
-      </div>
-
-    </section>
-
-  </main>
-
-  <script>
-    let referencePhotoBase64 = null;
-
-    function processImageFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        referencePhotoBase64 = e.target.result;
-        document.getElementById('reference-preview-img').src = referencePhotoBase64;
-        document.getElementById('reference-upload-container').classList.add('hidden');
-        document.getElementById('reference-preview-box').classList.remove('hidden');
-        document.getElementById('btn-generate-photos').disabled = false;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeReferencePhoto() {
-      referencePhotoBase64 = null;
-      document.getElementById('reference-preview-box').classList.add('hidden');
-      document.getElementById('reference-upload-container').classList.remove('hidden');
-      document.getElementById('btn-generate-photos').disabled = true;
-      renderEmptyGallery();
-    }
-
-    function executeUniversalSearch() {
-      const input = document.getElementById('manual-input-code').value.trim();
-      if (!input) return;
-
-      const parts = input.split(/\s+/);
-      const brand = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-      const code = parts.length > 1 ? parts.slice(1).join(' ') : "Modello Standard";
-
-      document.getElementById('field-brand').value = brand;
-      document.getElementById('field-code').value = code;
-      document.getElementById('field-color').value = "3H2";
-
-      updateSalesDescription();
-      document.getElementById('status-alert-success').classList.remove('hidden');
-    }
-
-    function updateSalesDescription() {
-      const brand = document.getElementById('field-brand').value.trim() || 'Brand';
-      const code = document.getElementById('field-code').value.trim() || 'Modello';
-      const color = document.getElementById('field-color').value.trim() || 'Colore';
-      const cal = document.getElementById('field-caliber').value.trim();
-      const br = document.getElementById('field-bridge').value.trim();
-      const te = document.getElementById('field-temple').value.trim();
-
-      document.getElementById('field-title').value = `Occhiali ${brand} ${code} - Col. ${color} (${cal}□${br}-${te})`;
-    }
-
-    function generateStudioPhotos() {
-      if (!referencePhotoBase64) return alert("Carica prima la foto reale dell'occhiale.");
-      
-      const gallery = document.getElementById('photo-gallery-grid');
-      gallery.innerHTML = '';
-
-      const viewConfigs = [
-        { title: "1. Studio Bianco Luce", bg: "#ffffff" },
-        { title: "2. Grigio E-Commerce", bg: "#f1f5f9" },
-        { title: "3. Marmo Chiaro", bg: "#e2e8f0" },
-        { title: "4. Sabbia Neutra", bg: "#fef3c7" },
-        { title: "5. Elegance Dark", bg: "#1e293b" }
-      ];
-
-      viewConfigs.forEach((cfg, idx) => {
-        gallery.innerHTML += `
-          <div id="render-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px]">
-              <span class="font-bold text-sky-400">${cfg.title}</span>
-              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD</span>
             </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
+
+        <!-- TAB 1: CODE DECODER & AI STUDIO -->
+        <section id="tab-creator" class="space-y-6">
             
-            <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[120px]">
-              <canvas id="canvas-render-${idx}" class="max-h-[110px] w-auto rounded shadow"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- LEFT COLUMN: CODE INPUT & REFERENCE IMAGE -->
+                <div class="lg:col-span-5 space-y-5">
+                    
+                    <!-- Temple Code Form -->
+                    <div class="glass-panel rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                                <i data-lucide="barcode" class="w-5 h-5 text-optics-400"></i>
+                                Codice Inciso sull'Astina
+                            </h2>
+                            <span class="text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">Serial Decoder</span>
+                        </div>
+
+                        <!-- Guide Banner -->
+                        <div class="p-3 bg-optics-900/30 border border-optics-500/20 rounded-xl text-[11px] text-slate-300 space-y-1">
+                            <p class="font-bold text-optics-400 flex items-center gap-1">
+                                <i data-lucide="info" class="w-3.5 h-3.5"></i> Struttura tipica codice astina:
+                            </p>
+                            <p class="font-mono text-slate-200">Marca/Modello | Colore | Calibro [] Ponte | Astina | Filtro</p>
+                            <p class="text-slate-400 text-[10px]">Es: <span class="text-amber-300">RB 2140 901 50[]22 150 3N</span> oppure <span class="text-amber-300">GG0036S 001 54-18-140</span></p>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-200 flex justify-between">
+                                <span>Inserisci Codice Testuale Astina:</span>
+                                <span class="text-[10px] text-optics-400">Obbligatorio</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="input-temple-code" placeholder="Es. RB 2140 901 50[]22 150 3N" class="w-full bg-slate-950 border border-slate-700 focus:border-optics-500 rounded-xl pl-3.5 pr-10 py-2.5 text-xs sm:text-sm font-mono text-white focus:outline-none transition-colors">
+                                <button onclick="pasteFromClipboard('input-temple-code')" class="absolute right-2 top-2.5 text-slate-400 hover:text-white p-1" title="Incolla">
+                                    <i data-lucide="clipboard" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Image Upload (Reference Image) -->
+                        <div class="space-y-2 pt-2 border-t border-slate-800/80">
+                            <label class="text-xs font-semibold text-slate-200 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5"><i data-lucide="camera" class="w-4 h-4 text-optics-400"></i> Foto dell'Occhiale / Astina (Per IA & Rimodellamento)</span>
+                            </label>
+                            
+                            <div id="dropzone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-optics-500 bg-slate-950/60 hover:bg-slate-900/90 rounded-xl p-4 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5">
+                                <div class="p-2 bg-slate-800 rounded-full text-optics-400 border border-slate-700">
+                                    <i data-lucide="upload" class="w-5 h-5"></i>
+                                </div>
+                                <p class="text-xs font-medium text-slate-200">Carica foto occhiale o astina <span class="text-optics-400 underline">Sfoglia</span></p>
+                                <p class="text-[10px] text-slate-400">Necessaria per generare i 5 rendering con sfondi differenti</p>
+                                <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                            </div>
+
+                            <!-- Preview of reference photo -->
+                            <div id="reference-photo-container" class="hidden relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950 aspect-video">
+                                <img id="reference-photo-img" class="w-full h-full object-contain">
+                                <button onclick="clearReferencePhoto()" class="absolute top-2 right-2 p-1 bg-rose-600/80 hover:bg-rose-600 text-white rounded-lg shadow">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button id="btn-analyze" onclick="analyzeTempleCodeWithAI()" class="w-full py-3.5 px-4 bg-optics-600 hover:bg-optics-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-optics-600/20 flex items-center justify-center gap-2 active:scale-[0.98]">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <span>Decodifica Codice & Cerca Dati Reali</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: DECODED DETAILS & VERIFICATION -->
+                <div class="lg:col-span-7">
+                    <div class="glass-panel rounded-2xl p-4 sm:p-6 shadow-xl space-y-5">
+                        
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                                <i data-lucide="file-search" class="w-5 h-5 text-optics-400"></i>
+                                Risultati Analisi & Specifiche Tecniche
+                            </h2>
+                            <span id="analysis-status-badge" class="text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5 flex-shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Inserimento
+                            </span>
+                        </div>
+
+                        <!-- Title & Direct Google Verification -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs font-semibold text-slate-300">Titolo Ufficiale Occhiale</label>
+                                <button onclick="copyToClipboard('input-title')" class="text-optics-400 hover:text-optics-300 text-[11px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia Titolo</button>
+                            </div>
+                            <input type="text" id="input-title" placeholder="Es. Ray-Ban Wayfarer Original RB2140 901" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-optics-500 font-semibold">
+                            
+                            <div id="google-search-container" class="hidden flex items-center gap-2 pt-1">
+                                <span class="text-[11px] text-slate-400">Verifica Modello Reale:</span>
+                                <a id="google-search-link" href="#" target="_blank" class="inline-flex items-center gap-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-optics-400 px-2.5 py-1 rounded-lg border border-slate-700 transition-colors">
+                                    <i data-lucide="search" class="w-3 h-3"></i> Apri Ricerca Google per la conferma
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Technical Grid Matrix -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 bg-slate-950/70 border border-slate-800 rounded-xl">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Marca</span>
+                                <input type="text" id="tech-brand" placeholder="Es. Ray-Ban" class="w-full bg-transparent border-b border-slate-700 text-xs font-bold text-optics-400 focus:outline-none focus:border-optics-500 py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Modello</span>
+                                <input type="text" id="tech-model" placeholder="Es. RB 2140" class="w-full bg-transparent border-b border-slate-700 text-xs font-bold text-white focus:outline-none focus:border-optics-500 py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Codice Colore</span>
+                                <input type="text" id="tech-color" placeholder="Es. 901 Nero" class="w-full bg-transparent border-b border-slate-700 text-xs font-bold text-white focus:outline-none focus:border-optics-500 py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Misure (Cal-Ponte-Ast)</span>
+                                <input type="text" id="tech-measures" placeholder="Es. 50[]22 150" class="w-full bg-transparent border-b border-slate-700 text-xs font-bold text-amber-400 focus:outline-none focus:border-optics-500 py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Lente / Filtro UV</span>
+                                <input type="text" id="tech-filter" placeholder="Es. Categoria 3N (G-15)" class="w-full bg-transparent border-b border-slate-700 text-xs text-slate-200 focus:outline-none py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Materiale Telaio</span>
+                                <input type="text" id="tech-material" placeholder="Es. Acetato" class="w-full bg-transparent border-b border-slate-700 text-xs text-slate-200 focus:outline-none py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Genere / Fit</span>
+                                <input type="text" id="tech-fit" placeholder="Es. Unisex / Standard" class="w-full bg-transparent border-b border-slate-700 text-xs text-slate-200 focus:outline-none py-0.5">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Stima Valore (€)</span>
+                                <input type="number" id="tech-price" placeholder="150" class="w-full bg-transparent border-b border-slate-700 text-xs font-bold text-emerald-400 focus:outline-none py-0.5">
+                            </div>
+                        </div>
+
+                        <!-- Fluid Description -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs font-semibold text-slate-300">Descrizione Commerciale Completa & Particolari</label>
+                                <button onclick="copyToClipboard('input-description')" class="text-optics-400 hover:text-optics-300 text-[11px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia Descrizione</button>
+                            </div>
+                            <textarea id="input-description" rows="4" placeholder="Descrizione dell'occhiale basata su dati di catalogo reali, forma montatura, materiali e dettagli..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-optics-500"></textarea>
+                        </div>
+
+                        <!-- SAVE TO INVENTORY ACTION -->
+                        <div class="pt-2 border-t border-slate-800 flex justify-end gap-3">
+                            <button onclick="resetDecoderForm()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                            </button>
+                            <button onclick="saveCurrentToInventory()" class="px-5 py-2.5 bg-optics-600 hover:bg-optics-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-optics-600/20 flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Salvataggio Permanente in Inventario
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
-            <div class="p-2 bg-slate-900 border-t border-slate-800 flex justify-between items-center text-[10px]">
-              <span class="text-slate-400">Pronto</span>
-              <a id="download-link-${idx}" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded font-bold cursor-pointer transition">Scarica HD</a>
+            <!-- SECTION 2: 5 AI GENERATED PHOTOS WITH DIFFERENT BACKGROUNDS -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="image" class="w-5 h-5 text-optics-400"></i>
+                            5 Render Foto Promo IA (Rimodellamento Prodotto & 5 Sfondi Diversi)
+                        </h2>
+                        <p class="text-xs text-slate-400">Genera 5 immagini promozionali HD basate sull'occhiale inserito e sulla foto caricata.</p>
+                    </div>
+                    <button id="btn-generate-5-photos" onclick="generate5AIPhotos()" class="px-4 py-2 bg-gradient-to-r from-optics-600 to-indigo-600 hover:from-optics-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i> Genera / Rigenera 5 Foto HD
+                    </button>
+                </div>
+
+                <!-- 5 Image Display Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="photos-grid-container">
+                    <!-- Cards will be populated dynamically -->
+                </div>
             </div>
-          </div>
-        `;
-      });
 
-      const img = new Image();
-      img.onload = function() {
-        viewConfigs.forEach((cfg, idx) => {
-          const canvas = document.getElementById(`canvas-render-${idx}`);
-          if (!canvas) return;
-          const ctx = canvas.getContext('2d');
+        </section>
 
-          canvas.width = 1200;
-          canvas.height = 900;
+        <!-- TAB 2: PERMANENT INVENTORY -->
+        <section id="tab-inventory" class="hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 shadow-xl space-y-6">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="archive" class="w-5 h-5 text-optics-400"></i>
+                            Inventario Ottico Registrato
+                        </h2>
+                        <p class="text-xs text-slate-400">Tutti i codici decodificati e salvati in modo permanente.</p>
+                    </div>
+                    <div class="w-full sm:w-auto flex items-center gap-2">
+                        <input type="text" id="inventory-search" oninput="renderInventory()" placeholder="Cerca codice, marca, modello..." class="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-optics-500 w-full sm:w-64">
+                    </div>
+                </div>
 
-          ctx.fillStyle = cfg.bg;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+                <!-- Inventory Grid -->
+                <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Dynamic Items -->
+                </div>
 
-          // Ombra a terra morbida e naturale
-          ctx.save();
-          ctx.fillStyle = "rgba(0, 0, 0, 0.18)";
-          ctx.beginPath();
-          ctx.ellipse(canvas.width / 2, canvas.height * 0.81, canvas.width * 0.38, canvas.height * 0.05, 0, 0, 2 * Math.PI);
-          ctx.filter = 'blur(18px)';
-          ctx.fill();
-          ctx.restore();
+                <!-- Empty State -->
+                <div id="inventory-empty-state" class="text-center py-12 space-y-3">
+                    <div class="p-4 bg-slate-900/80 w-14 h-14 rounded-full mx-auto flex items-center justify-center border border-slate-800 text-slate-500">
+                        <i data-lucide="inbox" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-300">Inventario Vuoto</h3>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Nessun codice decodificato o salvato finora. Torna al Decoder e salva la tua prima montatura.</p>
+                </div>
 
-          const hRatio = canvas.width / img.width;
-          const vRatio = canvas.height / img.height;
-          const ratio = Math.min(hRatio, vRatio) * 0.82;
-          const centerShiftX = (canvas.width - img.width * ratio) / 2;
-          const centerShiftY = (canvas.height - img.height * ratio) / 2 - 20;
+            </div>
+        </section>
 
-          ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
+    </main>
 
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-          const dlLink = document.getElementById(`download-link-${idx}`);
-          const brandName = document.getElementById('field-brand').value.trim() || 'Occhiale';
-          const modelName = document.getElementById('field-code').value.trim() || 'Modello';
-          dlLink.href = dataUrl;
-          dlLink.download = `${brandName}_${modelName}_Studio_${idx + 1}.jpg`;
+    <!-- IMAGE LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full flex flex-col items-center">
+            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-slate-400 hover:text-white p-2">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <img id="lightbox-img" class="max-h-[80vh] max-w-full rounded-2xl border border-slate-800 object-contain shadow-2xl">
+            <div class="mt-4 flex items-center gap-3">
+                <a id="lightbox-download-btn" href="#" download="occhiale_hd.jpg" class="px-5 py-2.5 bg-optics-600 hover:bg-optics-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Scarica Foto HD
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- API KEY MODAL -->
+    <div id="api-key-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Chiave API Gemini
+                </h3>
+                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Inserisci la tua API Key Gemini per la decodifica accurata dei codici delle astine.
+            </p>
+            <div class="space-y-1">
+                <input type="password" id="custom-api-key" placeholder="Incolla API Key Gemini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-optics-500">
+            </div>
+            <button onclick="saveApiKey()" class="w-full py-2.5 bg-optics-600 hover:bg-optics-500 text-white text-xs font-bold rounded-xl">Salva Chiave API</button>
+        </div>
+    </div>
+
+    <!-- Firebase Storage Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'eyewear-decoder-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "dummy",
+            authDomain: "dummy.firebaseapp.com",
+            projectId: "dummy",
+            storageBucket: "dummy.appspot.com",
+            messagingSenderId: "12345",
+            appId: "1:12345:web:12345"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const userCred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = userCred.user;
+                } else {
+                    const userCred = await signInAnonymously(auth);
+                    currentUser = userCred.user;
+                }
+                listenToPermanentInventory();
+            } catch (err) {
+                console.warn("Auth Firebase non attiva, utilizzo storage locale fallback.");
+            }
+        }
+
+        function listenToPermanentInventory() {
+            if (!currentUser) return;
+            const inventoryCol = collection(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory');
+            
+            onSnapshot(inventoryCol, (snapshot) => {
+                const cloudItems = [];
+                snapshot.forEach((docSnap) => {
+                    cloudItems.push(docSnap.data());
+                });
+
+                if (cloudItems.length > 0) {
+                    window.inventory = cloudItems.sort((a, b) => b.timestamp - a.timestamp);
+                    window.saveInventoryToLocalStorage();
+                    window.renderInventory();
+                }
+            }, (err) => {
+                console.warn("Cloud Firestore error:", err);
+            });
+        }
+
+        window.saveItemToCloud = async function(item) {
+            if (!currentUser) return;
+            try {
+                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory', item.id);
+                await setDoc(itemRef, item);
+            } catch (err) {
+                console.error("Errore salvataggio permanente cloud:", err);
+            }
+        };
+
+        window.deleteItemFromCloud = async function(id) {
+            if (!currentUser) return;
+            try {
+                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory', id);
+                await deleteDoc(itemRef);
+            } catch (err) {
+                console.error("Errore eliminazione dal cloud:", err);
+            }
+        };
+
+        initAuth();
+    </script>
+
+    <!-- Application Engine Script -->
+    <script>
+        // App State
+        let referencePhotoDataUrl = null;
+        let generatedPhotos = []; // [{ bgName, url, prompt }]
+        let inventory = [];
+
+        const BACKGROUND_SETTINGS = [
+            { name: "1. Display Studio Ottico", style: "placed elegantly on a sleek glass display shelf in a modern high-end optical store showcase, luxury lighting" },
+            { name: "2. E-Commerce Minimalista", style: "clean studio product photograph on a seamless light grey neutral background, sharp studio lighting, e-commerce shot" },
+            { name: "3. Tavolo Legno Lifestyle", style: "resting on a warm rustic wooden desk next to a luxury leather notebook and espresso cup, soft warm morning lighting" },
+            { name: "4. Esterno / Luce Solare", style: "outdoors sitting on a stone pedestal in direct golden hour sunlight, lush green foliage blur background, vivid natural tones" },
+            { name: "5. Urbano Architetturale", style: "placed on a polished marble surface with modern glass skyscrapers and urban architecture softly blurred in the background" }
+        ];
+
+        function getApiKey() {
+            const savedKey = localStorage.getItem('GEMINI_API_KEY');
+            if (savedKey && savedKey.trim() !== '') return savedKey.trim();
+            if (typeof window.apiKey !== 'undefined' && window.apiKey) return window.apiKey;
+            return '';
+        }
+
+        function toggleApiKeyModal() {
+            const modal = document.getElementById('api-key-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('custom-api-key').value = getApiKey();
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('custom-api-key').value.trim();
+            if (key) {
+                localStorage.setItem('GEMINI_API_KEY', key);
+                showToast("Chiave API salvata con successo!");
+            } else {
+                showToast("Inserisci una chiave valida", true);
+            }
+            toggleApiKeyModal();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            loadInventoryFromLocalStorage();
+            renderInventory();
+            renderPhotosPlaceholder();
         });
-      };
-      img.src = referencePhotoBase64;
-    }
 
-    function renderEmptyGallery() {
-      const gallery = document.getElementById('photo-gallery-grid');
-      gallery.innerHTML = '';
-      for(let i=1; i<=5; i++) {
-        gallery.innerHTML += `
-          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[130px] text-slate-600 space-y-2">
-            <i class="fa-solid fa-camera text-2xl"></i>
-            <span class="text-[11px] font-medium">Set Studio ${i} in attesa</span>
-          </div>`;
-      }
-    }
+        function switchTab(tab) {
+            const tabCreator = document.getElementById('tab-creator');
+            const tabInventory = document.getElementById('tab-inventory');
+            const btnCreator = document.getElementById('tab-creator-btn');
+            const btnInventory = document.getElementById('tab-inventory-btn');
 
-    function resetWorkflow() {
-      removeReferencePhoto();
-      ['manual-input-code', 'field-title', 'field-brand', 'field-code', 'field-color'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      renderEmptyGallery();
-    }
-  </script>
+            if (tab === 'creator') {
+                tabCreator.classList.remove('hidden');
+                tabInventory.classList.add('hidden');
+                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-optics-600 text-white shadow-sm active:scale-95";
+                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
+            } else {
+                tabCreator.classList.add('hidden');
+                tabInventory.classList.remove('hidden');
+                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-optics-600 text-white shadow-sm active:scale-95";
+                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
+                renderInventory();
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.textContent = msg;
+            toastIcon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle');
+            toastIcon.className = isError ? 'w-5 h-5 text-rose-500 flex-shrink-0' : 'w-5 h-5 text-optics-400 flex-shrink-0';
+            if (window.lucide) lucide.createIcons();
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // Image Selection Handler
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                referencePhotoDataUrl = e.target.result;
+                const imgEl = document.getElementById('reference-photo-img');
+                const container = document.getElementById('reference-photo-container');
+                const dropzone = document.getElementById('dropzone');
+
+                imgEl.src = referencePhotoDataUrl;
+                container.classList.remove('hidden');
+                dropzone.classList.add('hidden');
+                showToast("Foto riferimento caricata!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearReferencePhoto() {
+            referencePhotoDataUrl = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('reference-photo-container').classList.add('hidden');
+            document.getElementById('dropzone').classList.remove('hidden');
+        }
+
+        // Gemini AI Code Analysis
+        async function analyzeTempleCodeWithAI() {
+            const templeCode = document.getElementById('input-temple-code').value.trim();
+
+            if (!templeCode && !referencePhotoDataUrl) {
+                showToast("Inserisci il codice dell'astina o carica una foto.", true);
+                return;
+            }
+
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showToast("Inserisci la tua chiave API Gemini.", true);
+                toggleApiKeyModal();
+                return;
+            }
+
+            const btn = document.getElementById('btn-analyze');
+            const badge = document.getElementById('analysis-status-badge');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>Decodifica & Ricerca Online...</span>`;
+            badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full font-medium flex items-center gap-1.5 border border-amber-500/30';
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Analisi in corso...`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const systemPrompt = `Sei un ottico e perito di occhialeria esperto nella decodifica dei codici serigrafati sulle astine.
+Analizza rigorosamente il codice fornito o la foto dell'astina per individuare Marca, Modello, Codice Colore, Misure (Calibro, Ponte, Lunghezza Astina), Categoria Filtro UV e Materiale.
+Non inventare nulla. Se un dato non è rilevabile dal codice, inserisci 'N/D'.
+
+Rispondi ESCLUSIVAMENTE con un JSON con questo formato:
+{
+    "titolo_completo": "Nome commercialmente esatto dell'occhiale",
+    "marca": "Brand/Produttore",
+    "modello": "Codice modello",
+    "colore": "Codice colore e variante",
+    "misure": "Calibro[]Ponte Astina (es. 52[]18 145)",
+    "filtro_lente": "Categoria e tipo lente (es. Categoria 3N)",
+    "materiale": "Materiale telaio",
+    "fit": "Genere e Vestibilità",
+    "prezzo_stima": 140,
+    "descrizione": "Descrizione tecnica e dettagliata di catalogo dell'occhiale",
+    "query_google": "Stringa esatta da cercare su Google per confermare il modello"
+}`;
+
+                const contents = [];
+                let userText = `Codice inciso sull'astina da decodificare: "${templeCode}"`;
+
+                const parts = [{ text: userText }];
+
+                if (referencePhotoDataUrl) {
+                    const base64Data = referencePhotoDataUrl.split(',')[1];
+                    parts.push({
+                        inlineData: {
+                            mimeType: "image/jpeg",
+                            data: base64Data
+                        }
+                    });
+                }
+
+                contents.push({ role: "user", parts });
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents,
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (!response.ok) throw new Error("Errore chiamata API Gemini");
+
+                const result = await response.json();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!jsonText) throw new Error("Nessuna risposta generata.");
+
+                const parsed = JSON.parse(jsonText);
+
+                // Populate Fields
+                document.getElementById('input-title').value = parsed.titolo_completo || '';
+                document.getElementById('tech-brand').value = parsed.marca || '';
+                document.getElementById('tech-model').value = parsed.modello || '';
+                document.getElementById('tech-color').value = parsed.colore || '';
+                document.getElementById('tech-measures').value = parsed.misure || '';
+                document.getElementById('tech-filter').value = parsed.filtro_lente || '';
+                document.getElementById('tech-material').value = parsed.materiale || '';
+                document.getElementById('tech-fit').value = parsed.fit || '';
+                document.getElementById('tech-price').value = parsed.prezzo_stima || 100;
+                document.getElementById('input-description').value = parsed.descrizione || '';
+
+                // Setup Google Verification Link
+                const searchQuery = parsed.query_google || `${parsed.marca} ${parsed.modello} ${parsed.colore}`;
+                const googleLink = document.getElementById('google-search-link');
+                const googleContainer = document.getElementById('google-search-container');
+                googleLink.href = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+                googleContainer.classList.remove('hidden');
+
+                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-optics-500/20 text-optics-300 rounded-full font-medium flex items-center gap-1.5 border border-optics-500/30';
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-optics-400"></span> Decodifica Riuscita`;
+
+                showToast("Decodifica completata con successo!");
+
+                // Auto Trigger 5 AI Photos generation
+                generate5AIPhotos();
+
+            } catch (err) {
+                console.error("Errore decodifica:", err);
+                showToast("Errore durante l'analisi: " + err.message, true);
+                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded-full font-medium flex items-center gap-1.5 border border-rose-500/30';
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Errore Analisi`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5"></i> <span>Decodifica Codice & Cerca Dati Reali</span>`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        // Generate 5 Promo AI Photos with Free Image Generation (Pollinations)
+        function generate5AIPhotos() {
+            const title = document.getElementById('input-title').value.trim() || 'Eyewear Glasses';
+            const brand = document.getElementById('tech-brand').value.trim() || 'Designer';
+            const frameMaterial = document.getElementById('tech-material').value.trim() || 'Acetate';
+            const color = document.getElementById('tech-color').value.trim() || 'Black';
+
+            const container = document.getElementById('photos-grid-container');
+            container.innerHTML = '';
+            generatedPhotos = [];
+
+            BACKGROUND_SETTINGS.forEach((bg, index) => {
+                const prompt = `Hyper-realistic 8k photo of luxury ${brand} ${title} glasses (${color}, ${frameMaterial}), ${bg.style}, perfectly sharp detail, realistic reflections, professional optical commercial photograph`;
+                const encodedPrompt = encodeURIComponent(prompt);
+                // Seed for unique generation
+                const seed = Math.floor(Math.random() * 100000) + index;
+                const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=800&height=800&seed=${seed}&nologo=true`;
+
+                generatedPhotos.push({
+                    bgName: bg.name,
+                    url: imageUrl,
+                    prompt: prompt
+                });
+
+                const cardHtml = `
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between group">
+                        <div class="relative aspect-square bg-slate-900 overflow-hidden flex items-center justify-center">
+                            <img src="${imageUrl}" loading="lazy" alt="${bg.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x600/0f172a/38bdf8?text=Foto+In+Generazione'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2 justify-between">
+                                <button onclick="openLightbox('${imageUrl}')" class="p-1.5 bg-slate-800/90 text-white rounded-lg hover:bg-optics-600">
+                                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                                </button>
+                                <a href="${imageUrl}" target="_blank" download="occhiale_${index+1}.jpg" class="p-1.5 bg-optics-600 text-white rounded-lg hover:bg-optics-500 flex items-center gap-1 text-[10px] font-bold">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Scarica
+                                </a>
+                            </div>
+                        </div>
+                        <div class="p-2.5 bg-slate-900/90 border-t border-slate-800">
+                            <p class="text-[11px] font-bold text-slate-200 truncate">${bg.name}</p>
+                            <span class="text-[9px] text-optics-400">Render HD IA</span>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            if (window.lucide) lucide.createIcons();
+            showToast("5 foto promozionali generate!");
+        }
+
+        function renderPhotosPlaceholder() {
+            const container = document.getElementById('photos-grid-container');
+            container.innerHTML = BACKGROUND_SETTINGS.map((bg, idx) => `
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 text-center aspect-square flex flex-col items-center justify-center gap-2">
+                    <i data-lucide="image" class="w-8 h-8 text-slate-700"></i>
+                    <span class="text-xs font-semibold text-slate-400">${bg.name}</span>
+                    <span class="text-[10px] text-slate-600">In attesa di decodifica</span>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Lightbox Handler
+        function openLightbox(url) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            const btn = document.getElementById('lightbox-download-btn');
+
+            img.src = url;
+            btn.href = url;
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        // Copy Helper
+        function copyToClipboard(id) {
+            const el = document.getElementById(id);
+            if (!el || !el.value) {
+                showToast("Nessun testo da copiare", true);
+                return;
+            }
+            el.select();
+            document.execCommand('copy');
+            showToast("Copiato negli appunti!");
+        }
+
+        function pasteFromClipboard(id) {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById(id).value = text;
+                showToast("Incollato dagli appunti!");
+            }).catch(() => {
+                showToast("Impossibile accedere agli appunti", true);
+            });
+        }
+
+        function resetDecoderForm() {
+            document.getElementById('input-temple-code').value = '';
+            document.getElementById('input-title').value = '';
+            document.getElementById('tech-brand').value = '';
+            document.getElementById('tech-model').value = '';
+            document.getElementById('tech-color').value = '';
+            document.getElementById('tech-measures').value = '';
+            document.getElementById('tech-filter').value = '';
+            document.getElementById('tech-material').value = '';
+            document.getElementById('tech-fit').value = '';
+            document.getElementById('tech-price').value = '';
+            document.getElementById('input-description').value = '';
+            document.getElementById('google-search-container').classList.add('hidden');
+
+            clearReferencePhoto();
+            renderPhotosPlaceholder();
+
+            const badge = document.getElementById('analysis-status-badge');
+            badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5';
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Inserimento`;
+
+            showToast("Form resettato");
+        }
+
+        // Save Current Eyewear to Permanent Storage
+        function saveCurrentToInventory() {
+            const templeCode = document.getElementById('input-temple-code').value.trim();
+            const title = document.getElementById('input-title').value.trim();
+
+            if (!templeCode && !title) {
+                showToast("Decodifica un codice prima di salvare.", true);
+                return;
+            }
+
+            const newItem = {
+                id: 'eyewear_' + Date.now(),
+                templeCode: templeCode || 'N/D',
+                title: title || 'Occhiale Senza Nome',
+                brand: document.getElementById('tech-brand').value.trim(),
+                model: document.getElementById('tech-model').value.trim(),
+                color: document.getElementById('tech-color').value.trim(),
+                measures: document.getElementById('tech-measures').value.trim(),
+                filter: document.getElementById('tech-filter').value.trim(),
+                material: document.getElementById('tech-material').value.trim(),
+                fit: document.getElementById('tech-fit').value.trim(),
+                price: parseFloat(document.getElementById('tech-price').value) || 0,
+                description: document.getElementById('input-description').value.trim(),
+                referencePhoto: referencePhotoDataUrl,
+                generatedPhotos: generatedPhotos.map(p => p.url),
+                createdAt: new Date().toLocaleDateString('it-IT'),
+                timestamp: Date.now()
+            };
+
+            inventory.unshift(newItem);
+            saveInventoryToLocalStorage();
+            if (window.saveItemToCloud) window.saveItemToCloud(newItem);
+
+            updateInventoryBadge();
+            showToast("Salvato in inventario permanente!");
+            switchTab('inventory');
+        }
+
+        // Inventory Storage Helpers
+        function saveInventoryToLocalStorage() {
+            try {
+                localStorage.setItem('EYEWEAR_INVENTORY_DATA', JSON.stringify(inventory));
+            } catch (e) {
+                console.error("Storage error:", e);
+            }
+        }
+
+        function loadInventoryFromLocalStorage() {
+            try {
+                const data = localStorage.getItem('EYEWEAR_INVENTORY_DATA');
+                if (data) inventory = JSON.parse(data);
+            } catch (e) {
+                inventory = [];
+            }
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const emptyState = document.getElementById('inventory-empty-state');
+            const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
+
+            updateInventoryBadge();
+
+            const filtered = inventory.filter(item =>
+                item.templeCode.toLowerCase().includes(search) ||
+                item.title.toLowerCase().includes(search) ||
+                item.brand.toLowerCase().includes(search) ||
+                item.model.toLowerCase().includes(search) ||
+                item.color.toLowerCase().includes(search)
+            );
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(item => `
+                <div class="glass-panel rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-optics-500/50 transition-all">
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="text-[10px] font-mono text-optics-400 bg-optics-950 px-2 py-0.5 rounded border border-optics-500/30">${item.templeCode}</span>
+                                <h3 class="text-sm font-bold text-white mt-1 line-clamp-1">${item.title}</h3>
+                            </div>
+                            <span class="text-[9px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${item.createdAt}</span>
+                        </div>
+
+                        <!-- Technical Pill Highlights -->
+                        <div class="flex flex-wrap gap-1.5 text-[10px]">
+                            <span class="px-2 py-0.5 bg-slate-900 text-slate-300 rounded border border-slate-800 font-semibold">Marca: ${item.brand || 'N/D'}</span>
+                            <span class="px-2 py-0.5 bg-slate-900 text-amber-300 rounded border border-slate-800 font-mono">${item.measures || 'N/D'}</span>
+                            <span class="px-2 py-0.5 bg-slate-900 text-emerald-400 rounded border border-slate-800 font-bold">€${item.price.toFixed(2)}</span>
+                        </div>
+
+                        <!-- Photos Preview -->
+                        <div class="flex gap-1.5 overflow-x-auto py-1">
+                            ${item.referencePhoto ? `
+                                <a href="${item.referencePhoto}" target="_blank" class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 block" title="Foto Riferimento">
+                                    <img src="${item.referencePhoto}" class="w-full h-full object-cover">
+                                </a>
+                            ` : ''}
+                            ${(item.generatedPhotos || []).map((imgUrl, i) => `
+                                <a href="${imgUrl}" download="${item.title}_foto_${i+1}.jpg" target="_blank" class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-slate-800 bg-slate-900 block">
+                                    <img src="${imgUrl}" class="w-full h-full object-cover">
+                                </a>
+                            `).join('')}
+                        </div>
+
+                        <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">${item.description}</p>
+                    </div>
+
+                    <div class="p-3 bg-slate-900/90 border-t border-slate-800/80 flex gap-2">
+                        <button onclick="copyToClipboardText('${item.title}\\nCodice: ${item.templeCode}\\nMisure: ${item.measures}\\n${item.description}')" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copia Scheda
+                        </button>
+                        <button onclick="deleteInventoryItem('${item.id}')" class="p-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg transition-colors" title="Elimina">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function updateInventoryBadge() {
+            const badge = document.getElementById('inventory-count-badge');
+            if (badge) badge.textContent = inventory.length;
+        }
+
+        function deleteInventoryItem(id) {
+            inventory = inventory.filter(i => i.id !== id);
+            saveInventoryToLocalStorage();
+            if (window.deleteItemFromCloud) window.deleteItemFromCloud(id);
+            renderInventory();
+            showToast("Elemento eliminato dall'inventario.");
+        }
+
+        function copyToClipboardText(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("Scheda completa copiata!");
+        }
+    </script>
 </body>
 </html>
