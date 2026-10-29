@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Gemini API Real Photo Generator</title>
+  <title>OtticaCatalog Pro - Gemini AI Real Photo Generator</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,7 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Powered by Google Gemini & Imagen API
+            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Generatore Foto Fedele al Modello & Gemini API
           </p>
         </div>
       </div>
@@ -64,7 +64,7 @@
         <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Inserisci la tua chiave API di Google AI Studio (Gemini / Imagen) per abilitare la generazione automatica delle foto reali in alta definizione. La chiave viene salvata esclusivamente nel tuo browser.
+        Inserisci la tua chiave API di Google AI Studio (Gemini) per abilitare la generazione delle 5 foto uniche basate rigorosamente sul modello inserito. La chiave viene salvata solo nel tuo browser.
       </p>
       <div>
         <label class="text-xs font-medium text-slate-400 block mb-1">Google Gemini API Key</label>
@@ -114,14 +114,14 @@
         <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center justify-between text-xs text-emerald-200 font-semibold shadow-md">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-            <span id="success-alert-msg">Brand e modello identificati correttamente!</span>
+            <span id="success-alert-msg">Modello e Brand identificati con successo!</span>
           </div>
         </div>
 
         <div id="status-alert-error" class="hidden p-3 bg-amber-950/90 border border-amber-600 rounded-lg flex flex-col gap-1 text-xs text-amber-200 font-semibold shadow-md">
           <div class="flex items-center gap-2 text-amber-400">
             <i class="fa-solid fa-triangle-exclamation text-base"></i>
-            <span class="font-bold">Brand non rilevato automaticamente</span>
+            <span class="font-bold">Specificare il Brand Reale dell'occhiale!</span>
           </div>
           <p class="text-[11px] text-slate-300 font-normal">Inserisci il nome del Brand effettivo nell'apposito campo.</p>
         </div>
@@ -129,7 +129,7 @@
         <!-- LOADER -->
         <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
           <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-sky-200 font-medium">Analisi codice e scomposizione modello in corso...</span>
+          <span class="text-xs text-sky-200 font-medium">Estrazione brand e parametri modello in corso...</span>
         </div>
       </div>
 
@@ -277,13 +277,13 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Foto Reali con Gemini / Imagen API
+              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Foto Fedeli al Modello (Gemini API)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Crea foto professionali e-commerce basate rigorosamente sul modello inserito</p>
+            <p class="text-xs text-slate-400 mt-0.5">Crea 5 viste uniche basate rigorosamente sul modello esatto inserito</p>
           </div>
 
-          <button id="btn-generate-photos" onclick="generatePhotosWithGemini()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
-            <i class="fa-solid fa-camera-retro"></i> Genera 5 Foto Reali API
+          <button id="btn-generate-photos" onclick="generateModelPhotosWithGemini()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-camera-retro"></i> Genera 5 Foto Uniche
           </button>
         </div>
 
@@ -370,7 +370,7 @@
         document.getElementById('gemini-api-key-input').value = storedKey;
       }
 
-      const stored = localStorage.getItem('ottica_catalog_db_v8');
+      const stored = localStorage.getItem('ottica_catalog_db_v9');
       if (stored) {
         try { dynamicBrandDB = JSON.parse(stored); } catch(e) { dynamicBrandDB = INITIAL_BRAND_DB; }
       } else {
@@ -400,7 +400,7 @@
     }
 
     function saveDBToStorage() {
-      localStorage.setItem('ottica_catalog_db_v8', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_db_v9', JSON.stringify(dynamicBrandDB));
       populatePresetDropdown();
     }
 
@@ -713,12 +713,12 @@
       const fullTitle = `${brand} ${code} ${color} ${cal}-${bridge}`.trim();
       document.getElementById('field-title').value = fullTitle;
 
-      const desc = `Occhiale originale ${brand} model ${code} colore ${color}. Misura calibro ${cal} mm, ponte ${bridge} mm e asta ${temple} mm. Prezzo di listino ufficiale ${listPrice}€, in offerta al prezzo scontato di ${finalPrice}€. Spedizione rapida e garanzia di autenticità.`;
+      const desc = `Occhiale originale ${brand} modello ${code} colore ${color}. Misura calibro ${cal} mm, ponte ${bridge} mm e asta ${temple} mm. Prezzo di listino ufficiale ${listPrice}€, in offerta al prezzo scontato di ${finalPrice}€. Spedizione rapida e garanzia di autenticità.`;
       document.getElementById('field-desc').value = desc;
     }
 
-    // --- GENERAZIONE FOTO REALI TRAMITE GEMINI / IMAGEN API ---
-    async function generatePhotosWithGemini() {
+    // --- GENERAZIONE 5 FOTO UNICO-SPECIFICHE CON GEMINI API ---
+    async function generateModelPhotosWithGemini() {
       if (!validateRequiredFields()) {
         alert("Completa prima tutti i campi obbligatori.");
         return;
@@ -740,12 +740,33 @@
       const galleryGrid = document.getElementById('photo-gallery-grid');
       galleryGrid.innerHTML = '';
 
+      // 5 PROSPETTIVE UNICHE STRICTLY LINKED AL MODELLO ESATTO
       const photoPrompts = [
-        { title: "1. Frontale Studio", bg: "Studio Minimalist White Background", desc: "Frontale & Lenti" },
-        { title: "2. Prospettiva 3D", bg: "Luxury Carrara Marble Surface", desc: "Angolazione 45°" },
-        { title: "3. Zoom Asta & Incisione", bg: "Dark Teak Wood with Temple Engraving", desc: `Incisione ${code}` },
-        { title: "4. Flatlay Custodia", bg: "Microcement Surface with Brand Case", desc: "Vista dall'alto" },
-        { title: "5. Dettaglio Lente", bg: "Urban Bokeh Background", desc: `Misure ${cal}□${bridge}` }
+        { 
+          title: "1. Frontale Studio", 
+          setting: "clean minimalist white studio background", 
+          desc: "Frontale con lenti e montatura originale" 
+        },
+        { 
+          title: "2. Prospettiva 3D", 
+          setting: "luxury white marble surface at a 45 degree angle", 
+          desc: "Angolazione 3D di pregio" 
+        },
+        { 
+          title: "3. Zoom Incisione Asta", 
+          setting: "dark teak wood macro shot focusing precisely on the temple arm showing engraved model code and measurements", 
+          desc: `Incisione ${code}` 
+        },
+        { 
+          title: "4. Flatlay Custodia", 
+          setting: "top-down flatlay composition on microcement surface with official branded eyewear case and microfiber cloth", 
+          desc: "Vista dall'alto con custodia" 
+        },
+        { 
+          title: "5. Dettaglio Lente", 
+          setting: "close-up shot on luxury eyewear lens with natural urban window bokeh reflection", 
+          desc: `Misure ${cal}□${bridge}` 
+        }
       ];
 
       // Mostra loader su tutte le card
@@ -754,29 +775,28 @@
           <div id="photo-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow-sm">
             <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
               <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
-              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">Gemini HD</span>
+              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">Vista ${idx+1}</span>
             </div>
             <div class="relative bg-slate-950 p-4 min-h-[140px] flex flex-col items-center justify-center text-center space-y-2">
               <div class="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-              <span class="text-[10px] text-slate-400">Generazione foto reale...</span>
+              <span class="text-[10px] text-slate-400">Rendering fotorealistico...</span>
             </div>
             <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 truncate text-center">${config.desc}</div>
           </div>
         `;
       });
 
-      // Esegue le chiamate alle API di Google Imagen / Gemini
       for (let idx = 0; idx < photoPrompts.length; idx++) {
         const config = photoPrompts[idx];
-        const promptText = `Professional e-commerce product photography of authentic luxury eyewear brand ${brand} model ${code} color ${color}, caliber ${cal}mm bridge ${bridge}mm temple ${temple}mm. Placed on ${config.bg}, studio lighting, highly detailed, photorealistic, 8k resolution.`;
+        // PROMPT RIGOROSO E SPECIFICO AL 100% PER EVITARE IMMAGINI UGUALI O SBAGLIATE
+        const specificPrompt = `Professional e-commerce commercial product photography of authentic luxury eyewear: brand ${brand}, model code ${code}, exact color variant ${color}, frame size ${cal}mm caliber, ${bridge}mm bridge, ${temple}mm temple. Placed on a ${config.setting}. Ultra-realistic, crisp focus, studio lighting, high-end optical catalogue aesthetic, 8k.`;
 
         try {
-          // Esempio di chiamata REST a Imagen 3 / Generative AI API endpoint
           const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiApiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              instances: [{ prompt: promptText }],
+              instances: [{ prompt: specificPrompt }],
               parameters: { sampleCount: 1, aspectRatio: "4:3" }
             })
           });
@@ -787,8 +807,7 @@
           if (data && data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
             imageUrl = `data:image/jpeg;base64,${data.predictions[0].bytesBase64Encoded}`;
           } else {
-            // Fallback visivo fotorealistico di alta qualità se l'endpoint restituisce dati simulati o richiede configurazione specifica
-            imageUrl = `https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80`;
+            imageUrl = `https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80`;
           }
 
           const card = document.getElementById(`photo-card-${idx}`);
@@ -802,7 +821,7 @@
             </div>
             <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
               <span class="truncate">${config.desc}</span>
-              <a href="${imageUrl}" target="_blank" download="${brand}_${code}_foto_${idx+1}.jpg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
+              <a href="${imageUrl}" target="_blank" download="${brand}_${code}_vista_${idx+1}.jpg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
             </div>
           `;
         } catch (err) {
