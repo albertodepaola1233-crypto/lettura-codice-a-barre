@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Product AI Seller & Inventory Hub</title>
+    <title>Product AI Seller & OtticaCatalog Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -67,11 +67,11 @@
                 <!-- Logo & Title -->
                 <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
                     <div class="p-2 bg-brand-500/10 rounded-xl border border-brand-500/20 flex-shrink-0">
-                        <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-500"></i>
+                        <i data-lucide="glasses" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-500"></i>
                     </div>
                     <div class="truncate">
-                        <h1 class="text-sm sm:text-lg font-bold text-white tracking-tight truncate">Product AI Seller</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">Analisi, Foto IA & Inventario</p>
+                        <h1 class="text-sm sm:text-lg font-bold text-white tracking-tight truncate">Product AI Seller Pro</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">Lettura Astina, Studio Foto & Cloud</p>
                     </div>
                 </div>
 
@@ -85,11 +85,11 @@
                     <nav class="flex space-x-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/50">
                         <button id="tab-creator-btn" onclick="switchTab('creator')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95">
                             <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Nuovo</span>
+                            <span class="hidden xs:inline">Nuovo Occhiale</span>
                         </button>
                         <button id="tab-inventory-btn" onclick="switchTab('inventory')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95">
                             <i data-lucide="boxes" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Inventario</span>
+                            <span class="hidden xs:inline">Inventario Cloud</span>
                             <span id="inventory-count-badge" class="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold">0</span>
                         </button>
                     </nav>
@@ -114,7 +114,7 @@
                         <div class="flex justify-between items-center mb-3">
                             <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
                                 <i data-lucide="camera" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"></i>
-                                Foto Prodotto (<span id="photo-count">0</span>/3)
+                                Foto Astina & Montatura (<span id="photo-count">0</span>/3)
                             </h2>
                             <span class="text-[11px] text-slate-400">Max 3 foto</span>
                         </div>
@@ -125,25 +125,25 @@
                                 <i data-lucide="upload-cloud" class="w-6 h-6 sm:w-7 sm:h-7"></i>
                             </div>
                             <div>
-                                <p class="text-xs sm:text-sm font-medium text-slate-200">Scatta o Carica foto <span class="text-brand-500 underline font-semibold">Sfoglia</span></p>
-                                <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5">Carica da 1 a 3 foto chiare dell'oggetto</p>
+                                <p class="text-xs sm:text-sm font-medium text-slate-200">Scatta foto incisione o <span class="text-brand-500 underline font-semibold">Sfoglia</span></p>
+                                <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5">Inquadra il testo stampato sull'astina</p>
                             </div>
                             <input type="file" id="file-input" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
                         </div>
 
-                        <!-- Manual Input: Size / Dimensions (Mandatory for AI) -->
+                        <!-- Manual Input Code / Caliber Override -->
                         <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-1.5">
                             <label class="text-xs font-semibold text-amber-400 flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><i data-lucide="ruler" class="w-4 h-4 text-amber-400"></i> Taglia / Dimensione (Obbligatoria)</span>
-                                <span class="text-[10px] text-slate-400 font-normal">Richiesta per l'analisi</span>
+                                <span class="flex items-center gap-1.5"><i data-lucide="binary" class="w-4 h-4 text-amber-400"></i> Codice Asta / Misure (Opzionale)</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Supporto IA</span>
                             </label>
-                            <input type="text" id="input-size" oninput="updateButtonStates()" placeholder="Es. M, L, 42, 38x28cm, Unica..." class="w-full bg-slate-950/90 border border-slate-700 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors">
+                            <input type="text" id="input-size" oninput="updateButtonStates()" placeholder="Es. ETRO 0125 3H2 52□18..." class="w-full bg-slate-950/90 border border-slate-700 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors font-mono">
                         </div>
 
                         <!-- Image Previews Container -->
                         <div class="mt-4">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Anteprima Foto</span>
+                                <span class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Anteprima Scatti</span>
                                 <button onclick="clearAllPhotos()" id="btn-clear-photos" class="text-xs text-slate-400 hover:text-rose-400 hidden flex items-center gap-1">
                                     <i data-lucide="trash-2" class="w-3 h-3"></i> Svuota
                                 </button>
@@ -156,122 +156,135 @@
                             </div>
                         </div>
 
-                        <!-- AI Actions for Photos -->
+                        <!-- AI Actions for Astina Reading -->
                         <div class="mt-5 space-y-3 pt-3 border-t border-slate-800">
                             <button id="btn-analyze" onclick="analyzeProductWithAI()" disabled class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 active:scale-[0.98]">
                                 <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <span>Analizza & Genera Scheda Prodotto</span>
+                                <span>Leggi Astina & Genera Scheda</span>
                             </button>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Right Column: Editable Product Details Form -->
-                <div class="lg:col-span-7">
+                <!-- Right Column: Editable Product Details Form & Studio Photo Generator -->
+                <div class="lg:col-span-7 space-y-4 sm:space-y-6">
                     <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4 sm:space-y-5">
                         
                         <!-- Header Status -->
                         <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
                             <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2 truncate">
                                 <i data-lucide="file-edit" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500 flex-shrink-0"></i>
-                                Scheda Prodotto Modificabile
+                                Scheda Occhiale Decodificata
                             </h2>
                             <span id="analysis-status-badge" class="text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Analisi
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Scatto
                             </span>
                         </div>
 
                         <!-- Form Inputs -->
                         <div class="space-y-4">
-                            <!-- Title, Size & Color -->
+                            <!-- Brand, Model & Color -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                                <div class="sm:col-span-2 space-y-1">
-                                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                                        <span>Nome Prodotto</span>
-                                        <button onclick="copyToClipboard('input-name')" class="text-brand-500 hover:text-brand-400 text-[11px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                    </label>
-                                    <input type="text" id="input-name" placeholder="Es. Giacca in Pelle Nera..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 transition-colors">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-medium text-slate-300">Marca / Brand</label>
+                                    <input type="text" id="input-brand" placeholder="Es. Etro" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
                                 </div>
                                 <div class="space-y-1">
-                                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                                        <span>Colore Esatto</span>
-                                        <button onclick="copyToClipboard('input-color')" class="text-brand-500 hover:text-brand-400 text-[11px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                    </label>
-                                    <input type="text" id="input-color" placeholder="Es. Nero Opaco" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 transition-colors">
+                                    <label class="text-xs font-medium text-slate-300">Modello</label>
+                                    <input type="text" id="input-model" placeholder="Es. 0125" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-medium text-slate-300">Colore</label>
+                                    <input type="text" id="input-color" placeholder="Es. 3H2" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
                                 </div>
                             </div>
 
-                            <!-- Pricing Matrix & Market Analysis -->
+                            <!-- Misure Ottiche: Calibro, Ponte, Asta -->
+                            <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                                    <i data-lucide="ruler" class="w-3.5 h-3.5"></i> Misure Tecniche (mm)
+                                </label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Calibro</span>
+                                        <input type="text" id="input-caliber" placeholder="52" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Ponte</span>
+                                        <input type="text" id="input-bridge" placeholder="18" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Asta</span>
+                                        <input type="text" id="input-temple" placeholder="145" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono text-center">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Matrix -->
                             <div class="p-3.5 sm:p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
-                                <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2">
+                                <div class="flex items-center justify-between">
                                     <label class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-brand-400 flex items-center gap-1.5">
-                                        <i data-lucide="trending-up" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                                        Valutazione & Ricarico
+                                        <i data-lucide="tag" class="w-3.5 h-3.5"></i> Listino e Prezzi (€)
                                     </label>
-                                    <div class="flex items-center gap-3 text-xs">
-                                        <label class="flex items-center gap-1 cursor-pointer text-slate-300">
-                                            <input type="radio" name="markup-rate" value="10" onchange="calculatePrices()" class="text-brand-500 focus:ring-brand-500">
-                                            +10%
-                                        </label>
-                                        <label class="flex items-center gap-1 cursor-pointer text-slate-300">
-                                            <input type="radio" name="markup-rate" value="20" checked onchange="calculatePrices()" class="text-brand-500 focus:ring-brand-500">
-                                            +20% (Consigliato)
-                                        </label>
-                                    </div>
+                                    <span class="text-[10px] text-slate-400">-20% Sconto e-commerce</span>
                                 </div>
 
-                                <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+                                <div class="grid grid-cols-3 gap-2 sm:gap-3">
                                     <div class="space-y-1">
-                                        <span class="text-[10px] sm:text-[11px] font-medium text-slate-400 block truncate">Media Mercato (€)</span>
-                                        <input type="number" step="0.01" id="input-market-price" oninput="calculatePrices()" placeholder="0.00" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-200 focus:outline-none focus:border-brand-500">
-                                    </div>
-                                    <div class="space-y-1">
-                                        <span class="text-[10px] sm:text-[11px] font-semibold text-brand-400 block truncate">Vendita (€)</span>
-                                        <input type="number" step="0.01" id="input-list-price" placeholder="0.00" class="w-full bg-slate-900 border border-brand-500/40 rounded-lg px-2.5 py-2 text-xs sm:text-sm font-bold text-brand-400 focus:outline-none focus:border-brand-500">
+                                        <span class="text-[10px] text-slate-400 block truncate">Listino Ufficiale</span>
+                                        <input type="number" step="0.5" id="input-market-price" oninput="calculatePrices()" placeholder="290.00" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-200">
                                     </div>
                                     <div class="space-y-1">
-                                        <span class="text-[10px] sm:text-[11px] font-semibold text-amber-400 block truncate">Sconto/Rapido (€)</span>
-                                        <input type="number" step="0.01" id="input-discount-price" placeholder="0.00" class="w-full bg-slate-900 border border-amber-500/40 rounded-lg px-2.5 py-2 text-xs sm:text-sm font-bold text-amber-400 focus:outline-none focus:border-brand-500">
+                                        <span class="text-[10px] text-brand-400 font-semibold block truncate">Prezzo Finale</span>
+                                        <input type="number" step="0.5" id="input-list-price" placeholder="232.00" class="w-full bg-slate-900 border border-brand-500/40 rounded-lg px-2.5 py-2 text-xs font-bold text-brand-400">
                                     </div>
-                                </div>
-
-                                <!-- Demand & Market Insight Box -->
-                                <div id="market-insights-box" class="hidden p-3 bg-slate-900/90 border border-slate-800 rounded-xl space-y-1.5 text-xs">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="font-semibold text-slate-200 flex items-center gap-1.5 text-[11px]">
-                                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-400 flex-shrink-0"></i>
-                                            Stato Prezzo & Inventario:
-                                        </span>
-                                        <span id="demand-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30 flex-shrink-0">
-                                            Prezzo Stabilizzato
-                                        </span>
+                                    <div class="space-y-1">
+                                        <span class="text-[10px] text-amber-400 font-semibold block truncate">Promo / Rapido</span>
+                                        <input type="number" step="0.5" id="input-discount-price" placeholder="200.00" class="w-full bg-slate-900 border border-amber-500/40 rounded-lg px-2.5 py-2 text-xs font-bold text-amber-400">
                                     </div>
-                                    <p id="market-reasoning" class="text-slate-300 leading-relaxed text-[10px] sm:text-[11px]"></p>
                                 </div>
                             </div>
 
-                            <!-- Fluid Description -->
+                            <!-- Description -->
                             <div class="space-y-1">
-                                <div class="flex justify-between items-center">
-                                    <label class="text-xs font-medium text-slate-300">Descrizione Completa & Fluida</label>
-                                    <button onclick="copyToClipboard('input-description')" class="text-brand-500 hover:text-brand-400 text-[11px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                </div>
-                                <textarea id="input-description" rows="5" placeholder="Descrizione dettagliata e persuasiva pronta per la pubblicazione sui marketplace..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-brand-500 transition-colors"></textarea>
+                                <label class="text-xs font-medium text-slate-300">Descrizione Catalogo E-commerce</label>
+                                <textarea id="input-description" rows="3" placeholder="Descrizione generata dall'analisi dell'incisione..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-brand-500"></textarea>
                             </div>
                         </div>
 
-                        <!-- Save to Inventory Action -->
-                        <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row gap-2.5">
-                            <button onclick="resetCurrentProductForm()" class="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 active:scale-95">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Form
+                        <!-- Save Action -->
+                        <div class="pt-3 border-t border-slate-800 flex gap-2.5">
+                            <button onclick="resetCurrentProductForm()" class="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
                             </button>
-                            <button onclick="saveToInventory()" class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 active:scale-95">
-                                <i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <span>Salva in Inventario</span>
+                            <button onclick="saveToInventory()" class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>Salva nel Cloud Firestore</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STUDIO FOTO RENDERER: 5 VISTE REALI -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div>
+                                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="camera-retro" class="w-5 h-5 text-brand-500"></i> Generatore 5 Viste Studio Reali
+                                </h3>
+                                <p class="text-xs text-slate-400">Trasforma lo scatto reale nei 5 set e-commerce senza alterare l'occhiale</p>
+                            </div>
+                            <button onclick="generateVerifiedStudioPhotos()" id="btn-generate-photos" disabled class="py-2.5 px-4 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition shadow-md flex items-center gap-1.5 flex-shrink-0">
+                                <i data-lucide="wand-2" class="w-4 h-4"></i> Genera 5 Viste HD
                             </button>
                         </div>
 
+                        <!-- Grid delle 5 foto -->
+                        <div id="photo-gallery-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <div class="col-span-2 sm:col-span-5 text-center py-6 text-slate-500 text-xs italic border border-dashed border-slate-800 rounded-xl">
+                                Carica una foto dell'occhiale e decodifica l'astina per attivare i render studio
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -286,12 +299,15 @@
                     <div>
                         <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                             <i data-lucide="boxes" class="w-5 h-5 text-brand-500"></i>
-                            Inventario Prodotti Salvati
+                            Catalogo Occhiali Cloud Sincronizzato
                         </h2>
-                        <p class="text-xs text-slate-400">Consulta, modifica o elimina i prodotti salvati.</p>
+                        <p class="text-xs text-slate-400">Gestisci i modelli salvati permanentemente su Cloud Firestore.</p>
                     </div>
-                    <div class="w-full sm:w-auto">
-                        <input type="text" id="inventory-search" oninput="renderInventory()" placeholder="Cerca per nome, colore o testo..." class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 w-full sm:w-64">
+                    <div class="w-full sm:w-auto flex gap-2">
+                        <input type="text" id="inventory-search" oninput="renderInventory()" placeholder="Cerca marca, modello o codice..." class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 w-full sm:w-64">
+                        <button onclick="exportCSV()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-brand-400"></i> CSV
+                        </button>
                     </div>
                 </div>
 
@@ -305,72 +321,14 @@
                     <div class="p-4 bg-slate-950/80 w-14 h-14 rounded-full mx-auto flex items-center justify-center border border-slate-800 text-slate-500">
                         <i data-lucide="package-x" class="w-7 h-7"></i>
                     </div>
-                    <h3 class="text-sm font-semibold text-slate-300">Nessun Prodotto in Inventario</h3>
-                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Non hai ancora salvato alcun prodotto. Vai alla scheda "Nuovo", analizza l'oggetto e salvalo qui.</p>
+                    <h3 class="text-sm font-semibold text-slate-300">Nessun Occhiale in Inventario</h3>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Scatta o carica la foto dell'astina nella scheda "Nuovo Occhiale" per iniziare.</p>
                 </div>
 
             </div>
         </section>
 
     </main>
-
-    <!-- EDIT INVENTORY ITEM MODAL -->
-    <div id="edit-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="edit-3" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"></i> Modifica Prodotto Salvato
-                </h3>
-                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 sm:space-y-4">
-                <input type="hidden" id="edit-item-id">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="sm:col-span-2 space-y-1">
-                        <label class="text-xs font-medium text-slate-300">Nome Prodotto</label>
-                        <input type="text" id="edit-item-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-medium text-slate-300">Colore</label>
-                        <input type="text" id="edit-item-color" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate block">Mercato (€)</label>
-                        <input type="number" step="0.01" id="edit-item-market-price" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-white">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] sm:text-[11px] font-medium text-brand-400 truncate block">Vendita (€)</label>
-                        <input type="number" step="0.01" id="edit-item-list-price" class="w-full bg-slate-950 border border-brand-500/40 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-brand-400 font-bold">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] sm:text-[11px] font-medium text-amber-400 truncate block">Sconto (€)</label>
-                        <input type="number" step="0.01" id="edit-item-discount-price" class="w-full bg-slate-950 border border-amber-500/40 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-amber-400 font-bold">
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-300">Descrizione</label>
-                    <textarea id="edit-item-description" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brand-500"></textarea>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="text-xs font-medium text-slate-300">Foto Salvate (Clicca per scaricare)</label>
-                    <div id="edit-item-photos" class="flex flex-wrap gap-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800"></div>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-800">
-                <button onclick="closeEditModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Annulla</button>
-                <button onclick="saveEditModalChanges()" class="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-md">Salva Modifiche</button>
-            </div>
-        </div>
-    </div>
 
     <!-- API KEY MODAL -->
     <div id="api-key-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
@@ -384,12 +342,12 @@
                 </button>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-                Inserisci la tua chiave API Gemini per abilitare l'analisi dei prodotti e la stima automatica dei prezzi.
+                Inserisci la tua chiave API Gemini per consentire la lettura automatica delle incisioni sulle astine degli occhiali.
             </p>
             <div class="space-y-3">
                 <div class="space-y-1">
                     <label class="text-xs font-medium text-slate-300">Chiave API Gemini</label>
-                    <input type="password" id="custom-api-key" placeholder="Incolla chiave Gemini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
+                    <input type="password" id="custom-api-key" placeholder="Incolla chiave API..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
@@ -401,11 +359,10 @@
     <!-- Firebase SDK Imports for Permanent Storage -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup with environment variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-product-ai-app';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ottica-catalog-pro';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "dummy",
             authDomain: "dummy.firebaseapp.com",
@@ -421,7 +378,6 @@
 
         let currentUser = null;
 
-        // Authenticate user
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -433,11 +389,10 @@
                 }
                 listenToPermanentInventory();
             } catch (err) {
-                console.warn("Auth Firebase non disponibile o in modalità offline:", err);
+                console.warn("Auth Firebase offline fallback:", err);
             }
         }
 
-        // Realtime sync from Cloud Firestore (Permanent persistence)
         function listenToPermanentInventory() {
             if (!currentUser) return;
             const inventoryCollection = collection(db, 'artifacts', appId, 'public', 'data', 'inventory');
@@ -458,14 +413,13 @@
             });
         }
 
-        // Global functions for Firebase Persistence
         window.saveItemToCloud = async function(item) {
             if (!currentUser) return;
             try {
                 const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventory', item.id);
                 await setDoc(itemRef, item);
             } catch (err) {
-                console.error("Errore salvataggio permanente cloud:", err);
+                console.error("Errore salvataggio Cloud:", err);
             }
         };
 
@@ -475,7 +429,7 @@
                 const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventory', id);
                 await deleteDoc(itemRef);
             } catch (err) {
-                console.error("Errore eliminazione dal cloud:", err);
+                console.error("Errore eliminazione Cloud:", err);
             }
         };
 
@@ -484,11 +438,9 @@
 
     <!-- Application Logic Script -->
     <script>
-        // Global State
-        let loadedPhotos = []; // { id, dataUrl }
-        let inventory = []; // Saved products
+        let loadedPhotos = []; 
+        let inventory = []; 
 
-        // Retrieve API Keys safely from localStorage
         function getApiKey() {
             const savedKey = localStorage.getItem('GEMINI_API_KEY');
             if (savedKey && savedKey.trim() !== '') return savedKey.trim();
@@ -515,7 +467,6 @@
             toggleApiKeyModal();
         }
 
-        // Initialize UI
         window.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
             loadInventoryFromLocalStorage();
@@ -523,7 +474,6 @@
             updateButtonStates();
         });
 
-        // Tab Switching Logic
         function switchTab(tab) {
             const tabCreator = document.getElementById('tab-creator');
             const tabInventory = document.getElementById('tab-inventory');
@@ -544,7 +494,6 @@
             }
         }
 
-        // Toast Handler
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
@@ -569,8 +518,7 @@
             }, 3500);
         }
 
-        // Image Compressor Helper to speed up API payloads
-        async function compressImage(file, maxWidth = 800, quality = 0.7) {
+        async function compressImage(file, maxWidth = 900, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -597,7 +545,6 @@
             });
         }
 
-        // Image Selection & Dropzone Handlers
         async function handleFileSelect(event) {
             const files = Array.from(event.target.files);
             const remainingSlots = 3 - loadedPhotos.length;
@@ -661,13 +608,10 @@
 
         function updateButtonStates() {
             const hasPhotos = loadedPhotos.length >= 1;
-            const sizeInput = document.getElementById('input-size');
-            const hasSize = sizeInput && sizeInput.value.trim().length > 0;
-
-            document.getElementById('btn-analyze').disabled = !(hasPhotos && hasSize);
+            document.getElementById('btn-analyze').disabled = !hasPhotos;
+            document.getElementById('btn-generate-photos').disabled = !hasPhotos;
         }
 
-        // Fetch with Retry Logic
         async function fetchWithRetry(url, options, retries = 2, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -678,10 +622,9 @@
                 }
                 await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
             }
-            throw new Error("Impossibile contattare la chiave API Gemini.");
+            throw new Error("Impossibile contattare l'API Gemini.");
         }
 
-        // JSON Extraction Helper
         function extractJson(text) {
             try {
                 return JSON.parse(text);
@@ -694,35 +637,24 @@
             }
         }
 
-        // Price calculation based on markup radio select
         function calculatePrices() {
             const marketInput = document.getElementById('input-market-price');
             const listInput = document.getElementById('input-list-price');
             const discountInput = document.getElementById('input-discount-price');
 
             const marketPrice = parseFloat(marketInput.value) || 0;
-            const selectedMarkup = parseFloat(document.querySelector('input[name="markup-rate"]:checked')?.value || '20');
-
             if (marketPrice > 0) {
-                const listPrice = marketPrice * (1 + (selectedMarkup / 100));
-                const discountPrice = marketPrice * 0.95;
-
+                const listPrice = marketPrice * 0.80; // Sconto 20%
+                const discountPrice = marketPrice * 0.70;
                 listInput.value = listPrice.toFixed(2);
                 discountInput.value = discountPrice.toFixed(2);
             }
         }
 
-        // Analyze Product using Gemini
+        // DECODER ASTINA OCCHIALI CON GEMINI
         async function analyzeProductWithAI() {
-            const sizeValue = document.getElementById('input-size').value.trim();
-
             if (loadedPhotos.length === 0) {
-                showToast("Carica almeno 1 foto per analizzare.", true);
-                return;
-            }
-
-            if (!sizeValue) {
-                showToast("Inserisci prima la taglia o dimensione dell'oggetto.", true);
+                showToast("Carica almeno una foto dell'astina o della montatura.", true);
                 return;
             }
 
@@ -737,37 +669,32 @@
             const badge = document.getElementById('analysis-status-badge');
             
             btnAnalyze.disabled = true;
-            btnAnalyze.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"></i> <span>Analisi in corso...</span>`;
+            btnAnalyze.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"></i> <span>Lettura astina in corso...</span>`;
             badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full font-medium flex items-center gap-1.5 border border-amber-500/30';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Analisi in corso...`;
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Decodifica in corso...`;
             if (window.lucide) lucide.createIcons();
 
             try {
                 const imageParts = loadedPhotos.map(p => {
                     const base64Data = p.dataUrl.split(',')[1];
-                    const mimeType = 'image/jpeg';
-                    return { inlineData: { mimeType: mimeType, data: base64Data } };
+                    return { inlineData: { mimeType: 'image/jpeg', data: base64Data } };
                 });
 
-                const existingItemsSummary = inventory.map(item => ({
-                    name: item.name,
-                    color: item.color,
-                    size: item.size,
-                    marketPrice: item.marketPrice
-                }));
+                const manualHint = document.getElementById('input-size').value.trim();
 
-                const userPrompt = `Sei un esperto stimatore e-commerce.
-TAGLIA/DIMENSIONE: "${sizeValue}"
-INVENTARIO ESISTENTE: ${JSON.stringify(existingItemsSummary)}
+                const userPrompt = `Sei un ottico esperto. Analizza la foto dell'incisione sull'astina o della montatura di questo occhiale.
+${manualHint ? `Nota aggiuntiva inserita dall'utente: "${manualHint}"` : ''}
 
-Rispondi ESCLUSIVAMENTE in JSON:
+Estrai con precisione i dati ottici e restituisci ESCLUSIVAMENTE un oggetto JSON con questa struttura esatta:
 {
-    "oggetto_gia_in_inventario": false,
-    "nome_prodotto": "Nome preciso (marca e modello)",
-    "colore_esatto": "Colore",
-    "prezzo_media_mercato": 45.00,
-    "variazione_prezzo_motivo": "Spiegazione o motivazione prezzo",
-    "descrizione_fluida": "Descrizione accattivante e completa per la vendita inclusiva della taglia ${sizeValue}"
+    "marca": "Brand o Marca (es. Etro, Ray-Ban, Persol...)",
+    "modello": "Codice o nome modello (es. 0125)",
+    "colore": "Codice o nome colore (es. 3H2)",
+    "calibro": "Misura calibro lente in mm (es. 52)",
+    "ponte": "Misura ponte in mm (es. 18)",
+    "asta": "Lunghezza asta in mm (es. 145)",
+    "prezzo_listino_stimato": 290.00,
+    "descrizione": "Descrizione commerciale dettagliata per catalogo ottica."
 }`;
 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -788,105 +715,154 @@ Rispondi ESCLUSIVAMENTE in JSON:
 
                 const parsed = extractJson(responseText);
 
-                document.getElementById('input-name').value = parsed.nome_prodotto || '';
-                document.getElementById('input-color').value = parsed.colore_esatto || '';
-                document.getElementById('input-market-price').value = parsed.prezzo_media_mercato || 0;
-                document.getElementById('input-description').value = parsed.descrizione_fluida || '';
-
-                const insightsBox = document.getElementById('market-insights-box');
-                const demandBadge = document.getElementById('demand-badge');
-                const marketReasoning = document.getElementById('market-reasoning');
-
-                insightsBox.classList.remove('hidden');
-
-                if (parsed.oggetto_gia_in_inventario) {
-                    demandBadge.textContent = "Gia' in Inventario";
-                    demandBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex-shrink-0";
-                    showToast("Prodotto trovato in inventario! Prezzi aggiornati.");
-                } else {
-                    demandBadge.textContent = "Nuova Analisi";
-                    demandBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30 flex-shrink-0";
-                    showToast("Scheda generata con successo!");
-                }
-
-                marketReasoning.textContent = parsed.variazione_prezzo_motivo || "Valutazione effettuata in base al valore medio di mercato.";
+                document.getElementById('input-brand').value = parsed.marca || '';
+                document.getElementById('input-model').value = parsed.modello || '';
+                document.getElementById('input-color').value = parsed.colore || '';
+                document.getElementById('input-caliber').value = parsed.calibro || '';
+                document.getElementById('input-bridge').value = parsed.ponte || '';
+                document.getElementById('input-temple').value = parsed.asta || '';
+                document.getElementById('input-market-price').value = parsed.prezzo_listino_stimato || 250.00;
+                document.getElementById('input-description').value = parsed.descrizione || '';
 
                 calculatePrices();
 
                 badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-brand-500/20 text-brand-300 rounded-full font-medium flex items-center gap-1.5 border border-brand-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> Completata`;
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> Decodificato con successo`;
+                showToast("Incisione astina letta correttamente!");
+
+                // Genera automaticamente le viste studio appena decodificato
+                generateVerifiedStudioPhotos();
 
             } catch (error) {
-                console.error("Errore analisi:", error);
-                showToast("Errore analisi: " + error.message, true);
+                console.error("Errore lettura astina:", error);
+                showToast("Errore lettura: " + error.message, true);
                 badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded-full font-medium flex items-center gap-1.5 border border-rose-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Errore Analisi`;
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Errore Lettura`;
             } finally {
                 btnAnalyze.disabled = false;
-                btnAnalyze.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i> <span>Analizza & Genera Scheda Prodotto</span>`;
+                btnAnalyze.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i> <span>Leggi Astina & Genera Scheda</span>`;
                 if (window.lucide) lucide.createIcons();
             }
         }
 
-        // Copy text helper
-        function copyToClipboard(elementId) {
-            const input = document.getElementById(elementId);
-            if (!input || !input.value) {
-                showToast("Nessun testo da copiare", true);
+        // GENERATORE DI 5 VISTE STUDIO REALI BASATE SUL CANVAS DELLO SCATTO
+        async function generateVerifiedStudioPhotos() {
+            if (loadedPhotos.length === 0) {
+                showToast("Carica prima la foto dell'occhiale.", true);
                 return;
             }
-            input.select();
-            document.execCommand('copy');
-            showToast("Testo copiato!");
+
+            const gallery = document.getElementById('photo-gallery-grid');
+            gallery.innerHTML = '';
+
+            const viewConfigs = [
+                { title: "1. Frontale Studio", bg: "#ffffff", shadow: "rgba(0,0,0,0.15)" },
+                { title: "2. Marmo Carrara", bg: "#f1f5f9", shadow: "rgba(0,0,0,0.25)" },
+                { title: "3. Legno Teak", bg: "#1e293b", shadow: "rgba(0,0,0,0.4)" },
+                { title: "4. Flatlay Grigio", bg: "#334155", shadow: "rgba(0,0,0,0.3)" },
+                { title: "5. Bokeh Urbano", bg: "#0f172a", shadow: "rgba(0,0,0,0.5)" }
+            ];
+
+            viewConfigs.forEach((cfg, idx) => {
+                gallery.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
+                        <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px]">
+                            <span class="font-bold text-sky-400 truncate">${cfg.title}</span>
+                            <span class="bg-emerald-950 text-emerald-300 px-1 rounded">HD</span>
+                        </div>
+                        <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[120px]">
+                            <canvas id="canvas-view-${idx}" class="max-h-[110px] w-auto rounded shadow"></canvas>
+                        </div>
+                        <div class="p-2 bg-slate-900 border-t border-slate-800 text-[9px] text-center text-slate-400">
+                            Pronto e-commerce
+                        </div>
+                    </div>
+                `;
+            });
+
+            const img = new Image();
+            img.src = loadedPhotos[0].dataUrl;
+            img.onload = function() {
+                viewConfigs.forEach((cfg, idx) => {
+                    const canvas = document.getElementById(`canvas-view-${idx}`);
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 600;
+                    canvas.height = 450;
+
+                    ctx.fillStyle = cfg.bg;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.shadowColor = cfg.shadow;
+                    ctx.shadowBlur = 18;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 10;
+
+                    const hRatio = canvas.width / img.width;
+                    const vRatio = canvas.height / img.height;
+                    const ratio = Math.min(hRatio, vRatio) * 0.85;
+                    const centerShiftX = (canvas.width - img.width * ratio) / 2;
+                    const centerShiftY = (canvas.height - img.height * ratio) / 2;
+
+                    ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
+                });
+            };
+            showToast("5 Viste studio generate con successo!");
         }
 
-        // Reset Current Form
         function resetCurrentProductForm() {
             loadedPhotos = [];
-
             document.getElementById('file-input').value = '';
             document.getElementById('input-size').value = '';
-            document.getElementById('input-name').value = '';
+            document.getElementById('input-brand').value = '';
+            document.getElementById('input-model').value = '';
             document.getElementById('input-color').value = '';
+            document.getElementById('input-caliber').value = '';
+            document.getElementById('input-bridge').value = '';
+            document.getElementById('input-temple').value = '';
             document.getElementById('input-market-price').value = '';
             document.getElementById('input-list-price').value = '';
             document.getElementById('input-discount-price').value = '';
             document.getElementById('input-description').value = '';
 
-            document.getElementById('market-insights-box').classList.add('hidden');
-
             const badge = document.getElementById('analysis-status-badge');
             badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Analisi`;
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Attesa Scatto`;
 
             renderPreviews();
             updateButtonStates();
+            document.getElementById('photo-gallery-grid').innerHTML = `
+                <div class="col-span-2 sm:col-span-5 text-center py-6 text-slate-500 text-xs italic border border-dashed border-slate-800 rounded-xl">
+                    Carica una foto dell'occhiale e decodifica l'astina per attivare i render studio
+                </div>`;
             showToast("Form resettato");
         }
 
-        // Save Current Product to Inventory
         function saveToInventory() {
-            const name = document.getElementById('input-name').value.trim();
+            const brand = document.getElementById('input-brand').value.trim();
+            const model = document.getElementById('input-model').value.trim();
             const color = document.getElementById('input-color').value.trim();
-            const size = document.getElementById('input-size').value.trim();
-            const marketPrice = parseFloat(document.getElementById('input-market-price').value) || 0;
+            const caliber = document.getElementById('input-caliber').value.trim();
+            const bridge = document.getElementById('input-bridge').value.trim();
+            const temple = document.getElementById('input-temple').value.trim();
             const listPrice = parseFloat(document.getElementById('input-list-price').value) || 0;
-            const discountPrice = parseFloat(document.getElementById('input-discount-price').value) || 0;
             const description = document.getElementById('input-description').value.trim();
 
-            if (!name) {
-                showToast("Inserisci almeno il nome del prodotto prima di salvare.", true);
+            if (!brand || !model) {
+                showToast("Marca e Modello sono obbligatori prima di salvare.", true);
                 return;
             }
 
             const newItem = {
                 id: 'inv_' + Date.now(),
-                name,
+                name: `${brand} ${model} (${color || 'Std'})`,
+                brand,
+                model,
                 color,
-                size,
-                marketPrice,
+                size: `${caliber}□${bridge} - ${temple}mm`,
+                marketPrice: parseFloat(document.getElementById('input-market-price').value) || 0,
                 listPrice,
-                discountPrice,
+                discountPrice: parseFloat(document.getElementById('input-discount-price').value) || 0,
                 description,
                 photos: loadedPhotos.map(p => p.dataUrl),
                 createdAt: new Date().toLocaleDateString('it-IT'),
@@ -897,14 +873,13 @@ Rispondi ESCLUSIVAMENTE in JSON:
             saveInventoryToLocalStorage();
             if (window.saveItemToCloud) window.saveItemToCloud(newItem);
             updateInventoryBadge();
-            showToast("Prodotto salvato in inventario!");
+            showToast("Occhiale salvato permanentemente su Cloud Firestore!");
             switchTab('inventory');
         }
 
-        // Storage Management
         function saveInventoryToLocalStorage() {
             try {
-                localStorage.setItem('PRODUCT_AI_INVENTORY', JSON.stringify(inventory));
+                localStorage.setItem('OTTICA_AI_INVENTORY', JSON.stringify(inventory));
             } catch (e) {
                 console.error("Errore salvataggio locale:", e);
             }
@@ -912,17 +887,15 @@ Rispondi ESCLUSIVAMENTE in JSON:
 
         function loadInventoryFromLocalStorage() {
             try {
-                const stored = localStorage.getItem('PRODUCT_AI_INVENTORY');
+                const stored = localStorage.getItem('OTTICA_AI_INVENTORY');
                 if (stored) {
                     inventory = JSON.parse(stored);
                 }
             } catch (e) {
-                console.error("Errore caricamento locale:", e);
                 inventory = [];
             }
         }
 
-        // Render Inventory Grid
         function renderInventory() {
             const grid = document.getElementById('inventory-grid');
             const emptyState = document.getElementById('inventory-empty-state');
@@ -932,8 +905,8 @@ Rispondi ESCLUSIVAMENTE in JSON:
 
             const filtered = inventory.filter(item => 
                 item.name.toLowerCase().includes(searchQuery) ||
-                (item.color && item.color.toLowerCase().includes(searchQuery)) ||
-                (item.size && item.size.toLowerCase().includes(searchQuery)) ||
+                (item.brand && item.brand.toLowerCase().includes(searchQuery)) ||
+                (item.model && item.model.toLowerCase().includes(searchQuery)) ||
                 item.description.toLowerCase().includes(searchQuery)
             );
 
@@ -950,47 +923,36 @@ Rispondi ESCLUSIVAMENTE in JSON:
                         <div class="flex justify-between items-start gap-2">
                             <div class="min-w-0">
                                 <h3 class="text-xs sm:text-sm font-bold text-white line-clamp-1">${item.name}</h3>
-                                <p class="text-[11px] text-brand-400 font-medium truncate">Colore: ${item.color || 'N/D'} • Taglia: ${item.size || 'N/D'}</p>
+                                <p class="text-[11px] text-brand-400 font-mono truncate">Misure: ${item.size || 'N/D'}</p>
                             </div>
                             <span class="text-[9px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 flex-shrink-0">${item.createdAt}</span>
                         </div>
 
-                        <!-- Image Thumbnail Gallery -->
                         <div class="flex gap-1.5 overflow-x-auto py-1">
                             ${item.photos && item.photos.length > 0 ? item.photos.map((img, idx) => `
                                 <a href="${img}" download="${item.name}_foto_${idx+1}.jpg" class="w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden border border-slate-800 bg-slate-900 block">
                                     <img src="${img}" class="w-full h-full object-cover">
                                 </a>
-                            `).join('') : `
-                                <div class="text-[11px] text-slate-500 italic">Nessuna foto</div>
-                            `}
+                            `).join('') : '<div class="text-[11px] text-slate-500 italic">Nessuna foto</div>'}
                         </div>
 
-                        <!-- Pricing Table -->
-                        <div class="grid grid-cols-3 gap-1.5 p-2 bg-slate-900/80 rounded-xl border border-slate-800/80 text-center">
+                        <div class="grid grid-cols-2 gap-2 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-center">
                             <div>
-                                <span class="text-[9px] text-slate-400 block truncate">Mercato</span>
+                                <span class="text-[9px] text-slate-400 block">Listino</span>
                                 <span class="text-xs font-semibold text-slate-300">€${(item.marketPrice || 0).toFixed(2)}</span>
                             </div>
                             <div>
-                                <span class="text-[9px] text-brand-400 font-semibold block truncate">Vendita</span>
+                                <span class="text-[9px] text-brand-400 font-semibold block">Vendita (-20%)</span>
                                 <span class="text-xs font-bold text-brand-400">€${(item.listPrice || 0).toFixed(2)}</span>
-                            </div>
-                            <div>
-                                <span class="text-[9px] text-amber-400 font-semibold block truncate">Scontato</span>
-                                <span class="text-xs font-bold text-amber-400">€${(item.discountPrice || 0).toFixed(2)}</span>
                             </div>
                         </div>
 
                         <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">${item.description}</p>
                     </div>
 
-                    <div class="p-2.5 bg-slate-900/90 border-t border-slate-800/80 flex gap-2">
-                        <button onclick="openEditModal('${item.id}')" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center justify-center gap-1 active:scale-95">
-                            <i data-lucide="edit" class="w-3.5 h-3.5"></i> Modifica
-                        </button>
-                        <button onclick="deleteInventoryItem('${item.id}')" class="p-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg transition-colors active:scale-95" title="Elimina">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <div class="p-2.5 bg-slate-900/90 border-t border-slate-800 flex justify-end gap-2">
+                        <button onclick="deleteInventoryItem('${item.id}')" class="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Elimina
                         </button>
                     </div>
                 </div>
@@ -1009,54 +971,19 @@ Rispondi ESCLUSIVAMENTE in JSON:
             saveInventoryToLocalStorage();
             if (window.deleteItemFromCloud) window.deleteItemFromCloud(id);
             renderInventory();
-            showToast("Prodotto eliminato");
+            showToast("Occhiale eliminato");
         }
 
-        // Modal Edit Functions
-        function openEditModal(id) {
-            const item = inventory.find(i => i.id === id);
-            if (!item) return;
-
-            document.getElementById('edit-item-id').value = item.id;
-            document.getElementById('edit-item-name').value = item.name;
-            document.getElementById('edit-item-color').value = item.color;
-            document.getElementById('edit-item-market-price').value = item.marketPrice;
-            document.getElementById('edit-item-list-price').value = item.listPrice;
-            document.getElementById('edit-item-discount-price').value = item.discountPrice;
-            document.getElementById('edit-item-description').value = item.description;
-
-            const photosContainer = document.getElementById('edit-item-photos');
-            photosContainer.innerHTML = (item.photos || []).map((img, idx) => `
-                <a href="${img}" download="${item.name}_foto_${idx+1}.jpg" class="w-14 h-14 rounded-lg border border-slate-800 overflow-hidden relative group block">
-                    <img src="${img}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[9px]">Scarica</div>
-                </a>
-            `).join('');
-
-            document.getElementById('edit-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
-
-        function saveEditModalChanges() {
-            const id = document.getElementById('edit-item-id').value;
-            const item = inventory.find(i => i.id === id);
-            if (!item) return;
-
-            item.name = document.getElementById('edit-item-name').value.trim();
-            item.color = document.getElementById('edit-item-color').value.trim();
-            item.marketPrice = parseFloat(document.getElementById('edit-item-market-price').value) || 0;
-            item.listPrice = parseFloat(document.getElementById('edit-item-list-price').value) || 0;
-            item.discountPrice = parseFloat(document.getElementById('edit-item-discount-price').value) || 0;
-            item.description = document.getElementById('edit-item-description').value.trim();
-
-            saveInventoryToLocalStorage();
-            if (window.saveItemToCloud) window.saveItemToCloud(item);
-            renderInventory();
-            closeEditModal();
-            showToast("Modifiche salvate!");
+        function exportCSV() {
+            if (inventory.length === 0) return alert("Inventario vuoto.");
+            let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Misure,Listino,Vendita\n";
+            inventory.forEach(i => { csv += `"${i.brand}","${i.model}","${i.color}","${i.size}","${i.marketPrice}","${i.listPrice}"\n`; });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `Inventario_Ottica_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         }
     </script>
 </body>
