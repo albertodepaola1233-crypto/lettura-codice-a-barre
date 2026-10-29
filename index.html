@@ -113,7 +113,7 @@
         </div>
       </div>
 
-      <!-- FOTO REALE DI RIFERIMENTO (PULSANTI SEPARATI) -->
+      <!-- FOTO REALE DI RIFERIMENTO -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
@@ -125,7 +125,7 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Scatta o carica la foto reale per la scheda e per generare le 5 viste studio:
+          Scatta o carica la foto reale per generare le 5 viste studio:
         </p>
 
         <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -170,7 +170,7 @@
     <!-- RIGHT COLUMN -->
     <section class="lg:col-span-7 space-y-6">
 
-      <!-- SCHEDA TECNICA -->
+      <!-- SCHEDA TECNICA, TITOLO E DESCRIZIONE -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
@@ -179,6 +179,12 @@
           <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
             In attesa
           </span>
+        </div>
+
+        <!-- TITOLO DINAMICO -->
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Annuncio E-Commerce *</label>
+          <input type="text" id="field-title" placeholder="Es. Occhiali da Vista Etro 0125 Colore 3H2 Calibro 52" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -203,6 +209,12 @@
             <div><input type="text" id="field-bridge" placeholder="18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
             <div><input type="text" id="field-temple" placeholder="145" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
           </div>
+        </div>
+
+        <!-- DESCRIZIONE GENERATA -->
+        <div>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione Dettagliata per il Catalogo *</label>
+          <textarea id="field-description" rows="3" placeholder="Descrizione generata automaticamente con tutte le caratteristiche..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
         </div>
 
         <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
@@ -232,14 +244,14 @@
         </div>
       </div>
 
-      <!-- GENERATORE 5 FOTO REALI (STUDIO CANVAS INTEGRATO DAL SECONDO CODICE) -->
+      <!-- GENERATORE 5 FOTO REALI (CORRETTO - NO FOTO NERE) -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste e-Commerce Studio
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Renderizza il tuo scatto reale in 5 set fotografici professionali senza alterare l'occhiale</p>
+            <p class="text-xs text-slate-400 mt-0.5">Renderizza la tua foto reale in 5 set ambientati senza alterare l'occhiale</p>
           </div>
 
           <button id="btn-generate-photos" onclick="generateVerifiedStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
@@ -247,7 +259,6 @@
           </button>
         </div>
 
-        <!-- Grid dinamica dei Canvas -->
         <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
       </div>
 
@@ -379,6 +390,7 @@
       document.getElementById('field-temple').value = temple;
       document.getElementById('field-price-list').value = price;
       calculateDiscountedPrice();
+      updateSalesDescription();
       lockModelFields(true);
       showAlert('success');
     }
@@ -411,6 +423,7 @@
           document.getElementById('field-temple').value = item.temple;
           document.getElementById('field-price-list').value = item.price;
           calculateDiscountedPrice();
+          updateSalesDescription();
           suggestionsBox.classList.add('hidden');
           lockModelFields(true);
           showAlert('success');
@@ -431,8 +444,23 @@
       document.getElementById('field-temple').value = "145";
       document.getElementById('field-price-list').value = "290.00";
       calculateDiscountedPrice();
+      updateSalesDescription();
       lockModelFields(true);
       showAlert('success');
+    }
+
+    function updateSalesDescription() {
+      const brand = document.getElementById('field-brand').value.trim() || 'Brand';
+      const code = document.getElementById('field-code').value.trim() || 'Modello';
+      const color = document.getElementById('field-color').value.trim() || 'Colore';
+      const caliber = document.getElementById('field-caliber').value.trim() || '52';
+      const bridge = document.getElementById('field-bridge').value.trim() || '18';
+      const temple = document.getElementById('field-temple').value.trim() || '145';
+
+      document.getElementById('field-title').value = `Occhiali ${brand} ${code} Col. ${color} (${caliber}□${bridge}-${temple})`;
+      document.getElementById('field-description').value = `Splendido occhiale da collezione ${brand} modello ${code}, variante colore ${color}. Dotato di calibro ${caliber}mm, ponte ${bridge}mm e lunghezza aste di ${temple}mm. Montatura originale, controllata e pronta per la spedizione e-commerce.`;
+      
+      calculateDiscountedPrice();
     }
 
     function validateRequiredFields() {
@@ -444,7 +472,7 @@
       document.getElementById('btn-generate-photos').disabled = !valid;
       const ind = document.getElementById('saved-status-indicator');
       if (valid) {
-        ind.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione foto!`;
+        ind.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione foto e salvataggio!`;
         ind.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
       } else {
         ind.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)`;
@@ -472,29 +500,27 @@
       document.getElementById('field-price-final').value = (list * (1 - disc / 100)).toFixed(2);
     }
 
-    function updateSalesDescription() { calculateDiscountedPrice(); }
-
-    // --- LOGICA DI GENERAZIONE FOTO STUDIO INTEGRATA DAL SECONDO CODICE ---
+    // --- CORREZIONE RENDERING CANVAS: NO FOTO NERE ---
     async function generateVerifiedStudioPhotos() {
-      if (!validateRequiredFields()) return alert("Carica prima la foto reale dell'occhiale e inserisci i dati.");
+      if (!referencePhotoBase64) return alert("Carica prima la foto reale dell'occhiale.");
       
       const gallery = document.getElementById('photo-gallery-grid');
       gallery.innerHTML = '';
 
       const viewConfigs = [
-        { title: "1. Frontale Studio", bg: "#ffffff", shadow: "rgba(0,0,0,0.15)" },
-        { title: "2. Marmo Carrara", bg: "#f1f5f9", shadow: "rgba(0,0,0,0.25)" },
-        { title: "3. Legno Teak", bg: "#1e293b", shadow: "rgba(0,0,0,0.4)" },
-        { title: "4. Flatlay Grigio", bg: "#334155", shadow: "rgba(0,0,0,0.3)" },
-        { title: "5. Bokeh Urbano", bg: "#0f172a", shadow: "rgba(0,0,0,0.5)" }
+        { title: "1. Studio Bianco", bg: "#ffffff" },
+        { title: "2. Marmo Carrara", bg: "#e2e8f0" },
+        { title: "3. Legno Teak", bg: "#1e293b" },
+        { title: "4. Flatlay Grigio", bg: "#334155" },
+        { title: "5. Studio Elegance", bg: "#0f172a" }
       ];
 
       viewConfigs.forEach((cfg, idx) => {
         gallery.innerHTML += `
           <div id="render-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[11px]">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px]">
               <span class="font-bold text-sky-400">${cfg.title}</span>
-              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD Reale</span>
+              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD</span>
             </div>
             <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[130px]">
               <canvas id="canvas-view-${idx}" class="max-h-[115px] w-auto rounded shadow"></canvas>
@@ -506,36 +532,43 @@
         `;
       });
 
+      // Caricamento sicuro immagine reale senza schermata nera
       const img = new Image();
-      img.src = referencePhotoBase64;
+      img.crossOrigin = "anonymous";
       img.onload = function() {
         viewConfigs.forEach((cfg, idx) => {
           const canvas = document.getElementById(`canvas-view-${idx}`);
           if (!canvas) return;
           const ctx = canvas.getContext('2d');
+          
           canvas.width = 600;
           canvas.height = 450;
 
-          // Sfondo personalizzato del set
+          // Ripristino contesto visivo
+          ctx.restore();
+          ctx.save();
+
+          // Sfondo Studio
           ctx.fillStyle = cfg.bg;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Ombra ed effetto studio
-          ctx.shadowColor = cfg.shadow;
-          ctx.shadowBlur = 18;
+          // Ombra sotto l'occhiale
+          ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+          ctx.shadowBlur = 15;
           ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = 10;
+          ctx.shadowOffsetY = 8;
 
-          // Calcolo e riposizionamento proporzionale dello scatto reale nel canvas
+          // Calcolo dimensioni per centrare la foto senza distorsioni
           const hRatio = canvas.width / img.width;
           const vRatio = canvas.height / img.height;
-          const ratio = Math.min(hRatio, vRatio) * 0.85;
+          const ratio = Math.min(hRatio, vRatio) * 0.82;
           const centerShiftX = (canvas.width - img.width * ratio) / 2;
           const centerShiftY = (canvas.height - img.height * ratio) / 2;
 
           ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
         });
       };
+      img.src = referencePhotoBase64;
     }
 
     function renderEmptyGallery() {
@@ -556,6 +589,8 @@
         id: Date.now(),
         brand: document.getElementById('field-brand').value,
         code: document.getElementById('field-code').value,
+        title: document.getElementById('field-title').value,
+        description: document.getElementById('field-description').value,
         caliber: document.getElementById('field-caliber').value,
         bridge: document.getElementById('field-bridge').value,
         price: document.getElementById('field-price-final').value
@@ -593,15 +628,18 @@
     function resetWorkflow() {
       lockModelFields(false);
       removeReferencePhoto();
-      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-price-list', 'field-price-final'].forEach(id => document.getElementById(id).value = '');
+      ['manual-input-code', 'field-title', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-description', 'field-price-list', 'field-price-final'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
       renderEmptyGallery();
       showAlert('hide');
     }
 
     function exportCSV() {
       if (inventory.length === 0) return alert("Inventario vuoto.");
-      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Calibro,Ponte,Prezzo\n";
-      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.caliber}","${i.bridge}","${i.price}"\n`; });
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Titolo,Calibro,Ponte,Prezzo\n";
+      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.title}","${i.caliber}","${i.bridge}","${i.price}"\n`; });
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csv));
       link.setAttribute("download", `Inventario_${Date.now()}.csv`);
