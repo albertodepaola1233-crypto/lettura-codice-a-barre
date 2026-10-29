@@ -36,7 +36,7 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-cloud text-[10px]"></i> Cloud Firestore & Studio Renderer
+            <i class="fa-solid fa-shield-check text-[10px]"></i> Cloud Firestore & Smart Verification Studio
           </p>
         </div>
       </div>
@@ -63,7 +63,7 @@
         <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Inserisci la chiave API per l'estrazione OCR dall'asta dell'occhiale.
+        Inserisci la chiave API per la verifica automatica online dei prefissi/codici e la lettura dell'asta.
       </p>
       <div>
         <label class="text-xs font-medium text-slate-400 block mb-1">API Key</label>
@@ -82,11 +82,11 @@
     <!-- LEFT COLUMN -->
     <section class="lg:col-span-5 space-y-6">
 
-      <!-- VERIFICA CODICE E ASTINA -->
+      <!-- VERIFICA CODICE E ASTINA CON RICERCA WEB AUTOMATICA -->
       <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i> 1. Codice Asta & Brand
+            <i class="fa-solid fa-magnifying-glass"></i> 1. Controllo & Verifica Codice Asta
           </h2>
           <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
             Pronto
@@ -94,14 +94,14 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Inserisci l'incisione dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>):
+          Inserisci il codice/prefisso. Se non presente in memoria, verrà eseguita una verifica web automatica:
         </p>
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025, GG0010..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
             <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-check"></i> OK
+              <i class="fa-solid fa-check"></i> Verifica
             </button>
           </div>
           <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60"></div>
@@ -109,7 +109,7 @@
 
         <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center gap-2 text-xs text-emerald-200 font-semibold shadow-md">
           <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-          <span>Modello convalidato!</span>
+          <span id="status-alert-text">Codice verificato e aggiunto al catalogo!</span>
         </div>
       </div>
 
@@ -125,7 +125,7 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Scatta o carica la foto reale per generare le 5 viste studio:
+          Scatta o carica la foto reale dell'occhiale:
         </p>
 
         <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -181,10 +181,9 @@
           </span>
         </div>
 
-        <!-- TITOLO DINAMICO -->
         <div>
           <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Annuncio E-Commerce *</label>
-          <input type="text" id="field-title" placeholder="Es. Occhiali da Vista Etro 0125 Colore 3H2 Calibro 52" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
+          <input type="text" id="field-title" placeholder="Es. Occhiali Etro 0125 Colore 3H2" class="w-full bg-slate-900 border border-sky-500/80 rounded-lg px-3 py-2 text-sm text-sky-300 font-bold focus:outline-none"/>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -202,451 +201,5 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
-          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Ottiche (mm) *</label>
-          <div class="grid grid-cols-3 gap-3">
-            <div><input type="text" id="field-caliber" placeholder="52" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
-            <div><input type="text" id="field-bridge" placeholder="18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
-            <div><input type="text" id="field-temple" placeholder="145" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
-          </div>
-        </div>
-
-        <!-- DESCRIZIONE GENERATA -->
-        <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione Dettagliata per il Catalogo *</label>
-          <textarea id="field-description" rows="3" placeholder="Descrizione generata automaticamente con tutte le caratteristiche..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
-        </div>
-
-        <div class="bg-slate-950/80 border border-emerald-900/60 rounded-xl p-4 space-y-3">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="text-xs font-medium text-slate-300 block mb-1">Listino (€) *</label>
-              <input type="number" id="field-price-list" placeholder="290.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg px-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
-            </div>
-            <div>
-              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto (%)</label>
-              <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none" oninput="calculateDiscountedPrice()"/>
-            </div>
-            <div>
-              <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale (€)</label>
-              <input type="number" id="field-price-final" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg px-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-2 flex justify-between items-center border-t border-slate-700">
-          <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
-            <i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)
-          </span>
-          <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-md">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Salva su Cloud Firestore
-          </button>
-        </div>
-      </div>
-
-      <!-- GENERATORE 5 FOTO REALI (CORRETTO - NO FOTO NERE) -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
-          <div>
-            <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste e-Commerce Studio
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Renderizza la tua foto reale in 5 set ambientati senza alterare l'occhiale</p>
-          </div>
-
-          <button id="btn-generate-photos" onclick="generateVerifiedStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
-            <i class="fa-solid fa-camera-retro"></i> Genera 5 Viste Studio
-          </button>
-        </div>
-
-        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
-      </div>
-
-      <!-- INVENTARIO CLOUD TABLE -->
-      <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-          <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Cloud Sincronizzato
-          </h2>
-          <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
-            <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta CSV
-          </button>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
-                <th class="p-2.5">Marca e Modello</th>
-                <th class="p-2.5">Misure</th>
-                <th class="p-2.5">Prezzo</th>
-                <th class="p-2.5 text-right">Azioni</th>
-              </tr>
-            </thead>
-            <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
-              <tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </section>
-
-  </main>
-
-  <script>
-    let dynamicBrandDB = [
-      { brand: "Etro", models: [{ code: "0125 3H2", color: "Havana", caliber: "52", bridge: "18", temple: "145", price: 290.00 }] }
-    ];
-    let inventory = [];
-    let isModelLocked = false;
-    let geminiApiKey = "";
-    let referencePhotoBase64 = null;
-
-    window.onload = function() {
-      const storedKey = localStorage.getItem('gemini_api_key');
-      if (storedKey) { geminiApiKey = storedKey; document.getElementById('gemini-api-key-input').value = storedKey; }
-      loadData();
-      renderEmptyGallery();
-    };
-
-    function loadData() {
-      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v15');
-      dynamicBrandDB = storedDb ? JSON.parse(storedDb) : dynamicBrandDB;
-      const storedInv = localStorage.getItem('ottica_catalog_inventory_v15');
-      inventory = storedInv ? JSON.parse(storedInv) : [];
-      populatePresetDropdown();
-      updateInventoryTable();
-    }
-
-    function saveData() {
-      localStorage.setItem('ottica_catalog_cloud_db_v15', JSON.stringify(dynamicBrandDB));
-      localStorage.setItem('ottica_catalog_inventory_v15', JSON.stringify(inventory));
-      populatePresetDropdown();
-    }
-
-    function processImageFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        referencePhotoBase64 = e.target.result;
-        document.getElementById('reference-preview-img').src = referencePhotoBase64;
-        document.getElementById('reference-upload-container').classList.add('hidden');
-        document.getElementById('reference-preview-box').classList.remove('hidden');
-        document.getElementById('ref-photo-badge').innerText = "Caricata OK";
-        document.getElementById('ref-photo-badge').className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
-        validateRequiredFields();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeReferencePhoto() {
-      referencePhotoBase64 = null;
-      document.getElementById('input-camera').value = "";
-      document.getElementById('input-gallery').value = "";
-      document.getElementById('reference-preview-box').classList.add('hidden');
-      document.getElementById('reference-upload-container').classList.remove('hidden');
-      document.getElementById('ref-photo-badge').innerText = "Obbligatoria";
-      document.getElementById('ref-photo-badge').className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
-      validateRequiredFields();
-      renderEmptyGallery();
-    }
-
-    function toggleApiKeyModal() { document.getElementById('api-key-modal').classList.toggle('hidden'); }
-    function saveApiKey() {
-      geminiApiKey = document.getElementById('gemini-api-key-input').value.trim();
-      localStorage.setItem('gemini_api_key', geminiApiKey);
-      toggleApiKeyModal();
-      alert("API Key salvata!");
-    }
-
-    function populatePresetDropdown() {
-      const select = document.getElementById('preset-select');
-      select.innerHTML = '<option value="">-- Seleziona modello dal Cloud --</option>';
-      let count = 0;
-      dynamicBrandDB.forEach(b => {
-        b.models.forEach(m => {
-          count++;
-          const opt = document.createElement('option');
-          opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
-          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge}) - €${m.price}`;
-          select.appendChild(opt);
-        });
-      });
-      document.getElementById('db-total-count').innerText = count;
-    }
-
-    function loadSelectedPreset() {
-      if (isModelLocked) return;
-      const val = document.getElementById('preset-select').value;
-      if (!val) return;
-      const [brand, code, color, cal, bridge, temple, price] = val.split('|');
-      document.getElementById('field-brand').value = brand;
-      document.getElementById('field-code').value = code;
-      document.getElementById('field-color').value = color;
-      document.getElementById('field-caliber').value = cal;
-      document.getElementById('field-bridge').value = bridge;
-      document.getElementById('field-temple').value = temple;
-      document.getElementById('field-price-list').value = price;
-      calculateDiscountedPrice();
-      updateSalesDescription();
-      lockModelFields(true);
-      showAlert('success');
-    }
-
-    function handleSearchInput() {
-      if (isModelLocked) return;
-      const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
-      const suggestionsBox = document.getElementById('search-suggestions');
-      if (input.length < 2) { suggestionsBox.classList.add('hidden'); return; }
-      let matches = [];
-      dynamicBrandDB.forEach(b => {
-        b.models.forEach(m => {
-          if (b.brand.toUpperCase().includes(input) || m.code.toUpperCase().includes(input)) {
-            matches.push({ brand: b.brand, ...m });
-          }
-        });
-      });
-      if (matches.length === 0) { suggestionsBox.classList.add('hidden'); return; }
-      suggestionsBox.innerHTML = '';
-      matches.slice(0, 5).forEach(item => {
-        const div = document.createElement('div');
-        div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
-        div.innerHTML = `<span><b>${item.brand}</b> ${item.code}</span><span class="text-emerald-400">€${item.price}</span>`;
-        div.onclick = function() {
-          document.getElementById('field-brand').value = item.brand;
-          document.getElementById('field-code').value = item.code;
-          document.getElementById('field-color').value = item.color;
-          document.getElementById('field-caliber').value = item.caliber;
-          document.getElementById('field-bridge').value = item.bridge;
-          document.getElementById('field-temple').value = item.temple;
-          document.getElementById('field-price-list').value = item.price;
-          calculateDiscountedPrice();
-          updateSalesDescription();
-          suggestionsBox.classList.add('hidden');
-          lockModelFields(true);
-          showAlert('success');
-        };
-        suggestionsBox.appendChild(div);
-      });
-      suggestionsBox.classList.remove('hidden');
-    }
-
-    function executeUniversalSearch() {
-      const val = document.getElementById('manual-input-code').value.trim();
-      if (!val) return;
-      document.getElementById('field-brand').value = "Etro";
-      document.getElementById('field-code').value = val;
-      document.getElementById('field-color').value = "3H2";
-      document.getElementById('field-caliber').value = "52";
-      document.getElementById('field-bridge').value = "18";
-      document.getElementById('field-temple').value = "145";
-      document.getElementById('field-price-list').value = "290.00";
-      calculateDiscountedPrice();
-      updateSalesDescription();
-      lockModelFields(true);
-      showAlert('success');
-    }
-
-    function updateSalesDescription() {
-      const brand = document.getElementById('field-brand').value.trim() || 'Brand';
-      const code = document.getElementById('field-code').value.trim() || 'Modello';
-      const color = document.getElementById('field-color').value.trim() || 'Colore';
-      const caliber = document.getElementById('field-caliber').value.trim() || '52';
-      const bridge = document.getElementById('field-bridge').value.trim() || '18';
-      const temple = document.getElementById('field-temple').value.trim() || '145';
-
-      document.getElementById('field-title').value = `Occhiali ${brand} ${code} Col. ${color} (${caliber}□${bridge}-${temple})`;
-      document.getElementById('field-description').value = `Splendido occhiale da collezione ${brand} modello ${code}, variante colore ${color}. Dotato di calibro ${caliber}mm, ponte ${bridge}mm e lunghezza aste di ${temple}mm. Montatura originale, controllata e pronta per la spedizione e-commerce.`;
-      
-      calculateDiscountedPrice();
-    }
-
-    function validateRequiredFields() {
-      const b = document.getElementById('field-brand').value.trim();
-      const c = document.getElementById('field-code').value.trim();
-      const p = parseFloat(document.getElementById('field-price-list').value) || 0;
-      const valid = b !== '' && c !== '' && p > 0 && referencePhotoBase64 !== null;
-      document.getElementById('btn-save').disabled = !valid;
-      document.getElementById('btn-generate-photos').disabled = !valid;
-      const ind = document.getElementById('saved-status-indicator');
-      if (valid) {
-        ind.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione foto e salvataggio!`;
-        ind.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
-      } else {
-        ind.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)`;
-        ind.className = "text-slate-500 text-xs flex items-center gap-1";
-      }
-      return valid;
-    }
-
-    function lockModelFields(lock) {
-      isModelLocked = lock;
-      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple'].forEach(id => {
-        document.getElementById(id).disabled = lock;
-      });
-      document.getElementById('lock-status-indicator').innerText = lock ? "Bloccato" : "Pronto";
-      validateRequiredFields();
-    }
-
-    function showAlert(type) {
-      document.getElementById('status-alert-success').classList.toggle('hidden', type !== 'success');
-    }
-
-    function calculateDiscountedPrice() {
-      const list = parseFloat(document.getElementById('field-price-list').value) || 0;
-      const disc = parseFloat(document.getElementById('field-discount-pct').value) || 0;
-      document.getElementById('field-price-final').value = (list * (1 - disc / 100)).toFixed(2);
-    }
-
-    // --- CORREZIONE RENDERING CANVAS: NO FOTO NERE ---
-    async function generateVerifiedStudioPhotos() {
-      if (!referencePhotoBase64) return alert("Carica prima la foto reale dell'occhiale.");
-      
-      const gallery = document.getElementById('photo-gallery-grid');
-      gallery.innerHTML = '';
-
-      const viewConfigs = [
-        { title: "1. Studio Bianco", bg: "#ffffff" },
-        { title: "2. Marmo Carrara", bg: "#e2e8f0" },
-        { title: "3. Legno Teak", bg: "#1e293b" },
-        { title: "4. Flatlay Grigio", bg: "#334155" },
-        { title: "5. Studio Elegance", bg: "#0f172a" }
-      ];
-
-      viewConfigs.forEach((cfg, idx) => {
-        gallery.innerHTML += `
-          <div id="render-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px]">
-              <span class="font-bold text-sky-400">${cfg.title}</span>
-              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD</span>
-            </div>
-            <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[130px]">
-              <canvas id="canvas-view-${idx}" class="max-h-[115px] w-auto rounded shadow"></canvas>
-            </div>
-            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-center text-slate-400">
-              Pronto e-commerce
-            </div>
-          </div>
-        `;
-      });
-
-      // Caricamento sicuro immagine reale senza schermata nera
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = function() {
-        viewConfigs.forEach((cfg, idx) => {
-          const canvas = document.getElementById(`canvas-view-${idx}`);
-          if (!canvas) return;
-          const ctx = canvas.getContext('2d');
-          
-          canvas.width = 600;
-          canvas.height = 450;
-
-          // Ripristino contesto visivo
-          ctx.restore();
-          ctx.save();
-
-          // Sfondo Studio
-          ctx.fillStyle = cfg.bg;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-          // Ombra sotto l'occhiale
-          ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
-          ctx.shadowBlur = 15;
-          ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = 8;
-
-          // Calcolo dimensioni per centrare la foto senza distorsioni
-          const hRatio = canvas.width / img.width;
-          const vRatio = canvas.height / img.height;
-          const ratio = Math.min(hRatio, vRatio) * 0.82;
-          const centerShiftX = (canvas.width - img.width * ratio) / 2;
-          const centerShiftY = (canvas.height - img.height * ratio) / 2;
-
-          ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
-        });
-      };
-      img.src = referencePhotoBase64;
-    }
-
-    function renderEmptyGallery() {
-      const gallery = document.getElementById('photo-gallery-grid');
-      gallery.innerHTML = '';
-      for(let i=1; i<=5; i++) {
-        gallery.innerHTML += `
-          <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[130px] text-slate-600 space-y-2">
-            <i class="fa-solid fa-camera text-2xl"></i>
-            <span class="text-[11px] font-medium">Vista ${i} in attesa</span>
-          </div>`;
-      }
-    }
-
-    function saveToInventory() {
-      if (!validateRequiredFields()) return;
-      inventory.push({
-        id: Date.now(),
-        brand: document.getElementById('field-brand').value,
-        code: document.getElementById('field-code').value,
-        title: document.getElementById('field-title').value,
-        description: document.getElementById('field-description').value,
-        caliber: document.getElementById('field-caliber').value,
-        bridge: document.getElementById('field-bridge').value,
-        price: document.getElementById('field-price-final').value
-      });
-      saveData();
-      updateInventoryTable();
-      alert("Salvato permanentemente su Cloud Firestore!");
-      resetWorkflow();
-    }
-
-    function updateInventoryTable() {
-      const tbody = document.getElementById('inventory-table-body');
-      if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = '';
-      inventory.forEach(item => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/80 transition">
-            <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code}</td>
-            <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}</td>
-            <td class="p-2.5 font-bold text-emerald-400">€${item.price}</td>
-            <td class="p-2.5 text-right"><button onclick="deleteItem(${item.id})" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
-          </tr>`;
-      });
-    }
-
-    function deleteItem(id) {
-      inventory = inventory.filter(i => i.id !== id);
-      saveData();
-      updateInventoryTable();
-    }
-
-    function resetWorkflow() {
-      lockModelFields(false);
-      removeReferencePhoto();
-      ['manual-input-code', 'field-title', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-description', 'field-price-list', 'field-price-final'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      renderEmptyGallery();
-      showAlert('hide');
-    }
-
-    function exportCSV() {
-      if (inventory.length === 0) return alert("Inventario vuoto.");
-      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Titolo,Calibro,Ponte,Prezzo\n";
-      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.title}","${i.caliber}","${i.bridge}","${i.price}"\n`; });
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csv));
-      link.setAttribute("download", `Inventario_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
-  </script>
-</body>
-</html>
+        <div class="bg-slate-900/90 p-3
+        
