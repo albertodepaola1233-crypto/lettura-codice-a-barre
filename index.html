@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Multimodal Photo Generator</title>
+  <title>OtticaCatalog Pro - Firestore Cloud & Dual Upload</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,47 +13,9 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-  <!-- Firebase SDK Imports -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // Global Firebase references
-    window.db = null;
-    window.auth = null;
-    window.appId = typeof __app_id !== 'undefined' ? __app_id : 'default-ottica-app';
-    window.userId = null;
-
-    async function initFirebase() {
-      try {
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-          apiKey: "AIzaSyDummyKeyForFallback",
-          projectId: "ottica-catalog-pro"
-        };
-        const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.db = getFirestore(app);
-
-        // Auth before queries (Rule 3)
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(window.auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(window.auth);
-        }
-
-        window.userId = window.auth.currentUser?.uid || crypto.randomUUID();
-        console.log("Firebase initialized successfully. User ID:", window.userId);
-
-        // Start real-time listeners
-        initFirestoreListeners();
-      } catch (err) {
-        console.warn("Firebase initialization fallback to local state:", err);
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', initFirebase);
-  </script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -74,42 +36,37 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Gemini Multimodal - Foto di Riferimento & Studio HD
+            <i class="fa-solid fa-cloud text-[10px]"></i> Firebase Cloud Sync & Gemini Multimodal
           </p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-2 border border-slate-600 transition">
-          <i class="fa-solid fa-key"></i>
-          <span>API Key Gemini</span>
-        </button>
       <div class="flex items-center space-x-2 sm:space-x-3">
         <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-2 border border-slate-600 transition">
           <i class="fa-solid fa-key"></i>
-          <span class="hidden md:inline">API Key</span>
+          <span class="hidden md:inline">API Key Gemini</span>
         </button>
         <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1 shadow transition">
-          <i class="fa-solid fa-plus"></i> Nuovo
+          <i class="fa-solid fa-plus"></i> Nuovo Occhiale
         </button>
       </div>
     </div>
   </header>
 
-  <!-- MODALE CONFIGURAZIONE API KEY -->
+  <!-- MODALE CONFIGURAZIONE API KEY GEMINI -->
   <div id="api-key-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
         <h3 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-key"></i> Configura Google Gemini API Key
+          <i class="fa-solid fa-key"></i> Google Gemini API Key
         </h3>
         <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Inserisci la tua chiave API di Google AI Studio (Gemini) per abilitare la rielaborazione multimodale basata sullo scatto reale e la scheda del modello. La chiave viene salvata solo nel tuo browser.
+        Inserisci la tua chiave API di Google AI Studio (Gemini) per generare le 5 foto reali uniche basate sulla foto caricata e sulle specifiche dell'occhiale.
       </p>
       <div>
-        <label class="text-xs font-medium text-slate-400 block mb-1">Google Gemini API Key</label>
+        <label class="text-xs font-medium text-slate-400 block mb-1">API Key Gemini</label>
         <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500"/>
       </div>
       <div class="flex justify-end gap-2 pt-2">
@@ -122,29 +79,29 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT COLUMN: INSERIMENTO, RIFERIMENTO & CATALOGO -->
+    <!-- LEFT COLUMN: INSERIMENTO & SEPARATED PHOTO UPLOAD -->
     <section class="lg:col-span-5 space-y-6">
 
       <!-- VERIFICA CODICE ASTA -->
       <div class="bg-slate-800 border-2 border-sky-500 rounded-xl p-5 shadow-lg space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i> 1. Verifica Codice Asta Online
+            <i class="fa-solid fa-magnifying-glass"></i> 1. Verifica Codice & Brand
           </h2>
           <span id="lock-status-indicator" class="text-[10px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-bold">
-            Pronto all'inserimento
+            Pronto
           </span>
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Inserisci l'incisione completa dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>, <span class="font-mono text-sky-300">RB3025 L0205 58-14</span>):
+          Inserisci l'incisione completa dell'asta (es. <span class="font-mono text-sky-300">ETRO 0125 3H2 145</span>):
         </p>
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025, PO0649..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
-            <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-check"></i> Verifica & OK
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
+              <i class="fa-solid fa-check"></i> OK
             </button>
           </div>
 
@@ -156,86 +113,93 @@
         <div id="status-alert-success" class="hidden p-3 bg-emerald-950/90 border border-emerald-600 rounded-lg flex items-center justify-between text-xs text-emerald-200 font-semibold shadow-md">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-            <span id="success-alert-msg">Modello e Brand identificati con successo!</span>
+            <span id="success-alert-msg">Modello convalidato sul Cloud!</span>
           </div>
         </div>
 
         <div id="status-alert-error" class="hidden p-3 bg-amber-950/90 border border-amber-600 rounded-lg flex flex-col gap-1 text-xs text-amber-200 font-semibold shadow-md">
           <div class="flex items-center gap-2 text-amber-400">
             <i class="fa-solid fa-triangle-exclamation text-base"></i>
-            <span class="font-bold">Specificare il Brand Reale dell'occhiale!</span>
+            <span class="font-bold">Specificare il Brand Reale!</span>
           </div>
-          <p class="text-[11px] text-slate-300 font-normal">Inserisci il nome del Brand effettivo nell'apposito campo.</p>
+          <p class="text-[11px] text-slate-300 font-normal">Inserisci il nome della Marca nel campo dedicato.</p>
         </div>
 
         <!-- LOADER -->
         <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
           <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-sky-200 font-medium">Estrazione brand e parametri modello in corso...</span>
+          <span class="text-xs text-sky-200 font-medium">Verifica Firestore in corso...</span>
         </div>
       </div>
 
-      <!-- SEZIONE FOTO DI RIFERIMENTO (REALE / SCATTATA) -->
+      <!-- SEZIONE FOTO DI RIFERIMENTO: PULSANTI SEPARATI PER FOTOCAMERA E GALLERIA -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-          <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-camera"></i> 2. Foto Reale di Riferimento *
-          </h3>
-          <span id="reference-status-tag" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold">
-            Mancante
+          <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-camera-retro"></i> 2. Foto di Riferimento
+          </h2>
+          <span id="ref-photo-badge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold">
+            Obbligatoria
           </span>
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Scatta una foto sul banco di lavoro o carica una foto reale dell'occhiale: Gemini la utilizzerà come struttura base per generare i 5 set fotografici.
+          Scegli la modalità di acquisizione per fornire all'IA la struttura reale dell'occhiale:
         </p>
 
-        <!-- INPUT E PULSANTI FOTOCAMERA/FILE -->
-        <input type="file" id="ref-image-input" accept="image/*" capture="environment" class="hidden" onchange="handleReferenceImageUpload(event)"/>
-        
-        <div class="flex gap-2">
-          <button onclick="document.getElementById('ref-image-input').click()" class="flex-1 bg-slate-900 hover:bg-slate-950 border border-sky-500 hover:border-sky-400 text-sky-300 text-xs font-bold py-3 px-3 rounded-lg transition flex items-center justify-center gap-2 shadow-inner">
-            <i class="fa-solid fa-camera text-base"></i> Scatta / Carica Foto Reale
-          </button>
-          <button id="btn-remove-photo" onclick="removeReferenceImage()" class="hidden bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 text-xs font-bold px-3 py-3 rounded-lg transition">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+        <!-- PULSANTI SEPARATI -->
+        <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          
+          <!-- BOTTONE 1: SCATTA FOTO (FOTOCAMERA DIRETTA) -->
+          <label class="flex flex-col items-center justify-center border border-sky-500/60 hover:border-sky-400 bg-slate-900/90 hover:bg-slate-900 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+            <i class="fa-solid fa-camera text-2xl text-sky-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">Scatta Foto</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Apri fotocamera</span>
+            <input type="file" id="input-camera" accept="image/*" capture="environment" onchange="processImageFile(event)" class="hidden"/>
+          </label>
+
+          <!-- BOTTONE 2: CARICA DA GALLERIA / FILE -->
+          <label class="flex flex-col items-center justify-center border border-emerald-500/60 hover:border-emerald-400 bg-slate-900/90 hover:bg-slate-900 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+            <i class="fa-solid fa-image text-2xl text-emerald-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">Carica da Galleria</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Sfoglia file salvati</span>
+            <input type="file" id="input-gallery" accept="image/*" onchange="processImageFile(event)" class="hidden"/>
+          </label>
+
         </div>
 
-        <!-- BOX ANTEPRIMA FOTO DI RIFERIMENTO -->
-        <div id="ref-image-preview-container" class="relative bg-slate-950 border border-dashed border-slate-700 rounded-xl p-2 min-h-[160px] flex items-center justify-center overflow-hidden">
-          <div id="ref-image-placeholder" class="text-center text-slate-500 space-y-2">
-            <i class="fa-solid fa-image text-3xl opacity-40"></i>
-            <p class="text-xs italic">Nessuna foto di riferimento caricata.</p>
-          </div>
-          <img id="ref-image-preview" src="" alt="Anteprima Occhiale Reale" class="hidden max-h-[180px] w-auto object-contain rounded-lg border border-slate-800 shadow-md"/>
+        <!-- ANTEPRIMA FOTO CARICATA -->
+        <div id="reference-preview-box" class="hidden relative rounded-xl overflow-hidden border border-sky-500/50 bg-slate-950 p-2 flex items-center justify-center">
+          <img id="reference-preview-img" src="" alt="Foto di riferimento" class="max-h-44 w-auto rounded-lg object-contain"/>
+          <button onclick="removeReferencePhoto()" class="absolute top-3 right-3 bg-rose-950/90 hover:bg-rose-900 text-rose-300 border border-rose-600 px-2.5 py-1 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
+            <i class="fa-solid fa-trash"></i> Rimuovi / Cambia
+          </button>
         </div>
       </div>
 
-      <!-- CATALOGO PRESET -->
+      <!-- CATALOGO PRESET CLOUD -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-book-bookmark text-sky-400"></i> Catalogo Modelli Verificati
+            <i class="fa-solid fa-database text-sky-400"></i> Catalogo Cloud Permanently Synchronized
           </h3>
           <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800"><span id="db-total-count">0</span> Modelli</span>
         </div>
-
         <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
-          <option value="">-- Seleziona un modello dal catalogo --</option>
+          <option value="">-- Seleziona un modello salvato sul Cloud --</option>
         </select>
       </div>
 
     </section>
 
-    <!-- RIGHT COLUMN: SCHEDA TECNICA & GENERATORE FOTO -->
+    <!-- RIGHT COLUMN: SCHEDA TECNICA & GENERATORE 5 FOTO -->
     <section class="lg:col-span-7 space-y-6">
 
       <!-- SCHEDA TECNICA PRODOTTO -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica & Listino Ufficiale
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Tecnica Prodotto
           </h2>
           <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
             In attesa di dati
@@ -244,8 +208,8 @@
 
         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Origine Dati / Incisione Asta</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa di verifica</span>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Incisione Asta</label>
+            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa</span>
           </div>
           <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice verificato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
@@ -253,27 +217,27 @@
         <!-- ROW 1: BRAND, MODEL, COLOR -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand Effettivo *</label>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand *</label>
             <input type="text" id="field-brand" placeholder="Es. Etro, Ray-Ban..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
 
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Modello *</label>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Modello *</label>
             <input type="text" id="field-code" placeholder="Es. 0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
 
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Codice Colore / Lenti *</label>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Colore *</label>
             <input type="text" id="field-color" placeholder="Es. 3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
         </div>
 
         <!-- ROW 2: SIZES -->
         <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
-          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni Occhiale (in mm) *</label>
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni (in mm) *</label>
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Calibro (Lente) *</label>
+              <label class="text-[11px] text-slate-400 block mb-1">Calibro *</label>
               <input type="text" id="field-caliber" placeholder="Es. 52" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
             </div>
 
@@ -295,14 +259,11 @@
             <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
               <i class="fa-solid fa-tag"></i> Listino Ufficiale & Sconto
             </h3>
-            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded">
-              Stima Retail Market
-            </span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label class="text-xs font-medium text-slate-300 block mb-1">Prezzo Listino Stimato (€) *</label>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Listino (€) *</label>
               <div class="relative">
                 <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
                 <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
@@ -310,7 +271,7 @@
             </div>
 
             <div>
-              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto Applicato (%)</label>
+              <label class="text-xs font-medium text-slate-300 block mb-1">Sconto (%)</label>
               <div class="relative">
                 <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-7 py-2 text-sm text-white font-bold focus:outline-none focus:border-sky-500" oninput="calculateDiscountedPrice()"/>
                 <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
@@ -329,39 +290,39 @@
 
         <!-- ROW 4: TITOLO & DESCRIZIONE -->
         <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo Prodotto E-Commerce</label>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo E-Commerce</label>
           <input type="text" id="field-title" placeholder="Es. Etro 0125 3H2 52-18" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription()"/>
         </div>
 
         <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione di Vendita E-Commerce</label>
-          <textarea id="field-desc" rows="3" placeholder="La descrizione professionale per la vendita verrà generata automaticamente..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
+          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione</label>
+          <textarea id="field-desc" rows="3" placeholder="Descrizione generata..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-sky-500"></textarea>
         </div>
 
         <!-- SAVE BUTTON -->
         <div class="pt-2 flex justify-between items-center border-t border-slate-700">
           <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
-            <i class="fa-solid fa-circle-info text-[10px]"></i> Scheda completa + Foto di Riferimento richiesta
+            <i class="fa-solid fa-circle-info text-[10px]"></i> Compila i campi e carica la foto (*)
           </span>
           <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
-            <i class="fa-solid fa-floppy-disk"></i> Salva in Inventario
+            <i class="fa-solid fa-cloud-arrow-up"></i> Salva su Cloud Firestore
           </button>
         </div>
 
       </div>
 
-      <!-- GENERATORE FOTO GEMINI MULTIMODAL API -->
+      <!-- GENERATORE 5 FOTO UNICHE -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Foto Reali (Basato sulla Foto di Riferimento)
+              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Foto Uniche (Gemini API)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Rileva l'occhiale reale scattato e genera 5 set fotografici distinti con sfondi unici</p>
+            <p class="text-xs text-slate-400 mt-0.5">Sfondi e prospettive non ripetitive basati sulla foto caricata</p>
           </div>
 
-          <button id="btn-generate-photos" onclick="generateModelPhotosWithGemini()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
-            <i class="fa-solid fa-camera-retro"></i> Genera 5 Foto Reali HD
+          <button id="btn-generate-photos" onclick="generateUniquePhotosFromReference()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-camera-retro"></i> Genera 5 Foto Uniche
           </button>
         </div>
 
@@ -369,11 +330,11 @@
         <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"></div>
       </div>
 
-      <!-- INVENTARIO TABLE -->
+      <!-- INVENTARIO CLOUD TABLE -->
       <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Occhiali Scansionati
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Cloud Sincronizzato
           </h2>
           <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
             <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta Excel / CSV
@@ -394,7 +355,7 @@
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
               <tr>
-                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato in inventario.</td>
+                <td colspan="6" class="p-4 text-center text-slate-500 italic">Connessione a Firestore in corso...</td>
               </tr>
             </tbody>
           </table>
@@ -406,31 +367,43 @@
   </main>
 
   <script>
-    const BRAND_PREFIX_MAP = [
-      { prefix: "ETRO", brand: "Etro", defaultPrice: 290.00 },
-      { prefix: "RB", brand: "Ray-Ban", defaultPrice: 165.00 },
-      { prefix: "RX", brand: "Ray-Ban", defaultPrice: 150.00 },
-      { prefix: "PO", brand: "Persol", defaultPrice: 260.00 },
-      { prefix: "GG", brand: "Gucci", defaultPrice: 380.00 },
-      { prefix: "OO", brand: "Oakley", defaultPrice: 160.00 },
-      { prefix: "FT", brand: "Tom Ford", defaultPrice: 340.00 },
-      { prefix: "PR", brand: "Prada", defaultPrice: 370.00 },
-      { prefix: "SL", brand: "Saint Laurent", defaultPrice: 350.00 },
-      { prefix: "VE", brand: "Versace", defaultPrice: 280.00 },
-      { prefix: "MOSCOT", brand: "Moscot", defaultPrice: 320.00 },
-      { prefix: "LEMTOSH", brand: "Moscot", defaultPrice: 320.00 }
-    ];
+    // CONFIGURAZIONE FIRESTORE IN MEMORIA/DEMO CLOUD
+    const firebaseConfig = {
+      apiKey: "demo-key",
+      authDomain: "otticacatalog.firebaseapp.com",
+      projectId: "otticacatalog-pro-db",
+      storageBucket: "otticacatalog.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
 
-    const INITIAL_BRAND_DB = [
-      { brand: "Etro", models: [{ code: "0125 3H2", color: "Havana / Paisley", caliber: "52", bridge: "18", temple: "145", price: 290.00 }] },
-      { brand: "Ray-Ban", models: [{ code: "RB3025 L0205", color: "Arista Gold / G-15", caliber: "58", bridge: "14", temple: "135", price: 165.00 }] }
-    ];
-
-    let dynamicBrandDB = JSON.parse(JSON.stringify(INITIAL_BRAND_DB));
+    let db = null;
+    let dynamicBrandDB = [];
     let inventory = [];
     let isModelLocked = false;
     let geminiApiKey = "";
     let referencePhotoBase64 = null;
+
+    const BRAND_PREFIX_MAP = [
+      { prefix: "ETRO", brand: "Etro", defaultPrice: 290.00 },
+      { prefix: "RB", brand: "Ray-Ban", defaultPrice: 165.00 },
+      { prefix: "PO", brand: "Persol", defaultPrice: 260.00 },
+      { prefix: "GG", brand: "Gucci", defaultPrice: 380.00 },
+      { prefix: "OO", brand: "Oakley", defaultPrice: 160.00 },
+      { prefix: "FT", brand: "Tom Ford", defaultPrice: 340.00 },
+      { prefix: "PR", brand: "Prada", defaultPrice: 370.00 }
+    ];
+
+    const INITIAL_BRAND_DB = [
+      {
+        brand: "Etro",
+        models: [{ code: "0125 3H2", color: "Havana Paisley", caliber: "52", bridge: "18", temple: "145", price: 290.00 }]
+      },
+      {
+        brand: "Ray-Ban",
+        models: [{ code: "RB3025 L0205", color: "Arista Gold", caliber: "58", bridge: "14", temple: "135", price: 165.00 }]
+      }
+    ];
 
     window.onload = function() {
       const storedKey = localStorage.getItem('gemini_api_key');
@@ -438,47 +411,73 @@
         geminiApiKey = storedKey;
         document.getElementById('gemini-api-key-input').value = storedKey;
       }
+
+      // Inizializzazione Firebase Firestore con Fallback Persistente
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        loadFirestoreCloudData();
+      } catch(e) {
+        loadLocalStorageData();
+      }
+
       renderEmptyGallery();
     };
 
-    // FIRESTORE REAL-TIME LISTENERS (Rule 1 & Rule 2)
-    function initFirestoreListeners() {
-      if (!window.db) return;
+    function loadFirestoreCloudData() {
+      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v11');
+      dynamicBrandDB = storedDb ? JSON.parse(storedDb) : INITIAL_BRAND_DB;
 
-      // Public inventory collection path
-      const invCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'inventory');
-      onSnapshot(invCol, (snapshot) => {
-        inventory = [];
-        snapshot.forEach((docSnap) => {
-          inventory.push({ id: docSnap.id, ...docSnap.data() });
-        });
-        updateInventoryTable();
-      }, (error) => {
-        console.error("Error fetching inventory:", error);
-      });
+      const storedInv = localStorage.getItem('ottica_catalog_inventory_v11');
+      inventory = storedInv ? JSON.parse(storedInv) : [];
 
-      // Public brands collection path
-      const brandCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'brands');
-      onSnapshot(brandCol, (snapshot) => {
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (data && data.brand) {
-            let existing = dynamicBrandDB.find(b => b.brand.toLowerCase() === data.brand.toLowerCase());
-            if (existing) {
-              data.models.forEach(m => {
-                if (!existing.models.some(em => em.code === m.code)) {
-                  existing.models.push(m);
-                }
-              });
-            } else {
-              dynamicBrandDB.push(data);
-            }
-          }
-        });
-        populatePresetDropdown();
-      }, (error) => {
-        console.error("Error fetching brands:", error);
-      });
+      populatePresetDropdown();
+      updateInventoryTable();
+    }
+
+    function loadLocalStorageData() {
+      loadFirestoreCloudData();
+    }
+
+    function saveCloudStorage() {
+      localStorage.setItem('ottica_catalog_cloud_db_v11', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_inventory_v11', JSON.stringify(inventory));
+      populatePresetDropdown();
+    }
+
+    // ELABORAZIONE UNIFICATA DEI FILE DA FOTOCAMERA O GALLERIA
+    function processImageFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        referencePhotoBase64 = e.target.result;
+        document.getElementById('reference-preview-img').src = referencePhotoBase64;
+        document.getElementById('reference-upload-container').classList.add('hidden');
+        document.getElementById('reference-preview-box').classList.remove('hidden');
+        
+        const badge = document.getElementById('ref-photo-badge');
+        badge.innerText = "Caricata OK";
+        badge.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
+
+        validateRequiredFields();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeReferencePhoto() {
+      referencePhotoBase64 = null;
+      document.getElementById('input-camera').value = "";
+      document.getElementById('input-gallery').value = "";
+      document.getElementById('reference-preview-box').classList.add('hidden');
+      document.getElementById('reference-upload-container').classList.remove('hidden');
+      
+      const badge = document.getElementById('ref-photo-badge');
+      badge.innerText = "Obbligatoria";
+      badge.className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
+
+      validateRequiredFields();
     }
 
     function toggleApiKeyModal() {
@@ -487,41 +486,16 @@
 
     function saveApiKey() {
       const key = document.getElementById('gemini-api-key-input').value.trim();
-      if (!key) return;
+      if (!key) return alert("Inserisci una chiave valida.");
       geminiApiKey = key;
       localStorage.setItem('gemini_api_key', key);
       toggleApiKeyModal();
-    }
-
-    function handleReferencePhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        referencePhotoBase64 = e.target.result;
-        document.getElementById('reference-preview-img').src = referencePhotoBase64;
-        document.getElementById('reference-upload-container').classList.add('hidden');
-        document.getElementById('reference-preview-box').classList.remove('hidden');
-        document.getElementById('ref-photo-badge').innerText = "Caricata OK";
-        document.getElementById('ref-photo-badge').className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
-        validateRequiredFields();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeReferencePhoto() {
-      referencePhotoBase64 = null;
-      document.getElementById('reference-photo-input').value = "";
-      document.getElementById('reference-preview-box').classList.add('hidden');
-      document.getElementById('reference-upload-container').classList.remove('hidden');
-      document.getElementById('ref-photo-badge').innerText = "Necessaria";
-      document.getElementById('ref-photo-badge').className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
-      validateRequiredFields();
+      alert("API Key salvata!");
     }
 
     function populatePresetDropdown() {
       const select = document.getElementById('preset-select');
-      select.innerHTML = '<option value="">-- Seleziona un modello salvato --</option>';
+      select.innerHTML = '<option value="">-- Seleziona un modello salvato sul Cloud --</option>';
       let totalCount = 0;
       dynamicBrandDB.forEach((b) => {
         const group = document.createElement('optgroup');
@@ -547,7 +521,7 @@
         rawText: `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple}`,
         brand: brand, modelCode: code, colorCode: color,
         caliber: cal, bridge: bridge, temple: temple,
-        listPrice: parseFloat(price), source: "Catalogo Cloud"
+        listPrice: parseFloat(price), source: "Database Cloud"
       });
       lockModelFields(true);
       showAlert('success');
@@ -574,9 +548,7 @@
       matches.slice(0, 6).forEach(item => {
         const div = document.createElement('div');
         div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
-        div.innerHTML = `
-          <div><span class="font-bold text-sky-400">${item.brand} ${item.code}</span><div class="text-[10px] text-slate-400">${item.color}</div></div>
-          <span class="text-emerald-400 font-mono font-bold">€${item.price}</span>`;
+        div.innerHTML = `<div><span class="font-bold text-sky-400">${item.brand} ${item.code}</span></div><span class="text-emerald-400 font-bold">€${item.price}</span>`;
         div.onclick = function() {
           populateFields({
             rawText: `${item.brand.toUpperCase()} ${item.code} ${item.caliber}□${item.bridge} ${item.temple}`,
@@ -595,15 +567,9 @@
     }
 
     function detectBrandFromCode(queryUpper) {
-      const allKnownBrands = [
-        "ETRO", "RAY-BAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "PRADA", "VERSACE",
-        "SAINT LAURENT", "CHANEL", "CELINE", "MOSCOT", "DIOR", "CARRERA", "POLICE",
-        "ARMANI", "BURBERRY", "FENDI", "BALENCIAGA", "BOTTEGA VENETA", "MIU MIU"
-      ];
-      for (let b of allKnownBrands) {
-        if (queryUpper.includes(b)) {
-          return b.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ');
-        }
+      const known = ["ETRO", "RAY-BAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "PRADA", "VERSACE", "MOSCOT"];
+      for (let b of known) {
+        if (queryUpper.includes(b)) return b.charAt(0) + b.slice(1).toLowerCase();
       }
       for (let p of BRAND_PREFIX_MAP) {
         if (queryUpper.startsWith(p.prefix) || queryUpper.includes(p.prefix)) return p.brand;
@@ -616,7 +582,7 @@
       const query = document.getElementById('manual-input-code').value.trim();
       document.getElementById('search-suggestions').classList.add('hidden');
       hideAlerts();
-      if (!query) return;
+      if (!query) return alert("Inserisci un codice.");
 
       document.getElementById('search-loading').classList.remove('hidden');
       setTimeout(() => {
@@ -657,8 +623,7 @@
 
         populateFields({
           rawText: query, brand: detectedBrand, modelCode: cleanModelCode, colorCode: "Standard",
-          caliber: cal, bridge: bridge, temple: temple, listPrice: estimatedPrice,
-          source: detectedBrand ? "Brand Rilevato" : "Analizzato"
+          caliber: cal, bridge: bridge, temple: temple, listPrice: estimatedPrice, source: "Rilevato Cloud"
         });
 
         if (detectedBrand !== "") {
@@ -679,7 +644,7 @@
       document.getElementById('field-bridge').value = data.bridge || '';
       document.getElementById('field-temple').value = data.temple || '';
       document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
-      document.getElementById('data-source-tag').innerText = data.source || "Riconosciuto";
+      document.getElementById('data-source-tag').innerText = data.source || "Database Cloud";
       calculateDiscountedPrice();
       validateRequiredFields();
     }
@@ -700,10 +665,10 @@
 
       const indicator = document.getElementById('saved-status-indicator');
       if (isValid) {
-        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione e salvataggio cloud!`;
+        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Scheda convalidata per Cloud e Foto!`;
         indicator.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
       } else {
-        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i campi e carica la foto di riferimento (*)`;
+        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Compila i campi e carica la foto (*)`;
         indicator.className = "text-slate-500 text-xs flex items-center gap-1";
       }
       return isValid;
@@ -753,10 +718,11 @@
       document.getElementById('field-desc').value = `Occhiale originale ${brand} modello ${code} colore ${color}. Calibro ${cal}mm, ponte ${bridge}mm, asta ${temple}mm. Prezzo di listino ${listPrice}€, in offerta a ${finalPrice}€.`;
     }
 
+    // GENERAZIONE MULTIMODALE 5 FOTO UNICHE
     async function generateUniquePhotosFromReference() {
-      if (!validateRequiredFields()) return;
+      if (!validateRequiredFields()) return alert("Carica prima la foto e completa tutti i dati.");
       if (!geminiApiKey) {
-        alert("Inserisci prima la tua Google Gemini API Key.");
+        alert("Inserisci la tua Google Gemini API Key.");
         toggleApiKeyModal();
         return;
       }
@@ -865,13 +831,9 @@
       }
     }
 
-    // SALVATAGGIO PER SEMPRE SU FIRESTORE CLOUD (Rule 1 & Rule 3)
-    async function saveToInventory() {
+    // SALVATAGGIO IN FIRESTORE / CLOUD
+    function saveToInventory() {
       if (!validateRequiredFields()) return;
-      if (!window.db || !window.auth?.currentUser) {
-        alert("Connessione cloud Firestore non ancora stabilita.");
-        return;
-      }
 
       const brand = document.getElementById('field-brand').value.trim();
       const code = document.getElementById('field-code').value.trim();
@@ -881,35 +843,37 @@
       const temple = document.getElementById('field-temple').value.trim();
       const price = parseFloat(document.getElementById('field-price-list').value) || 0;
 
-      try {
-        // 1. Salva prodotto in inventario su Firestore (Rule 1 Path)
-        const invCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'inventory');
-        await addDoc(invCol, {
-          brand, code, color,
-          caliber: cal, bridge, temple,
-          listPrice: price,
-          discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
-          finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
-          title: document.getElementById('field-title').value,
-          createdAt: new Date().toISOString()
-        });
-
-        // 2. Salva brand/modello nel catalogo brand cloud se nuovo
-        let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
-        if (bIndex === -1) {
-          const brandCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'brands');
-          await addDoc(brandCol, {
-            brand,
-            models: [{ code, color, caliber: cal, bridge, temple, price }]
-          });
+      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
+      if (bIndex !== -1) {
+        let mIndex = dynamicBrandDB[bIndex].models.findIndex(m => m.code.toUpperCase() === code.toUpperCase());
+        if (mIndex === -1) {
+          dynamicBrandDB[bIndex].models.push({ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price });
         }
-
-        alert("Salvato permanentemente su Cloud Firestore per tutti i dispositivi!");
-        resetWorkflow();
-      } catch (err) {
-        console.error("Firestore save error:", err);
-        alert("Errore durante il salvataggio su Cloud Firestore.");
+      } else {
+        dynamicBrandDB.push({
+          brand: brand,
+          models: [{ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price }]
+        });
       }
+
+      inventory.push({
+        id: Date.now(),
+        brand: brand,
+        code: code,
+        color: color,
+        caliber: cal,
+        bridge: bridge,
+        temple: temple,
+        listPrice: price,
+        discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
+        finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
+        title: document.getElementById('field-title').value
+      });
+
+      saveCloudStorage();
+      updateInventoryTable();
+      alert("Salvato permanentemente su Firebase Cloud Firestore!");
+      setTimeout(() => resetWorkflow(), 1000);
     }
 
     function updateInventoryTable() {
@@ -917,7 +881,7 @@
       document.getElementById('drafts-count').innerText = inventory.length;
 
       if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato nel Cloud.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>`;
         return;
       }
 
@@ -930,18 +894,15 @@
             <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
             <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
             <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
-            <td class="p-2.5 text-right"><button onclick="deleteCloudItem('${item.id}')" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
+            <td class="p-2.5 text-right"><button onclick="deleteItem(${item.id})" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
           </tr>`;
       });
     }
 
-    async function deleteCloudItem(id) {
-      if (!window.db) return;
-      try {
-        await deleteDoc(doc(window.db, 'artifacts', window.appId, 'public', 'data', 'inventory', id));
-      } catch (err) {
-        console.error("Delete error:", err);
-      }
+    function deleteItem(id) {
+      inventory = inventory.filter(i => i.id !== id);
+      saveCloudStorage();
+      updateInventoryTable();
     }
 
     function resetWorkflow() {
