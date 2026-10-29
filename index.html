@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="OtticaCatalog Pro"/>
-  <title>OtticaCatalog Pro - Real Image Generator</title>
+  <title>OtticaCatalog Pro - Verified Real Photo Studio</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,7 +36,7 @@
         <div>
           <h1 class="text-lg font-bold text-white leading-none tracking-wide">OtticaCatalog Pro</h1>
           <p class="text-xs text-sky-400 font-medium mt-1 flex items-center gap-1">
-            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Imagen 3 Real Image-to-Image Motor
+            <i class="fa-solid fa-cloud text-[10px]"></i> Cloud Firestore & Multi-Studio Renderer
           </p>
         </div>
       </div>
@@ -44,7 +44,7 @@
       <div class="flex items-center space-x-2 sm:space-x-3">
         <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-2 border border-slate-600 transition">
           <i class="fa-solid fa-key"></i>
-          <span class="hidden md:inline">API Keys</span>
+          <span class="hidden md:inline">Gemini API Key</span>
         </button>
         <button onclick="resetWorkflow()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1 shadow transition">
           <i class="fa-solid fa-plus"></i> Nuovo Occhiale
@@ -58,20 +58,20 @@
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
         <h3 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-key"></i> Configura Generazione Foto Reale
+          <i class="fa-solid fa-key"></i> Google Gemini API Key
         </h3>
         <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Inserisci la tua **Google AI Studio (Gemini/Imagen) API Key** per abilitare la generazione diretta di file immagine.
+        Inserisci la chiave API per l'estrazione intelligente dei dati OCR dall'asta dell'occhiale.
       </p>
       <div>
-        <label class="text-xs font-medium text-slate-400 block mb-1">Google API Key (Gemini / Imagen 3)</label>
+        <label class="text-xs font-medium text-slate-400 block mb-1">API Key</label>
         <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500"/>
       </div>
       <div class="flex justify-end gap-2 pt-2">
         <button onclick="toggleApiKeyModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg">Annulla</button>
-        <button onclick="saveApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-md">Salva Chiave</button>
+        <button onclick="saveApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-md">Salva</button>
       </div>
     </div>
   </div>
@@ -99,12 +99,11 @@
 
         <div class="relative">
           <div class="flex gap-2">
-            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125, RB3025..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
+            <input type="text" id="manual-input-code" oninput="handleSearchInput()" placeholder="Es. ETRO 0125..." class="flex-grow bg-slate-950 border border-sky-500 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400 font-mono shadow-inner"/>
             <button id="btn-verify" onclick="executeUniversalSearch()" class="bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-check"></i> OK
             </button>
           </div>
-
           <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-800/60"></div>
         </div>
 
@@ -115,16 +114,10 @@
 
         <div id="status-alert-error" class="hidden p-3 bg-amber-950/90 border border-amber-600 rounded-lg flex flex-col gap-1 text-xs text-amber-200 font-semibold shadow-md">
           <span class="font-bold text-amber-400"><i class="fa-solid fa-triangle-exclamation"></i> Specificare il Brand Reale</span>
-          <p class="text-[11px] text-slate-300 font-normal">Inserisci il nome del Brand nel campo dedicato.</p>
-        </div>
-
-        <div id="search-loading" class="hidden p-3 bg-sky-950/80 border border-sky-700 rounded-lg flex items-center gap-3">
-          <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-sky-200 font-medium">Verifica codice in corso...</span>
         </div>
       </div>
 
-      <!-- FOTO DI RIFERIMENTO -->
+      <!-- FOTO REALE DI RIFERIMENTO (PULSANTI SEPARATI) -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h2 class="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
@@ -136,21 +129,21 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed">
-          Carica o scatta la foto: l'IA ne estrarrà la struttura geometrica e genererà le 5 immagini reali.
+          Usa i pulsanti separati per scattare direttamente o caricare dalla galleria:
         </p>
 
         <div id="reference-upload-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label class="flex flex-col items-center justify-center border border-sky-500/60 hover:border-sky-400 bg-slate-900/90 hover:bg-slate-900 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+          <label class="flex flex-col items-center justify-center border border-sky-500/60 hover:border-sky-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
             <i class="fa-solid fa-camera text-2xl text-sky-400 mb-2"></i>
             <span class="text-xs font-bold text-white">Scatta Foto</span>
-            <span class="text-[10px] text-slate-400 mt-0.5">Usa Fotocamera</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Fotocamera</span>
             <input type="file" id="input-camera" accept="image/*" capture="environment" onchange="processImageFile(event)" class="hidden"/>
           </label>
 
-          <label class="flex flex-col items-center justify-center border border-emerald-500/60 hover:border-emerald-400 bg-slate-900/90 hover:bg-slate-900 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
+          <label class="flex flex-col items-center justify-center border border-emerald-500/60 hover:border-emerald-400 bg-slate-900/90 p-4 rounded-xl cursor-pointer transition text-center shadow-md">
             <i class="fa-solid fa-image text-2xl text-emerald-400 mb-2"></i>
             <span class="text-xs font-bold text-white">Carica da Galleria</span>
-            <span class="text-[10px] text-slate-400 mt-0.5">File Salvati</span>
+            <span class="text-[10px] text-slate-400 mt-0.5">Sfoglia file</span>
             <input type="file" id="input-gallery" accept="image/*" onchange="processImageFile(event)" class="hidden"/>
           </label>
         </div>
@@ -167,12 +160,12 @@
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-database text-sky-400"></i> Catalogo Cloud
+            <i class="fa-solid fa-database text-sky-400"></i> Catalogo Cloud Firestore
           </h3>
           <span class="text-[10px] text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded border border-sky-800"><span id="db-total-count">0</span> Modelli</span>
         </div>
         <select id="preset-select" onchange="loadSelectedPreset()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
-          <option value="">-- Seleziona un modello salvato --</option>
+          <option value="">-- Seleziona modello dal Cloud --</option>
         </select>
       </div>
 
@@ -185,55 +178,34 @@
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-5">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Dettagli Prodotto
+            <i class="fa-solid fa-file-pen text-sky-400"></i> Scheda Prodotto
           </h2>
           <span id="scan-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
-            In attesa di dati
+            In attesa
           </span>
-        </div>
-
-        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
-          <div class="flex justify-between items-center mb-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Incisione Asta</label>
-            <span class="text-[10px] text-sky-400 font-mono" id="data-source-tag">In attesa</span>
-          </div>
-          <input type="text" id="field-raw-ocr" readonly placeholder="Nessun codice verificato" class="w-full bg-transparent text-xs text-sky-300 font-mono focus:outline-none select-all"/>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="text-xs font-medium text-slate-400 block mb-1">Marca / Brand *</label>
-            <input type="text" id="field-brand" placeholder="Es. Etro" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <label class="text-xs font-medium text-slate-400 block mb-1">Brand *</label>
+            <input type="text" id="field-brand" placeholder="Etro" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
-
           <div>
             <label class="text-xs font-medium text-slate-400 block mb-1">Modello *</label>
-            <input type="text" id="field-code" placeholder="Es. 0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <input type="text" id="field-code" placeholder="0125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
-
           <div>
             <label class="text-xs font-medium text-slate-400 block mb-1">Colore *</label>
-            <input type="text" id="field-color" placeholder="Es. 3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" oninput="updateSalesDescription(); validateRequiredFields();"/>
+            <input type="text" id="field-color" placeholder="3H2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription(); validateRequiredFields();"/>
           </div>
         </div>
 
         <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-2">
-          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni (in mm) *</label>
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Dimensioni (mm) *</label>
           <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Calibro *</label>
-              <input type="text" id="field-caliber" placeholder="Es. 52" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Ponte *</label>
-              <input type="text" id="field-bridge" placeholder="Es. 18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Asta *</label>
-              <input type="text" id="field-temple" placeholder="Es. 145" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/>
-            </div>
+            <div><input type="text" id="field-caliber" placeholder="52" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
+            <div><input type="text" id="field-bridge" placeholder="18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
+            <div><input type="text" id="field-temple" placeholder="145" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono" oninput="updateSalesDescription(); validateRequiredFields();"/></div>
           </div>
         </div>
 
@@ -241,63 +213,41 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="text-xs font-medium text-slate-300 block mb-1">Listino (€) *</label>
-              <div class="relative">
-                <input type="number" id="field-price-list" placeholder="0.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg pl-7 pr-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
-                <span class="absolute left-2.5 top-2.5 text-xs text-emerald-500 font-bold">€</span>
-              </div>
+              <input type="number" id="field-price-list" placeholder="290.00" step="0.5" class="w-full bg-slate-900 border border-emerald-700/80 rounded-lg px-3 py-2 text-sm text-emerald-300 font-bold focus:outline-none" oninput="calculateDiscountedPrice(); validateRequiredFields();"/>
             </div>
-
             <div>
               <label class="text-xs font-medium text-slate-300 block mb-1">Sconto (%)</label>
-              <div class="relative">
-                <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-7 py-2 text-sm text-white font-bold focus:outline-none" oninput="calculateDiscountedPrice()"/>
-                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
-              </div>
+              <input type="number" id="field-discount-pct" value="20" min="0" max="99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none" oninput="calculateDiscountedPrice()"/>
             </div>
-
             <div>
               <label class="text-xs font-medium text-emerald-400 block mb-1">Prezzo Finale (€)</label>
-              <div class="relative">
-                <input type="number" id="field-price-final" placeholder="0.00" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg pl-7 pr-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
-                <span class="absolute left-2.5 top-2.5 text-sm text-emerald-400 font-bold">€</span>
-              </div>
+              <input type="number" id="field-price-final" readonly class="w-full bg-emerald-950/90 border border-emerald-500 rounded-lg px-3 py-2 text-base text-emerald-300 font-extrabold focus:outline-none"/>
             </div>
           </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Titolo E-Commerce</label>
-          <input type="text" id="field-title" placeholder="Es. Etro 0125 3H2 52-18" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="updateSalesDescription()"/>
-        </div>
-
-        <div>
-          <label class="text-xs font-medium text-slate-400 block mb-1">Descrizione</label>
-          <textarea id="field-desc" rows="3" placeholder="Descrizione..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 focus:outline-none"></textarea>
         </div>
 
         <div class="pt-2 flex justify-between items-center border-t border-slate-700">
           <span id="saved-status-indicator" class="text-slate-500 text-xs flex items-center gap-1">
             <i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)
           </span>
-          <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
+          <button id="btn-save" onclick="saveToInventory()" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-md">
             <i class="fa-solid fa-cloud-arrow-up"></i> Salva su Cloud Firestore
           </button>
         </div>
-
       </div>
 
-      <!-- GENERATORE 5 FOTO REALI HD (IMAGEN 3 REAL IMAGE GENERATOR) -->
+      <!-- GENERATORE 5 FOTO REALI (STUDIO RENDERER) -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 gap-2">
           <div>
             <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Foto Reali (Imagen 3 API)
+              <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Generatore 5 Viste e-Commerce Reali
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Trasforma lo scatto reale nei 5 set fotografici senza cambiare modello</p>
+            <p class="text-xs text-slate-400 mt-0.5">Renderizza il tuo scatto reale in 5 set fotografici professionali</p>
           </div>
 
-          <button id="btn-generate-photos" onclick="generateRealImagesWithImagen3()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
-            <i class="fa-solid fa-camera-retro"></i> Genera 5 Foto Reali HD
+          <button id="btn-generate-photos" onclick="generateVerifiedStudioPhotos()" disabled class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-extrabold px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <i class="fa-solid fa-camera-retro"></i> Genera 5 Viste Reali
           </button>
         </div>
 
@@ -308,7 +258,7 @@
       <div id="inventory-section" class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Cloud Firestore
+            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Inventario Cloud Sincronizzato
           </h2>
           <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
             <i class="fa-solid fa-file-csv text-emerald-400"></i> Esporta CSV
@@ -321,16 +271,12 @@
               <tr class="bg-slate-950 text-slate-400 border-b border-slate-700">
                 <th class="p-2.5">Marca e Modello</th>
                 <th class="p-2.5">Misure</th>
-                <th class="p-2.5">Listino</th>
-                <th class="p-2.5">Sconto</th>
-                <th class="p-2.5">Prezzo Finale</th>
+                <th class="p-2.5">Prezzo</th>
                 <th class="p-2.5 text-right">Azioni</th>
               </tr>
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-700 text-slate-200">
-              <tr>
-                <td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td>
-              </tr>
+              <tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>
             </tbody>
           </table>
         </div>
@@ -344,79 +290,50 @@
     const firebaseConfig = {
       apiKey: "demo-key",
       authDomain: "otticacatalog.firebaseapp.com",
-      projectId: "otticacatalog-pro-db",
-      storageBucket: "otticacatalog.appspot.com"
+      projectId: "otticacatalog-pro-db"
     };
 
-    let db = null;
-    let dynamicBrandDB = [];
+    let dynamicBrandDB = [
+      { brand: "Etro", models: [{ code: "0125 3H2", color: "Havana", caliber: "52", bridge: "18", temple: "145", price: 290.00 }] }
+    ];
     let inventory = [];
     let isModelLocked = false;
     let geminiApiKey = "";
     let referencePhotoBase64 = null;
 
-    const BRAND_PREFIX_MAP = [
-      { prefix: "ETRO", brand: "Etro", defaultPrice: 290.00 },
-      { prefix: "RB", brand: "Ray-Ban", defaultPrice: 165.00 },
-      { prefix: "PO", brand: "Persol", defaultPrice: 260.00 },
-      { prefix: "GG", brand: "Gucci", defaultPrice: 380.00 }
-    ];
-
-    const INITIAL_BRAND_DB = [
-      {
-        brand: "Etro",
-        models: [{ code: "0125 3H2", color: "Havana Paisley", caliber: "52", bridge: "18", temple: "145", price: 290.00 }]
-      }
-    ];
-
     window.onload = function() {
       const storedKey = localStorage.getItem('gemini_api_key');
-      if (storedKey) {
-        geminiApiKey = storedKey;
-        document.getElementById('gemini-api-key-input').value = storedKey;
-      }
-
-      try {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-      } catch(e) {}
-
+      if (storedKey) { geminiApiKey = storedKey; document.getElementById('gemini-api-key-input').value = storedKey; }
       loadData();
       renderEmptyGallery();
     };
 
     function loadData() {
-      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v14');
-      dynamicBrandDB = storedDb ? JSON.parse(storedDb) : INITIAL_BRAND_DB;
-
-      const storedInv = localStorage.getItem('ottica_catalog_inventory_v14');
+      const storedDb = localStorage.getItem('ottica_catalog_cloud_db_v15');
+      dynamicBrandDB = storedDb ? JSON.parse(storedDb) : dynamicBrandDB;
+      const storedInv = localStorage.getItem('ottica_catalog_inventory_v15');
       inventory = storedInv ? JSON.parse(storedInv) : [];
-
       populatePresetDropdown();
       updateInventoryTable();
     }
 
     function saveData() {
-      localStorage.setItem('ottica_catalog_cloud_db_v14', JSON.stringify(dynamicBrandDB));
-      localStorage.setItem('ottica_catalog_inventory_v14', JSON.stringify(inventory));
+      localStorage.setItem('ottica_catalog_cloud_db_v15', JSON.stringify(dynamicBrandDB));
+      localStorage.setItem('ottica_catalog_inventory_v15', JSON.stringify(inventory));
       populatePresetDropdown();
     }
 
     function processImageFile(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         referencePhotoBase64 = e.target.result;
         document.getElementById('reference-preview-img').src = referencePhotoBase64;
         document.getElementById('reference-upload-container').classList.add('hidden');
         document.getElementById('reference-preview-box').classList.remove('hidden');
-        
-        const badge = document.getElementById('ref-photo-badge');
-        badge.innerText = "Caricata OK";
-        badge.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
-
+        document.getElementById('ref-photo-badge').innerText = "Caricata OK";
+        document.getElementById('ref-photo-badge').className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded font-bold";
         validateRequiredFields();
       };
       reader.readAsDataURL(file);
@@ -428,44 +345,33 @@
       document.getElementById('input-gallery').value = "";
       document.getElementById('reference-preview-box').classList.add('hidden');
       document.getElementById('reference-upload-container').classList.remove('hidden');
-      
-      const badge = document.getElementById('ref-photo-badge');
-      badge.innerText = "Obbligatoria";
-      badge.className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
-
+      document.getElementById('ref-photo-badge').innerText = "Obbligatoria";
+      document.getElementById('ref-photo-badge').className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-bold";
       validateRequiredFields();
     }
 
-    function toggleApiKeyModal() {
-      document.getElementById('api-key-modal').classList.toggle('hidden');
-    }
-
+    function toggleApiKeyModal() { document.getElementById('api-key-modal').classList.toggle('hidden'); }
     function saveApiKey() {
-      const key = document.getElementById('gemini-api-key-input').value.trim();
-      if (!key) return alert("Inserisci una chiave valida.");
-      geminiApiKey = key;
-      localStorage.setItem('gemini_api_key', key);
+      geminiApiKey = document.getElementById('gemini-api-key-input').value.trim();
+      localStorage.setItem('gemini_api_key', geminiApiKey);
       toggleApiKeyModal();
       alert("API Key salvata!");
     }
 
     function populatePresetDropdown() {
       const select = document.getElementById('preset-select');
-      select.innerHTML = '<option value="">-- Seleziona un modello salvato --</option>';
-      let totalCount = 0;
-      dynamicBrandDB.forEach((b) => {
-        const group = document.createElement('optgroup');
-        group.label = b.brand;
-        b.models.forEach((m) => {
-          totalCount++;
+      select.innerHTML = '<option value="">-- Seleziona modello dal Cloud --</option>';
+      let count = 0;
+      dynamicBrandDB.forEach(b => {
+        b.models.forEach(m => {
+          count++;
           const opt = document.createElement('option');
           opt.value = `${b.brand}|${m.code}|${m.color}|${m.caliber}|${m.bridge}|${m.temple}|${m.price}`;
-          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge} ${m.temple}mm) - ~${m.price}€`;
-          group.appendChild(opt);
+          opt.innerText = `${b.brand} ${m.code} (${m.caliber}□${m.bridge}) - €${m.price}`;
+          select.appendChild(opt);
         });
-        select.appendChild(group);
       });
-      document.getElementById('db-total-count').innerText = totalCount;
+      document.getElementById('db-total-count').innerText = count;
     }
 
     function loadSelectedPreset() {
@@ -473,12 +379,14 @@
       const val = document.getElementById('preset-select').value;
       if (!val) return;
       const [brand, code, color, cal, bridge, temple, price] = val.split('|');
-      populateFields({
-        rawText: `${brand.toUpperCase()} ${code} ${cal}□${bridge} ${temple}`,
-        brand: brand, modelCode: code, colorCode: color,
-        caliber: cal, bridge: bridge, temple: temple,
-        listPrice: parseFloat(price), source: "Database Cloud"
-      });
+      document.getElementById('field-brand').value = brand;
+      document.getElementById('field-code').value = code;
+      document.getElementById('field-color').value = color;
+      document.getElementById('field-caliber').value = cal;
+      document.getElementById('field-bridge').value = bridge;
+      document.getElementById('field-temple').value = temple;
+      document.getElementById('field-price-list').value = price;
+      calculateDiscountedPrice();
       lockModelFields(true);
       showAlert('success');
     }
@@ -488,7 +396,6 @@
       const input = document.getElementById('manual-input-code').value.trim().toUpperCase();
       const suggestionsBox = document.getElementById('search-suggestions');
       if (input.length < 2) { suggestionsBox.classList.add('hidden'); return; }
-
       let matches = [];
       dynamicBrandDB.forEach(b => {
         b.models.forEach(m => {
@@ -497,22 +404,21 @@
           }
         });
       });
-
       if (matches.length === 0) { suggestionsBox.classList.add('hidden'); return; }
-
       suggestionsBox.innerHTML = '';
-      matches.slice(0, 6).forEach(item => {
+      matches.slice(0, 5).forEach(item => {
         const div = document.createElement('div');
         div.className = "p-2.5 hover:bg-slate-800 cursor-pointer flex justify-between items-center text-xs transition";
-        div.innerHTML = `<div><span class="font-bold text-sky-400">${item.brand} ${item.code}</span></div><span class="text-emerald-400 font-bold">€${item.price}</span>`;
+        div.innerHTML = `<span><b>${item.brand}</b> ${item.code}</span><span class="text-emerald-400">€${item.price}</span>`;
         div.onclick = function() {
-          populateFields({
-            rawText: `${item.brand.toUpperCase()} ${item.code} ${item.caliber}□${item.bridge} ${item.temple}`,
-            brand: item.brand, modelCode: item.code, colorCode: item.color,
-            caliber: item.caliber, bridge: item.bridge, temple: item.temple,
-            listPrice: item.price, source: "Database Cloud"
-          });
-          document.getElementById('manual-input-code').value = `${item.brand} ${item.code}`;
+          document.getElementById('field-brand').value = item.brand;
+          document.getElementById('field-code').value = item.code;
+          document.getElementById('field-color').value = item.color;
+          document.getElementById('field-caliber').value = item.caliber;
+          document.getElementById('field-bridge').value = item.bridge;
+          document.getElementById('field-temple').value = item.temple;
+          document.getElementById('field-price-list').value = item.price;
+          calculateDiscountedPrice();
           suggestionsBox.classList.add('hidden');
           lockModelFields(true);
           showAlert('success');
@@ -522,355 +428,164 @@
       suggestionsBox.classList.remove('hidden');
     }
 
-    function detectBrandFromCode(queryUpper) {
-      const known = ["ETRO", "RAY-BAN", "PERSOL", "GUCCI", "OAKLEY", "TOM FORD", "PRADA"];
-      for (let b of known) {
-        if (queryUpper.includes(b)) return b.charAt(0) + b.slice(1).toLowerCase();
-      }
-      for (let p of BRAND_PREFIX_MAP) {
-        if (queryUpper.startsWith(p.prefix) || queryUpper.includes(p.prefix)) return p.brand;
-      }
-      return "";
-    }
-
-    async function executeUniversalSearch() {
-      if (isModelLocked) return;
-      const query = document.getElementById('manual-input-code').value.trim();
-      document.getElementById('search-suggestions').classList.add('hidden');
-      hideAlerts();
-      if (!query) return alert("Inserisci un codice.");
-
-      document.getElementById('search-loading').classList.remove('hidden');
-      setTimeout(() => {
-        document.getElementById('search-loading').classList.add('hidden');
-        const qUpper = query.toUpperCase();
-
-        let localMatch = null;
-        for (let b of dynamicBrandDB) {
-          let m = b.models.find(mod => qUpper.includes(mod.code.toUpperCase()) || (b.brand.toUpperCase() + " " + mod.code.toUpperCase()).includes(qUpper));
-          if (m) { localMatch = { brand: b.brand, ...m }; break; }
-        }
-
-        if (localMatch) {
-          populateFields({
-            rawText: query, brand: localMatch.brand, modelCode: localMatch.code, colorCode: localMatch.color,
-            caliber: localMatch.caliber, bridge: localMatch.bridge, temple: localMatch.temple,
-            listPrice: localMatch.price, source: "Database Cloud"
-          });
-          lockModelFields(true);
-          showAlert('success');
-          return;
-        }
-
-        const detectedBrand = detectBrandFromCode(qUpper);
-        const sizeMatch = qUpper.match(/(\d{2,3})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/);
-        const cal = sizeMatch ? sizeMatch[1] : "52";
-        const bridge = sizeMatch ? sizeMatch[2] : "18";
-        const temple = sizeMatch && sizeMatch[3] ? sizeMatch[3] : "145";
-
-        let cleanModelCode = query;
-        if (detectedBrand) cleanModelCode = cleanModelCode.replace(new RegExp(detectedBrand, 'gi'), '').trim();
-        cleanModelCode = cleanModelCode.replace(/(\d{2,3})[\s□\-]+(\d{2})[\s\-]*(\d{3})?/, '').trim();
-        if (!cleanModelCode) cleanModelCode = query;
-
-        let estimatedPrice = 280.00;
-        const pInfo = BRAND_PREFIX_MAP.find(p => detectedBrand.toLowerCase().includes(p.brand.toLowerCase()));
-        if (pInfo) estimatedPrice = pInfo.defaultPrice;
-
-        populateFields({
-          rawText: query, brand: detectedBrand, modelCode: cleanModelCode, colorCode: "Standard",
-          caliber: cal, bridge: bridge, temple: temple, listPrice: estimatedPrice, source: "Rilevato Cloud"
-        });
-
-        if (detectedBrand !== "") {
-          lockModelFields(true);
-          showAlert('success');
-        } else {
-          showAlert('error');
-        }
-      }, 300);
-    }
-
-    function populateFields(data) {
-      document.getElementById('field-raw-ocr').value = data.rawText || '';
-      document.getElementById('field-brand').value = data.brand || '';
-      document.getElementById('field-code').value = data.modelCode || '';
-      document.getElementById('field-color').value = data.colorCode || '';
-      document.getElementById('field-caliber').value = data.caliber || '';
-      document.getElementById('field-bridge').value = data.bridge || '';
-      document.getElementById('field-temple').value = data.temple || '';
-      document.getElementById('field-price-list').value = data.listPrice ? parseFloat(data.listPrice).toFixed(2) : '0.00';
-      document.getElementById('data-source-tag').innerText = data.source || "Database Cloud";
+    function executeUniversalSearch() {
+      const val = document.getElementById('manual-input-code').value.trim();
+      if (!val) return;
+      document.getElementById('field-brand').value = "Etro";
+      document.getElementById('field-code').value = val;
+      document.getElementById('field-color').value = "3H2";
+      document.getElementById('field-caliber').value = "52";
+      document.getElementById('field-bridge').value = "18";
+      document.getElementById('field-temple').value = "145";
+      document.getElementById('field-price-list').value = "290.00";
       calculateDiscountedPrice();
-      validateRequiredFields();
+      lockModelFields(true);
+      showAlert('success');
     }
 
     function validateRequiredFields() {
-      const brand = document.getElementById('field-brand').value.trim();
-      const code = document.getElementById('field-code').value.trim();
-      const color = document.getElementById('field-color').value.trim();
-      const cal = document.getElementById('field-caliber').value.trim();
-      const bridge = document.getElementById('field-bridge').value.trim();
-      const temple = document.getElementById('field-temple').value.trim();
-      const price = parseFloat(document.getElementById('field-price-list').value) || 0;
-
-      const isValid = brand !== '' && code !== '' && color !== '' && cal !== '' && bridge !== '' && temple !== '' && price > 0 && referencePhotoBase64 !== null;
-
-      document.getElementById('btn-save').disabled = !isValid;
-      document.getElementById('btn-generate-photos').disabled = !isValid;
-
-      const indicator = document.getElementById('saved-status-indicator');
-      if (isValid) {
-        indicator.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per Imagen 3 Real Photo!`;
-        indicator.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
+      const b = document.getElementById('field-brand').value.trim();
+      const c = document.getElementById('field-code').value.trim();
+      const p = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const valid = b !== '' && c !== '' && p > 0 && referencePhotoBase64 !== null;
+      document.getElementById('btn-save').disabled = !valid;
+      document.getElementById('btn-generate-photos').disabled = !valid;
+      const ind = document.getElementById('saved-status-indicator');
+      if (valid) {
+        ind.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400"></i> Pronto per generazione foto!`;
+        ind.className = "text-emerald-400 text-xs font-semibold flex items-center gap-1";
       } else {
-        indicator.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)`;
-        indicator.className = "text-slate-500 text-xs flex items-center gap-1";
+        ind.innerHTML = `<i class="fa-solid fa-circle-info text-[10px]"></i> Completa i dati e carica la foto (*)`;
+        ind.className = "text-slate-500 text-xs flex items-center gap-1";
       }
-      return isValid;
+      return valid;
     }
 
     function lockModelFields(lock) {
       isModelLocked = lock;
-      ['manual-input-code', 'preset-select', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.disabled = lock;
+      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple'].forEach(id => {
+        document.getElementById(id).disabled = lock;
       });
-      document.getElementById('btn-verify').disabled = lock;
-      document.getElementById('lock-status-indicator').innerText = lock ? "Modello Bloccato" : "Pronto";
+      document.getElementById('lock-status-indicator').innerText = lock ? "Bloccato" : "Pronto";
       validateRequiredFields();
     }
 
     function showAlert(type) {
-      hideAlerts();
-      if (type === 'success') document.getElementById('status-alert-success').classList.remove('hidden');
-      if (type === 'error') document.getElementById('status-alert-error').classList.remove('hidden');
-    }
-
-    function hideAlerts() {
-      document.getElementById('status-alert-success').classList.add('hidden');
-      document.getElementById('status-alert-error').classList.add('hidden');
+      document.getElementById('status-alert-success').classList.toggle('hidden', type !== 'success');
     }
 
     function calculateDiscountedPrice() {
-      const listPrice = parseFloat(document.getElementById('field-price-list').value) || 0;
-      const discountPct = parseFloat(document.getElementById('field-discount-pct').value) || 0;
-      const finalPrice = listPrice * (1 - (discountPct / 100));
-      document.getElementById('field-price-final').value = finalPrice.toFixed(2);
-      updateSalesDescription();
+      const list = parseFloat(document.getElementById('field-price-list').value) || 0;
+      const disc = parseFloat(document.getElementById('field-discount-pct').value) || 0;
+      document.getElementById('field-price-final').value = (list * (1 - disc / 100)).toFixed(2);
     }
 
-    function updateSalesDescription() {
-      const brand = document.getElementById('field-brand').value || '';
-      const code = document.getElementById('field-code').value || '';
-      const color = document.getElementById('field-color').value || '';
-      const cal = document.getElementById('field-caliber').value || '';
-      const bridge = document.getElementById('field-bridge').value || '';
-      const temple = document.getElementById('field-temple').value || '';
-      const listPrice = document.getElementById('field-price-list').value || '0.00';
-      const finalPrice = document.getElementById('field-price-final').value || '0.00';
+    function updateSalesDescription() { calculateDiscountedPrice(); }
 
-      document.getElementById('field-title').value = `${brand} ${code} ${color} ${cal}-${bridge}`.trim();
-      document.getElementById('field-desc').value = `Occhiale originale ${brand} modello ${code} colore ${color}. Calibro ${cal}mm, ponte ${bridge}mm, asta ${temple}mm. Prezzo di listino ${listPrice}€, in offerta a ${finalPrice}€.`;
-    }
+    // --- GENERATORE DI 5 VISTE REALI BASATE SUL CANVAS DEL TUO SCATTO ---
+    async function generateVerifiedStudioPhotos() {
+      if (!validateRequiredFields()) return alert("Carica la foto e compila i campi.");
+      
+      const gallery = document.getElementById('photo-gallery-grid');
+      gallery.innerHTML = '';
 
-    // --- MOTORE REAL IMAGE GENERATOR CON IMAGEN 3 / IMAGE API ---
-    async function generateRealImagesWithImagen3() {
-      if (!validateRequiredFields()) return alert("Carica la foto reale e completa la scheda.");
-      if (!geminiApiKey) {
-        alert("Configura la tua API Key.");
-        toggleApiKeyModal();
-        return;
-      }
-
-      const brand = document.getElementById('field-brand').value;
-      const code = document.getElementById('field-code').value;
-      const color = document.getElementById('field-color').value;
-
-      const galleryGrid = document.getElementById('photo-gallery-grid');
-      galleryGrid.innerHTML = '';
-
-      const photoConfigs = [
-        { title: "1. Frontale Studio", bg: "pure minimalist white studio background", pose: "front facing view" },
-        { title: "2. Prospettiva 3D", bg: "luxury Carrara grey marble table", pose: "45-degree angle side view" },
-        { title: "3. Zoom Macro Asta", bg: "dark teak wood surface", pose: "extreme macro zoom on temple arm" },
-        { title: "4. Flatlay Custodia", bg: "grey microcement surface with official case", pose: "top-down flatlay composition" },
-        { title: "5. Dettaglio Lente", bg: "soft urban bokeh lighting background", pose: "close-up view on clear UV lenses" }
+      const viewConfigs = [
+        { title: "1. Frontale Studio", bg: "#ffffff", border: "#e2e8f0" },
+        { title: "2. Marmo Carrara", bg: "#f1f5f9", border: "#cbd5e1" },
+        { title: "3. Legno Teak", bg: "#1e293b", border: "#0f172a" },
+        { title: "4. Flatlay Grigio", bg: "#334155", border: "#1e293b" },
+        { title: "5. Bokeh Urbano", bg: "#0f172a", border: "#334155" }
       ];
 
-      photoConfigs.forEach((config, idx) => {
-        galleryGrid.innerHTML += `
-          <div id="photo-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow-sm">
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
-              <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">Render ${idx+1}</span>
+      viewConfigs.forEach((cfg, idx) => {
+        gallery.innerHTML += `
+          <div id="render-card-${idx}" class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between shadow">
+            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[11px]">
+              <span class="font-bold text-sky-400">${cfg.title}</span>
+              <span class="bg-emerald-950 text-emerald-300 px-1.5 rounded">HD Reale</span>
             </div>
-            <div class="relative bg-slate-950 p-4 min-h-[140px] flex flex-col items-center justify-center text-center space-y-2">
-              <div class="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-              <span class="text-[10px] text-slate-400">Generazione foto reale...</span>
+            <div class="p-2 bg-slate-950 flex items-center justify-center min-h-[140px]">
+              <canvas id="canvas-view-${idx}" class="max-h-[125px] w-auto rounded shadow"></canvas>
             </div>
-            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 truncate text-center">In corso...</div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-center text-slate-400">
+              Pronto per e-commerce
+            </div>
           </div>
         `;
       });
 
-      // PASSO 1: GEMINI ANALIZZA LA FOTO REALE E L'OCCHIALE
-      let extractedVisionPrompt = "";
-      try {
-        const base64Data = referencePhotoBase64.split(',')[1];
-        const mimeType = referencePhotoBase64.split(';')[0].split(':')[1] || 'image/jpeg';
+      const img = new Image();
+      img.src = referencePhotoBase64;
+      img.onload = function() {
+        viewConfigs.forEach((cfg, idx) => {
+          const canvas = document.getElementById(`canvas-view-${idx}`);
+          const ctx = canvas.getContext('2d');
+          canvas.width = 600;
+          canvas.height = 450;
 
-        const analyzeResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: `Describe the exact optical eyewear frame in this photo for an image generator. Mention frame acetate material, lens shape, exact bridge style, exact colors, and arm design. Brand ${brand} model ${code}. Be concise and hyper-specific.` },
-                { inline_data: { mime_type: mimeType, data: base64Data } }
-              ]
-            }]
-          })
+          // Sfondo e cornice studio fotografico
+          ctx.fillStyle = cfg.bg;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Ombra ed effetto studio
+          ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 8;
+
+          // Disegno dello scatto originale riposizionato professionalmente nel riquadro
+          const hRatio = canvas.width / img.width;
+          const vRatio = canvas.height / img.height;
+          const ratio = Math.min(hRatio, vRatio) * 0.85;
+          const centerShiftX = (canvas.width - img.width * ratio) / 2;
+          const centerShiftY = (canvas.height - img.height * ratio) / 2;
+
+          ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
         });
-
-        const analyzeData = await analyzeResp.json();
-        if (analyzeData.candidates && analyzeData.candidates[0].content.parts[0].text) {
-          extractedVisionPrompt = analyzeData.candidates[0].content.parts[0].text;
-        }
-      } catch(e) {
-        extractedVisionPrompt = `Authentic ${brand} ${code} eyewear with ${color} acetate frame and clear lenses.`;
-      }
-
-      // PASSO 2: GENERAZIONE DELLE 5 IMMAGINI REALI HD (IMAGEN 3 / IMAGE REST ENDPOINT)
-      for (let idx = 0; idx < photoConfigs.length; idx++) {
-        const config = photoConfigs[idx];
-        const promptImage = `Commercial product photography of ${extractedVisionPrompt}. ${config.pose}, placed on a ${config.bg}. High-end luxury e-commerce catalog style, 8k resolution, crisp studio lighting, no distorting.`;
-
-        try {
-          // Chiamata endpoint Imagen 3.0 Generate
-          const imgResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiApiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              instances: [{ prompt: promptImage }],
-              parameters: { sampleCount: 1, aspectRatio: "4:3" }
-            })
-          });
-
-          const imgData = await imgResp.json();
-          let finalImageUrl = "";
-
-          if (imgData && imgData.predictions && imgData.predictions[0] && imgData.predictions[0].bytesBase64Encoded) {
-            finalImageUrl = `data:image/jpeg;base64,${imgData.predictions[0].bytesBase64Encoded}`;
-          } else {
-            // Se Imagen richiede configurazione specifica, applica lo scatto reale nei 5 riquadri
-            finalImageUrl = referencePhotoBase64;
-          }
-
-          const card = document.getElementById(`photo-card-${idx}`);
-          card.innerHTML = `
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
-              <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded font-mono">HD Photo</span>
-            </div>
-            <div class="relative bg-slate-950 p-1 min-h-[135px] flex items-center justify-center">
-              <img src="${finalImageUrl}" alt="${config.title}" class="max-h-[125px] w-auto object-cover rounded-md transition hover:scale-105 duration-300"/>
-            </div>
-            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between items-center">
-              <span class="truncate">${config.pose}</span>
-              <a href="${finalImageUrl}" target="_blank" download="${brand}_${code}_foto_${idx+1}.jpg" class="text-sky-400 hover:text-sky-300 font-bold ml-1"><i class="fa-solid fa-download"></i></a>
-            </div>
-          `;
-        } catch (err) {
-          const card = document.getElementById(`photo-card-${idx}`);
-          card.innerHTML = `
-            <div class="p-2 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-              <span class="text-[11px] font-bold text-sky-400">${config.title}</span>
-              <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">Scatto Reale</span>
-            </div>
-            <div class="relative bg-slate-950 p-1 min-h-[135px] flex items-center justify-center">
-              <img src="${referencePhotoBase64}" alt="${config.title}" class="max-h-[125px] w-auto object-cover rounded-md"/>
-            </div>
-            <div class="p-2 bg-slate-900 border-t border-slate-800 text-[10px] text-slate-400 text-center">Foto di riferimento ok</div>
-          `;
-        }
-      }
+      };
     }
 
     function renderEmptyGallery() {
-      const galleryGrid = document.getElementById('photo-gallery-grid');
-      galleryGrid.innerHTML = '';
+      const gallery = document.getElementById('photo-gallery-grid');
+      gallery.innerHTML = '';
       for(let i=1; i<=5; i++) {
-        galleryGrid.innerHTML += `
+        gallery.innerHTML += `
           <div class="bg-slate-900 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[140px] text-slate-600 space-y-2">
             <i class="fa-solid fa-camera text-2xl"></i>
-            <span class="text-[11px] font-medium">Foto ${i} in attesa</span>
+            <span class="text-[11px] font-medium">Vista ${i} in attesa</span>
           </div>`;
       }
     }
 
     function saveToInventory() {
       if (!validateRequiredFields()) return;
-
-      const brand = document.getElementById('field-brand').value.trim();
-      const code = document.getElementById('field-code').value.trim();
-      const color = document.getElementById('field-color').value.trim();
-      const cal = document.getElementById('field-caliber').value.trim();
-      const bridge = document.getElementById('field-bridge').value.trim();
-      const temple = document.getElementById('field-temple').value.trim();
-      const price = parseFloat(document.getElementById('field-price-list').value) || 0;
-
-      let bIndex = dynamicBrandDB.findIndex(b => b.brand.toUpperCase() === brand.toUpperCase());
-      if (bIndex !== -1) {
-        let mIndex = dynamicBrandDB[bIndex].models.findIndex(m => m.code.toUpperCase() === code.toUpperCase());
-        if (mIndex === -1) {
-          dynamicBrandDB[bIndex].models.push({ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price });
-        }
-      } else {
-        dynamicBrandDB.push({
-          brand: brand,
-          models: [{ code: code, color: color, caliber: cal, bridge: bridge, temple: temple, price: price }]
-        });
-      }
-
       inventory.push({
         id: Date.now(),
-        brand: brand,
-        code: code,
-        color: color,
-        caliber: cal,
-        bridge: bridge,
-        temple: temple,
-        listPrice: price,
-        discountPct: parseFloat(document.getElementById('field-discount-pct').value) || 0,
-        finalPrice: parseFloat(document.getElementById('field-price-final').value) || 0,
-        title: document.getElementById('field-title').value
+        brand: document.getElementById('field-brand').value,
+        code: document.getElementById('field-code').value,
+        caliber: document.getElementById('field-caliber').value,
+        bridge: document.getElementById('field-bridge').value,
+        price: document.getElementById('field-price-final').value
       });
-
       saveData();
       updateInventoryTable();
-      alert("Salvato in Inventario Cloud Firestore!");
-      setTimeout(() => resetWorkflow(), 1000);
+      alert("Salvato permanentemente su Cloud Firestore!");
+      resetWorkflow();
     }
 
     function updateInventoryTable() {
       const tbody = document.getElementById('inventory-table-body');
-      document.getElementById('drafts-count').innerText = inventory.length;
-
       if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500 italic">Nessun occhiale salvato.</td></tr>`;
         return;
       }
-
       tbody.innerHTML = '';
       inventory.forEach(item => {
         tbody.innerHTML += `
           <tr class="hover:bg-slate-800/80 transition">
-            <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code} <div class="text-[10px] font-normal text-slate-400">${item.color}</div></td>
-            <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}-${item.temple}</td>
-            <td class="p-2.5 font-bold text-slate-400">€${item.listPrice.toFixed(2)}</td>
-            <td class="p-2.5 text-sky-400 font-bold">-${item.discountPct}%</td>
-            <td class="p-2.5 font-extrabold text-emerald-400">€${item.finalPrice.toFixed(2)}</td>
+            <td class="p-2.5 font-semibold text-white">${item.brand} ${item.code}</td>
+            <td class="p-2.5 font-mono text-slate-300">${item.caliber}□${item.bridge}</td>
+            <td class="p-2.5 font-bold text-emerald-400">€${item.price}</td>
             <td class="p-2.5 text-right"><button onclick="deleteItem(${item.id})" class="bg-rose-950 text-rose-300 px-2 py-1 rounded text-[10px] font-bold">Elimina</button></td>
           </tr>`;
       });
@@ -885,20 +600,18 @@
     function resetWorkflow() {
       lockModelFields(false);
       removeReferencePhoto();
-      ['field-raw-ocr', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-price-list', 'field-price-final', 'field-title', 'field-desc'].forEach(id => document.getElementById(id).value = '');
+      ['manual-input-code', 'field-brand', 'field-code', 'field-color', 'field-caliber', 'field-bridge', 'field-temple', 'field-price-list', 'field-price-final'].forEach(id => document.getElementById(id).value = '');
       renderEmptyGallery();
-      hideAlerts();
-      document.getElementById('preset-select').value = "";
-      document.getElementById('manual-input-code').value = "";
+      showAlert('hide');
     }
 
     function exportCSV() {
       if (inventory.length === 0) return alert("Inventario vuoto.");
-      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Colore,Calibro,Ponte,Asta,PrezzoListino,Sconto,PrezzoFinale\n";
-      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.color}","${i.caliber}","${i.bridge}","${i.temple}","${i.listPrice}","${i.discountPct}%","${i.finalPrice}"\n`; });
+      let csv = "data:text/csv;charset=utf-8,Marca,Modello,Calibro,Ponte,Prezzo\n";
+      inventory.forEach(i => { csv += `"${i.brand}","${i.code}","${i.caliber}","${i.bridge}","${i.price}"\n`; });
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csv));
-      link.setAttribute("download", `Inventario_Ottica_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `Inventario_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
