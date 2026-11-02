@@ -103,7 +103,7 @@ async function gem(model,parts,tools){
  if(!S.key)throw Error("Inserisci la chiave Gemini nelle impostazioni.");
  const body={contents:[{parts}]};if(tools)body.tools=tools;
  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${S.key}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
- const j=await r.json();if(!r.ok)throw Error(j.error?.message||"Errore Gemini");
+ const j=await r.json();if(!r.ok){const v=(j.error?.details||[]).flatMap(d=>d.violations||[]).map(x=>(x.quotaMetric||"")+" "+JSON.stringify(x.quotaDimensions||{})).join(" ; ");throw Error((j.error?.message||"Errore Gemini")+(v?" ["+v+"]":""));}
  return j.candidates?.[0]?.content?.parts||[]}
 const txt=p=>p.map(x=>x.text||"").join("");
 function num(s){const n=parseFloat(String(s).replace(",","."));return isNaN(n)?null:n}
@@ -122,10 +122,10 @@ $("bRead").onclick=async()=>{const f=$("fCode").files[0];if(!f)return msg("Scegl
  const [c,b]=txt(p).trim().split("|");$("code").value=c.trim();if(b)$("brand").value=b.trim();msg("Codice letto: controllalo e correggilo se serve.")}catch(e){msg(e.message,1)}};
 $("bFind").onclick=async()=>{const c=$("code").value.trim();if(!c)return msg("Inserisci il codice.",1);msg("Cerco nei cataloghi online…");$("bFind").disabled=true;
  try{const q=`Cerca su internet l'occhiale con codice modello "${c}" ${$("brand").value?"di marca "+$("brand").value:""}. Usa solo fonti affidabili: sito ufficiale del marchio e rivenditori autorizzati/verificati. Rispondi SOLO con un JSON valido, senza altro testo: {"brand":"","name":"","title":"titolo per un e-commerce","description":"descrizione in italiano di 60-90 parole basata solo su dati trovati","stores":[{"store":"","price":0,"url":""}],"note":"dubbi o incertezze"}. Se non trovi il modello con certezza, lascia i campi vuoti e spiega in note.`;
- const p=await gem(S.txt,[{text:q}],[{google_search:{}}]),m=txt(p).match(/\{[\s\S]*\}/);if(!m)throw Error("Risposta non leggibile, riprova.");
+ let p,web=true;try{p=await gem(S.txt,[{text:q}],[{google_search:{}}])}catch(e){if(!/quota|429|RESOURCE/i.test(e.message))throw e;web=false;msg("Ricerca web rifiutata ("+e.message.slice(0,300)+"). Riprovo senza web…",1);p=await gem(S.txt,[{text:q.replace("Cerca su internet","Usando solo le tue conoscenze, senza ricerca web, descrivi")+" Lascia stores vuoto: non hai accesso ai prezzi."}])}const m=txt(p).match(/\{[\s\S]*\}/);if(!m)throw Error("Risposta non leggibile, riprova.");
  const j=JSON.parse(m[0]);if(j.brand)$("brand").value=j.brand;$("name").value=j.name||"";$("title").value=j.title||"";$("desc").value=j.description||"";
  $("stores").value=(j.stores||[]).map(s=>`${s.store} | ${s.price} | ${s.url}`).join("\n");avg();
- msg(j.note?"Nota: "+j.note:"Fatto. Verifica i dati prima di salvare.")}catch(e){msg(e.message,1)}$("bFind").disabled=false};
+ msg(!web?"Compilato SENZA ricerca web: verifica titolo e descrizione, prezzi da inserire a mano.":j.note?"Nota: "+j.note:"Fatto. Verifica i dati prima di salvare.")}catch(e){msg(e.message,1)}$("bFind").disabled=false};
 $("fRef").onchange=async e=>{const f=e.target.files[0];if(f){refMime="image/jpeg";refB64=await b64(f,1280);msg("Foto di riferimento caricata.")}};
 $("bGen").onclick=async()=>{if(!refB64)return msg("Carica prima la foto di riferimento.",1);$("bGen").disabled=true;cur.images=[];draw();
  for(let i=0;i<5;i++){msg(`Genero foto ${i+1} di 5…`);
