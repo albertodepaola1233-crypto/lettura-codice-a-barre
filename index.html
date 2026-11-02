@@ -1,852 +1,154 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full bg-slate-950 text-slate-100">
+<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eyewear AI Decoder & Inventory Hub</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                        }
-                    },
-                    screens: {
-                        'xs': '475px',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.8);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(51, 65, 85, 0.8);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(71, 85, 105, 1);
-        }
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vision Express – Catalogo occhiali</title>
+<style>
+:root{--bg:#eef2f8;--card:#fff;--ink:#0a1b33;--mute:#62708a;--acc:#1f5bff;--acc2:#dfe8ff;--line:#e1e8f3;--gold:#ffb703;--side:#0a1b33;--sink:#e8eefc;--sh:0 14px 34px -16px rgba(10,27,51,.28)}
+@media (prefers-color-scheme:dark){:root{--bg:#070d1a;--card:#101a2e;--ink:#eaf0ff;--mute:#8d9bb8;--acc:#5f8cff;--acc2:#18284d;--line:#1f2d4a;--side:#0d1730;--sh:0 14px 34px -16px rgba(0,0,0,.7)}}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:16px/1.55 "Avenir Next","Segoe UI Variable","Segoe UI",system-ui,sans-serif;background:radial-gradient(900px 420px at 90% -8%,var(--acc2),transparent 70%),var(--bg);min-height:100vh}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:22px clamp(16px,4vw,40px) 6px;max-width:1240px;margin:0 auto}
+.brand{display:flex;gap:14px;align-items:center}.brand svg{width:54px;height:32px;color:var(--acc)}
+h1{font-size:1.45rem;margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.1}.brand span{font-size:.85rem;color:var(--mute)}
+h2{font-size:1.15rem;margin:0 0 16px;font-weight:700;letter-spacing:-.01em;display:flex;gap:12px;align-items:center}
+.n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#7a5cff);color:#fff;font-size:.9rem;font-weight:700}
+main{display:grid;grid-template-columns:300px 1fr;gap:26px;max-width:1240px;margin:18px auto 90px;padding:0 clamp(16px,4vw,40px);align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}aside{position:static!important}}
+aside{position:sticky;top:18px}
+.side{background:var(--side);color:var(--sink);border-radius:22px;padding:22px;box-shadow:var(--sh)}
+.side h2{color:var(--sink)}
+.card{background:var(--card);border-radius:22px;padding:26px;margin-bottom:22px;box-shadow:var(--sh);border:1px solid var(--line)}
+button{font:inherit;font-weight:600;border:0;background:linear-gradient(135deg,var(--acc),#6a4dff);color:#fff;border-radius:12px;padding:10px 18px;cursor:pointer;box-shadow:0 8px 18px -8px var(--acc);transition:transform .15s,box-shadow .15s}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 12px 22px -8px var(--acc)}
+button.ghost{background:var(--acc2);color:var(--acc);box-shadow:none}
+button:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--mute);margin:16px 0 6px}
+.f{display:flex;gap:8px}.f input,.f textarea{flex:1}
+input,textarea{width:100%;font:inherit;padding:12px 14px;border:2px solid transparent;border-radius:12px;background:var(--bg);color:var(--ink);transition:border-color .15s,background .15s}
+input:focus,textarea:focus{border-color:var(--acc);background:var(--card)}
+textarea{min-height:104px;resize:vertical}
+input[type=file]{padding:8px;background:var(--bg);border:2px dashed var(--line)}
+input::file-selector-button{font:inherit;font-weight:600;border:0;background:var(--acc2);color:var(--acc);border-radius:8px;padding:8px 12px;margin-right:12px;cursor:pointer}
+.cp{padding:0 14px;align-self:stretch;font-size:.85rem;border-radius:12px;max-height:46px}
+#avg,#disc{font-size:1.7rem;font-weight:800;letter-spacing:-.02em}
+#disc{border-color:var(--gold);color:var(--ink)}
+.list button{display:block;width:100%;text-align:left;background:rgba(255,255,255,.06);color:var(--sink);box-shadow:none;margin-bottom:8px;padding:12px 14px;font-weight:500}
+.list button:hover:not(:disabled){background:rgba(255,255,255,.13);transform:none;box-shadow:none}
+.list button.on{background:var(--acc);color:#fff}
+.list b{display:block;font-weight:700}.list small{color:#9db0d4;font-size:.8rem}
+.list button.on small{color:#e0e8ff}.bd{color:var(--gold)!important}.ok{color:#5be0a5!important}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:16px}
+.imgs:empty::before{content:"Le 5 viste appariranno qui";grid-column:1/-1;padding:44px 16px;text-align:center;color:var(--mute);border:2px dashed var(--line);border-radius:16px}
+.imgs figure{margin:0;background:var(--bg);border-radius:16px;padding:10px;transition:transform .2s,box-shadow .2s}
+.imgs figure:hover{transform:translateY(-3px);box-shadow:var(--sh)}
+.imgs img{width:100%;border-radius:10px;background:#fff;aspect-ratio:1;object-fit:contain;display:block}
+.imgs figure button{width:100%;margin-top:10px;padding:8px}
+p{line-height:1.5}
+#msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;max-width:min(92vw,560px);padding:12px 20px;border-radius:999px;background:var(--side);color:var(--sink);font-size:.92rem;box-shadow:var(--sh)}
+#msg:empty{display:none}#msg.err{background:#b4232c;color:#fff}
+dialog{border:0;border-radius:22px;background:var(--card);color:var(--ink);max-width:560px;width:92%;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(7,13,26,.6);backdrop-filter:blur(4px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white bg-slate-950 min-h-screen">
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 ease-out flex items-center justify-between sm:justify-start gap-3 bg-slate-800/95 text-slate-100 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md max-w-md mx-auto">
-        <div class="flex items-center gap-3">
-            <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-brand-500 flex-shrink-0"></i>
-            <span id="toast-message" class="text-xs sm:text-sm font-medium leading-snug">Operazione completata!</span>
-        </div>
-    </div>
-
-    <!-- Header Navigation -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 gap-2">
-                
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-                    <div class="p-2 bg-brand-500/10 rounded-xl border border-brand-500/20 flex-shrink-0">
-                        <i data-lucide="glasses" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-500"></i>
-                    </div>
-                    <div class="truncate">
-                        <h1 class="text-sm sm:text-lg font-bold text-white tracking-tight truncate">Eyewear AI Hub</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate hidden xs:block">Decoder Astine, 5 Foto IA & Inventario</p>
-                    </div>
-                </div>
-
-                <!-- Navigation Tabs & API Key Modal Button -->
-                <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
-                    <button onclick="toggleApiKeyModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700/50 transition-all flex items-center gap-1.5 text-xs font-semibold active:scale-95">
-                        <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
-                        <span class="hidden md:inline">Chiave API Gemini</span>
-                    </button>
-
-                    <nav class="flex space-x-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700/50">
-                        <button id="tab-creator-btn" onclick="switchTab('creator')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95">
-                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Nuovo Occhiale</span>
-                        </button>
-                        <button id="tab-inventory-btn" onclick="switchTab('inventory')" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95">
-                            <i data-lucide="boxes" class="w-4 h-4"></i>
-                            <span class="hidden xs:inline">Inventario</span>
-                            <span id="inventory-count-badge" class="bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold">0</span>
-                        </button>
-                    </nav>
-                </div>
-
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
-
-        <!-- TAB 1: DECODER & ANALYSIS -->
-        <section id="tab-creator" class="space-y-4 sm:space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                
-                <!-- Left Column: Upload & Code Input -->
-                <div class="lg:col-span-5 space-y-4 sm:space-y-6">
-                    
-                    <!-- Photo Dropzone -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl backdrop-blur-sm">
-                        <div class="flex justify-between items-center mb-3">
-                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
-                                <i data-lucide="camera" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"></i>
-                                Foto Occhiale (Modello Base per IA)
-                            </h2>
-                            <span class="text-[11px] text-slate-400">1 Foto</span>
-                        </div>
-
-                        <div id="dropzone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-brand-500/70 bg-slate-950/60 hover:bg-slate-900/90 rounded-xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 active:scale-[0.99]">
-                            <div class="p-2.5 bg-slate-800 rounded-full text-brand-500 border border-slate-700">
-                                <i data-lucide="upload-cloud" class="w-6 h-6 sm:w-7 sm:h-7"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs sm:text-sm font-medium text-slate-200">Carica foto occhiale <span class="text-brand-500 underline font-semibold">Sfoglia</span></p>
-                                <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5">Necessaria per generare le 5 varianti con sfondi diversi</p>
-                            </div>
-                            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                        </div>
-
-                        <!-- Preview -->
-                        <div id="image-preview-container" class="mt-4 hidden">
-                            <div class="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950 aspect-video max-h-48 flex items-center justify-center">
-                                <img id="preview-img" class="w-full h-full object-contain">
-                                <button onclick="clearPhoto()" class="absolute top-2 right-2 p-1.5 bg-rose-600/90 hover:bg-rose-600 text-white rounded-lg shadow">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Astina Code / Full Name Input -->
-                        <div class="mt-4 pt-3 border-t border-slate-800 space-y-1.5">
-                            <label class="text-xs font-semibold text-amber-400 flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><i data-lucide="code" class="w-4 h-4 text-amber-400"></i> Codice Astina o Nome Modello (Obbligatorio)</span>
-                            </label>
-                            <input type="text" id="input-code" oninput="updateButtonStates()" placeholder="Es. RB2140 901 50-22 o Wayfarer Classic..." class="w-full bg-slate-950/90 border border-slate-700 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none transition-colors">
-                            <p class="text-[10px] text-slate-400">Puoi inserire sia il codice seriale abbreviato inciso sulle astine che il nome completo del modello.</p>
-                        </div>
-
-                        <!-- Analyze Button -->
-                        <div class="mt-5 pt-3 border-t border-slate-800">
-                            <button id="btn-analyze" onclick="analyzeEyewearWithAI()" disabled class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 active:scale-[0.98]">
-                                <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <span>Decodifica & Genera 5 Foto IA</span>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Right Column: Results & 5 Generated Photos -->
-                <div class="lg:col-span-7 space-y-4 sm:space-y-6">
-                    
-                    <!-- Decoded Details Box -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
-                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2 truncate">
-                                <i data-lucide="file-text" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500 flex-shrink-0"></i>
-                                Scheda Tecnica & Dettagli Verificati
-                            </h2>
-                            <span id="analysis-status-badge" class="text-[10px] sm:text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-full font-medium flex items-center gap-1.5 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> In attesa di codice
-                            </span>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div class="space-y-1">
-                                    <label class="text-[11px] font-medium text-slate-300 flex justify-between">
-                                        <span>Titolo / Modello</span>
-                                        <button onclick="copyToClipboard('input-name')" class="text-brand-500 hover:text-brand-400 text-[10px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                    </label>
-                                    <input type="text" id="input-name" placeholder="Nome ufficiale occhiale..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[11px] font-medium text-slate-300 flex justify-between">
-                                        <span>Marca</span>
-                                        <button onclick="copyToClipboard('input-brand')" class="text-brand-500 hover:text-brand-400 text-[10px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                    </label>
-                                    <input type="text" id="input-brand" placeholder="Brand..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-white">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-3 gap-2">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-medium text-slate-400">Calibro / Ponte</label>
-                                    <input type="text" id="input-size" placeholder="Es. 50-22" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-medium text-slate-400">Colore Montatura</label>
-                                    <input type="text" id="input-color" placeholder="Colore..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-medium text-slate-400">Valore Stimato (€)</label>
-                                    <input type="number" step="0.01" id="input-price" placeholder="0.00" class="w-full bg-slate-950 border border-brand-500/40 rounded-lg px-2.5 py-1.5 text-xs font-bold text-brand-400">
-                                </div>
-                            </div>
-
-                            <div class="space-y-1">
-                                <label class="text-[11px] font-medium text-slate-300 flex justify-between">
-                                    <span>Descrizione Dettagliata & Particolari</span>
-                                    <button onclick="copyToClipboard('input-description')" class="text-brand-500 hover:text-brand-400 text-[10px] flex items-center gap-0.5"><i data-lucide="copy" class="w-3 h-3"></i> Copia</button>
-                                </label>
-                                <textarea id="input-description" rows="3" placeholder="Caratteristiche, materiali, tipo di lenti..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 5 AI Generated Photos Section -->
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
-                                <i data-lucide="image" class="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"></i>
-                                5 Foto IA con Sfondi Differenti (<span id="ai-photos-count">0</span>/5)
-                            </h2>
-                            <span class="text-[10px] text-slate-400">Rimodellate sul prodotto</span>
-                        </div>
-
-                        <div id="ai-photos-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[140px] items-center">
-                            <div class="col-span-2 sm:col-span-3 text-center py-6 text-slate-500 text-xs flex flex-col items-center gap-1">
-                                <i data-lucide="sparkles" class="w-6 h-6 opacity-30"></i>
-                                <span>Le 5 foto con sfondi differenti appariranno qui dopo l'analisi</span>
-                            </div>
-                        </div>
-
-                        <!-- Save Action -->
-                        <div class="pt-3 border-t border-slate-800">
-                            <button onclick="saveToInventory()" id="btn-save" disabled class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 active:scale-95">
-                                <i data-lucide="save" class="w-5 h-5"></i>
-                                <span>Salva Occhiale in Inventario (Permanente)</span>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-
-        <!-- TAB 2: INVENTORY -->
-        <section id="tab-inventory" class="hidden space-y-4 sm:space-y-6">
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm space-y-4 sm:space-y-6">
-                
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="boxes" class="w-5 h-5 text-brand-500"></i>
-                            Inventario Occhiali Salvati
-                        </h2>
-                        <p class="text-xs text-slate-400">Tutti i dati e le 5 foto scaricabili salvati in modo permanente.</p>
-                    </div>
-                    <div class="w-full sm:w-auto">
-                        <input type="text" id="inventory-search" oninput="renderInventory()" placeholder="Cerca marca, modello o codice..." class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 w-full sm:w-64">
-                    </div>
-                </div>
-
-                <!-- Inventory Grid -->
-                <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
-
-                <!-- Empty State -->
-                <div id="inventory-empty-state" class="text-center py-12 space-y-3">
-                    <div class="p-4 bg-slate-950/80 w-14 h-14 rounded-full mx-auto flex items-center justify-center border border-slate-800 text-slate-500">
-                        <i data-lucide="glasses" class="w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-sm font-semibold text-slate-300">Nessun occhiale in inventario</h3>
-                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Inserisci un codice o nome e carica una foto nella scheda "Nuovo Occhiale" per iniziare.</p>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- API KEY MODAL -->
-    <div id="api-key-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Chiave API Gemini
-                </h3>
-                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Inserisci la tua chiave API Gemini per abilitare la decodifica intelligente e la generazione delle 5 foto IA.
-            </p>
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-300">Chiave API Gemini</label>
-                    <input type="password" id="custom-api-key" placeholder="Incolla chiave Gemini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-500">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="saveApiKey()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-md">Salva Chiave API</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK for Permanent Storage -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'eyewear-decoder-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "dummy", authDomain: "dummy.firebaseapp.com", projectId: "dummy", storageBucket: "dummy.appspot.com", messagingSenderId: "12345", appId: "1:12345:web:12345"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentUser = null;
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const userCred = await signInWithCustomToken(auth, __initial_auth_token);
-                    currentUser = userCred.user;
-                } else {
-                    const userCred = await signInAnonymously(auth);
-                    currentUser = userCred.user;
-                }
-                listenToCloudInventory();
-            } catch (err) {
-                console.warn("Auth offline mode:", err);
-            }
-        }
-
-        function listenToCloudInventory() {
-            if (!currentUser) return;
-            const ref = collection(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory');
-            onSnapshot(ref, (snapshot) => {
-                const cloudItems = [];
-                snapshot.forEach((docSnap) => cloudItems.push(docSnap.data()));
-                if (cloudItems.length > 0) {
-                    window.inventory = cloudItems.sort((a, b) => b.timestamp - a.timestamp);
-                    window.saveInventoryLocal();
-                    window.renderInventory();
-                }
-            }, (err) => console.warn("Firestore sync error:", err));
-        }
-
-        window.saveItemCloud = async function(item) {
-            if (!currentUser) return;
-            try {
-                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory', item.id);
-                await setDoc(itemRef, item);
-            } catch (err) {
-                console.error("Cloud save error:", err);
-            }
-        };
-
-        window.deleteItemCloud = async function(id) {
-            if (!currentUser) return;
-            try {
-                const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'eyewear_inventory', id);
-                await deleteDoc(itemRef);
-            } catch (err) {
-                console.error("Cloud delete error:", err);
-            }
-        };
-
-        initAuth();
-    </script>
-
-    <!-- App Logic -->
-    <script>
-        let uploadedPhoto = null; // Base64 string
-        let generatedAiPhotos = []; // Array of 5 Base64 strings
-        let inventory = [];
-
-        function getApiKey() {
-            const savedKey = localStorage.getItem('GEMINI_API_KEY');
-            if (savedKey && savedKey.trim() !== '') return savedKey.trim();
-            if (typeof window.apiKey !== 'undefined' && window.apiKey) return window.apiKey;
-            return '';
-        }
-
-        function toggleApiKeyModal() {
-            const modal = document.getElementById('api-key-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                document.getElementById('custom-api-key').value = getApiKey();
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('custom-api-key').value.trim();
-            if (key) {
-                localStorage.setItem('GEMINI_API_KEY', key);
-                showToast("Chiave API salvata!");
-            } else {
-                showToast("Inserisci una chiave valida", true);
-            }
-            toggleApiKeyModal();
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-            loadInventoryLocal();
-            renderInventory();
-            updateButtonStates();
-        });
-
-        function switchTab(tab) {
-            const tabCreator = document.getElementById('tab-creator');
-            const tabInventory = document.getElementById('tab-inventory');
-            const btnCreator = document.getElementById('tab-creator-btn');
-            const btnInventory = document.getElementById('tab-inventory-btn');
-
-            if (tab === 'creator') {
-                tabCreator.classList.remove('hidden');
-                tabInventory.classList.add('hidden');
-                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95";
-                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
-            } else {
-                tabCreator.classList.add('hidden');
-                tabInventory.classList.remove('hidden');
-                btnInventory.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all bg-brand-600 text-white shadow-sm active:scale-95";
-                btnCreator.className = "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white active:scale-95";
-                renderInventory();
-            }
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
-
-            toastMessage.textContent = message;
-            if (isError) {
-                toastIcon.setAttribute('data-lucide', 'alert-circle');
-                toastIcon.className = 'w-5 h-5 text-rose-500 flex-shrink-0';
-            } else {
-                toastIcon.setAttribute('data-lucide', 'check-circle');
-                toastIcon.className = 'w-5 h-5 text-brand-500 flex-shrink-0';
-            }
-            if (window.lucide) lucide.createIcons();
-
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-24', 'opacity-0');
-            }, 3500);
-        }
-
-        async function compressImage(file, maxWidth = 800, quality = 0.8) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
-            uploadedPhoto = await compressImage(file);
-            
-            document.getElementById('preview-img').src = uploadedPhoto;
-            document.getElementById('image-preview-container').classList.remove('hidden');
-            updateButtonStates();
-        }
-
-        function clearPhoto() {
-            uploadedPhoto = null;
-            document.getElementById('file-input').value = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-            updateButtonStates();
-        }
-
-        function updateButtonStates() {
-            const code = document.getElementById('input-code').value.trim();
-            const hasPhoto = uploadedPhoto !== null;
-            document.getElementById('btn-analyze').disabled = !(code.length > 0 && hasPhoto);
-        }
-
-        function extractJson(text) {
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                const match = text.match(/\{[\s\S]*\}/);
-                if (match) return JSON.parse(match[0]);
-                throw new Error("Risposta IA non valida.");
-            }
-        }
-
-        // Canvas helper to generate 5 styled variations with different backgrounds
-        async function generateVariationsOnCanvas(baseDataUrl) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    const backgrounds = [
-                        { name: "Studio Ottico", grad1: "#0f172a", grad2: "#1e293b", accent: "#22c55e", badge: "Ottica Premium" },
-                        { name: "Minimal E-commerce", grad1: "#ffffff", grad2: "#f8fafc", accent: "#0284c7", badge: "Studio White" },
-                        { name: "Lifestyle Legno", grad1: "#29180b", grad2: "#45220a", accent: "#f59e0b", badge: "Warm Lifestyle" },
-                        { name: "Solare Esterno", grad1: "#02233b", grad2: "#075985", accent: "#38bdf8", badge: "Outdoor Sun" },
-                        { name: "Urbano Moderno", grad1: "#18181b", grad2: "#27272a", accent: "#a855f7", badge: "Urban Chic" }
-                    ];
-
-                    const results = [];
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 800;
-                    canvas.height = 800;
-                    const ctx = canvas.getContext('2d');
-
-                    backgrounds.forEach((bg, idx) => {
-                        // Background gradient
-                        const gradient = ctx.createLinearGradient(0, 0, 800, 800);
-                        gradient.addColorStop(0, bg.grad1);
-                        gradient.addColorStop(1, bg.grad2);
-                        ctx.fillStyle = gradient;
-                        ctx.fillRect(0, 0, 800, 800);
-
-                        // Decorative grid / circle
-                        ctx.fillStyle = bg.accent;
-                        ctx.globalAlpha = 0.05;
-                        ctx.beginPath();
-                        ctx.arc(400, 400, 300, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-
-                        // Draw Product Image Centered with shadow
-                        ctx.save();
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                        ctx.shadowBlur = 30;
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 15;
-
-                        const maxW = 560;
-                        const maxH = 560;
-                        let w = img.width;
-                        let h = img.height;
-                        const ratio = Math.min(maxW / w, maxH / h);
-                        w *= ratio;
-                        h *= ratio;
-                        const x = (800 - w) / 2;
-                        const y = (800 - h) / 2;
-                        ctx.drawImage(img, x, y, w, h);
-                        ctx.restore();
-
-                        // Watermark / Badge
-                        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-                        ctx.roundRect(40, 40, 180, 45, 10);
-                        ctx.fill();
-                        ctx.strokeStyle = bg.accent;
-                        ctx.lineWidth = 2;
-                        ctx.roundRect(40, 40, 180, 45, 10);
-                        ctx.stroke();
-
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = 'bold 16px sans-serif';
-                        ctx.fillText(bg.badge, 65, 68);
-
-                        results.push(canvas.toDataURL('image/jpeg', 0.85));
-                    });
-
-                    resolve(results);
-                };
-                img.src = baseDataUrl;
-            });
-        }
-
-        async function analyzeEyewearWithAI() {
-            const codeInput = document.getElementById('input-code').value.trim();
-            if (!codeInput || !uploadedPhoto) {
-                showToast("Carica una foto e inserisci il codice o nome.", true);
-                return;
-            }
-
-            const apiKey = getApiKey();
-            if (!apiKey) {
-                showToast("Inserisci la tua API Key Gemini.", true);
-                toggleApiKeyModal();
-                return;
-            }
-
-            const btnAnalyze = document.getElementById('btn-analyze');
-            const badge = document.getElementById('analysis-status-badge');
-            
-            btnAnalyze.disabled = true;
-            btnAnalyze.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"></i> <span>Decodifica e Ricerca in corso...</span>`;
-            badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full font-medium flex items-center gap-1.5 border border-amber-500/30';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Ricerca reale...`;
-            if (window.lucide) lucide.createIcons();
-
-            try {
-                const base64Data = uploadedPhoto.split(',')[1];
-                const imagePart = { inlineData: { mimeType: 'image/jpeg', data: base64Data } };
-
-                const prompt = `Sei un ottico esperto e un analista di occhiali di lusso. L'utente ha inserito questo codice o nome presente sulle astine o sul modello: "${codeInput}". 
-Verifica attentamente online tramite le tue conoscenze reali ed estrai le informazioni corrette senza inventare nulla. Il codice può essere sia un codice abbreviato (es. calibro, ponte, modello) sia il nome completo del modello.
-
-Rispondi ESCLUSIVAMENTE in formato JSON con questa struttura esatta:
-{
-    "titolo": "Nome completo del modello e marca",
-    "marca": "Brand",
-    "calibro_ponte": "Es. 50-22 o dimensioni rilevate",
-    "colore": "Colore esatto della montatura",
-    "valore_mercato": 150.00,
-    "descrizione": "Descrizione dettagliata verificata, materiali, forma, particolari rilevabili dal codice o nome."
-}`;
-
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-                const res = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: prompt }, imagePart] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
-
-                if (!res.ok) throw new Error("Errore nella chiamata API Gemini.");
-                const data = await res.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("Risposta vuota dall'IA.");
-
-                const parsed = extractJson(text);
-
-                document.getElementById('input-name').value = parsed.titolo || codeInput;
-                document.getElementById('input-brand').value = parsed.marca || '';
-                document.getElementById('input-size').value = parsed.calibro_ponte || '';
-                document.getElementById('input-color').value = parsed.colore || '';
-                document.getElementById('input-price').value = parsed.valore_mercato || 0;
-                document.getElementById('input-description').value = parsed.descrizione || '';
-
-                // Generate 5 variations
-                generatedAiPhotos = await generateVariationsOnCanvas(uploadedPhoto);
-                renderAiPhotosGrid();
-
-                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-brand-500/20 text-brand-300 rounded-full font-medium flex items-center gap-1.5 border border-brand-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> Decodificato & 5 Foto Generate`;
-
-                document.getElementById('btn-save').disabled = false;
-                showToast("Decodifica completata e 5 foto generate con successo!");
-
-            } catch (err) {
-                console.error(err);
-                showToast("Errore durante l'analisi: " + err.message, true);
-                badge.className = 'text-[10px] sm:text-xs px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded-full font-medium flex items-center gap-1.5 border border-rose-500/30';
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Errore`;
-            } finally {
-                btnAnalyze.disabled = false;
-                btnAnalyze.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i> <span>Decodifica & Genera 5 Foto IA</span>`;
-                if (window.lucide) lucide.createIcons();
-            }
-        }
-
-        function renderAiPhotosGrid() {
-            const grid = document.getElementById('ai-photos-grid');
-            document.getElementById('ai-photos-count').textContent = generatedAiPhotos.length;
-
-            if (generatedAiPhotos.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 sm:col-span-3 text-center py-6 text-slate-500 text-xs flex flex-col items-center gap-1">
-                        <i data-lucide="sparkles" class="w-6 h-6 opacity-30"></i>
-                        <span>Le 5 foto con sfondi differenti appariranno qui dopo l'analisi</span>
-                    </div>`;
-                return;
-            }
-
-            const backgroundsNames = ["Studio Ottico", "Minimal E-commerce", "Lifestyle Legno", "Solare Esterno", "Urbano Moderno"];
-
-            grid.innerHTML = generatedAiPhotos.map((img, idx) => `
-                <div class="relative group rounded-xl overflow-hidden border border-slate-700 bg-slate-950 aspect-square shadow">
-                    <img src="${img}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
-                        <span class="text-[10px] font-bold text-white text-center">${backgroundsNames[idx]}</span>
-                        <a href="${img}" download="occhiale_foto_${idx+1}.jpg" class="px-2.5 py-1 bg-brand-600 hover:bg-brand-500 text-white text-[10px] font-semibold rounded-lg shadow flex items-center gap-1">
-                            <i data-lucide="download" class="w-3 h-3"></i> Scarica
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function copyToClipboard(id) {
-            const input = document.getElementById(id);
-            if (!input || !input.value) {
-                showToast("Nessun testo da copiare", true);
-                return;
-            }
-            input.select();
-            document.execCommand('copy');
-            showToast("Testo copiato!");
-        }
-
-        function saveToInventory() {
-            const name = document.getElementById('input-name').value.trim();
-            const brand = document.getElementById('input-brand').value.trim();
-            const size = document.getElementById('input-size').value.trim();
-            const color = document.getElementById('input-color').value.trim();
-            const price = parseFloat(document.getElementById('input-price').value) || 0;
-            const description = document.getElementById('input-description').value.trim();
-            const code = document.getElementById('input-code').value.trim();
-
-            if (!name) {
-                showToast("Nome occhiale obbligatorio.", true);
-                return;
-            }
-
-            const newItem = {
-                id: 'eye_' + Date.now(),
-                code,
-                name,
-                brand,
-                size,
-                color,
-                price,
-                description,
-                photos: generatedAiPhotos,
-                createdAt: new Date().toLocaleDateString('it-IT'),
-                timestamp: Date.now()
-            };
-
-            inventory.unshift(newItem);
-            saveInventoryLocal();
-            if (window.saveItemCloud) window.saveItemCloud(newItem);
-            updateInventoryBadge();
-            showToast("Occhiale salvato in inventario!");
-            switchTab('inventory');
-        }
-
-        function saveInventoryLocal() {
-            try {
-                localStorage.setItem('EYEWEAR_AI_INVENTORY', JSON.stringify(inventory));
-            } catch (e) {
-                console.error("Local storage error:", e);
-            }
-        }
-
-        function loadInventoryLocal() {
-            try {
-                const stored = localStorage.getItem('EYEWEAR_AI_INVENTORY');
-                if (stored) inventory = JSON.parse(stored);
-            } catch (e) {
-                inventory = [];
-            }
-        }
-
-        function updateInventoryBadge() {
-            const badge = document.getElementById('inventory-count-badge');
-            if (badge) badge.textContent = inventory.length;
-        }
-
-        function renderInventory() {
-            const grid = document.getElementById('inventory-grid');
-            const emptyState = document.getElementById('inventory-empty-state');
-            const query = (document.getElementById('inventory-search')?.value || '').toLowerCase();
-
-            updateInventoryBadge();
-
-            const filtered = inventory.filter(i => 
-                i.name.toLowerCase().includes(query) ||
-                i.brand.toLowerCase().includes(query) ||
-                i.code.toLowerCase().includes(query) ||
-                i.color.toLowerCase().includes(query)
-            );
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            grid.innerHTML = filtered.map(item => `
-                <div class="bg-slate-950/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between transition-all hover:border-slate-700">
-                    <div class="p-4 space-y-3">
-                        <div class="flex justify-between items-start gap-2">
-                            <div class="min-w-0">
-                                <span class="text-[10px] font-bold text-brand-400 uppercase tracking-wider">${item.brand || 'Modello'}</span>
-                                <h3 class="text-xs sm:text-sm font-bold text-white line-clamp-1">${item.name}</h3>
-                                <p class="text-[11px] text-slate-400">Codice/Astina: <span class="text-amber-400 font-semibold">${item.code}</span></p>
-                            </div>
-                            <span class="text-[9px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 flex-shrink-0">${item.createdAt}</span>
-                        </div>
-
-                        <!-- 5 Photos thumbnails -->
-                        <div class="flex gap-1.5 overflow-x-auto py-1">
-                            ${item.photos && item.photos.length > 0 ? item.photos.map((img, idx) => `
-                                <a href="${img}" download="${item.name}_foto_${idx+1}.jpg" class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-slate-800 bg-slate-900 block" title="Scarica foto ${idx+1}">
-                                    <img src="${img}" class="w-full h-full object-cover">
-                                </a>
-                            `).join('') : '<span class="text-xs text-slate-500">Nessuna foto</span>'}
-                        </div>
-
-                        <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 text-xs">
-                            <span class="text-slate-400">Calibro: <strong class="text-white">${item.size || 'N/D'}</strong></span>
-                            <span class="text-brand-400 font-bold text-sm">€${(item.price || 0).toFixed(2)}</span>
-                        </div>
-
-                        <p class="text-xs text-slate-300 line-clamp-2 leading-relaxed">${item.description}</p>
-                    </div>
-
-                    <div class="p-2.5 bg-slate-900/90 border-t border-slate-800 flex justify-end">
-                        <button onclick="deleteInventoryItem('${item.id}')" class="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 active:scale-95">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Elimina
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function deleteInventoryItem(id) {
-            inventory = inventory.filter(i => i.id !== id);
-            saveInventoryLocal();
-            if (window.deleteItemCloud) window.deleteItemCloud(id);
-            renderInventory();
-            showToast("Occhiale eliminato dall'inventario");
-        }
-    </script>
+<body>
+<header><div class="brand"><svg viewBox="0 0 54 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><circle cx="14" cy="17" r="11"/><circle cx="40" cy="17" r="11"/><path d="M25 14c1.5-2 2.5-2 4 0"/></svg><div><h1>Vision Express</h1><span>Catalogo occhiali</span></div></div>
+<div class="row"><button id="bNew">Nuovo prodotto</button><button class="ghost" id="bSet">Impostazioni</button></div></header>
+<main>
+<aside><div class="side"><h2>Progetti</h2><div class="list" id="list"><small>Configura Firebase nelle impostazioni.</small></div></div></aside>
+<section>
+<div id="msg"></div>
+<div class="card"><h2><span class="n">1</span>Codice sull'asta</h2>
+<div class="row"><input type="file" id="fCode" accept="image/*" capture="environment" style="flex:1"><button id="bRead" class="ghost">Leggi il codice dalla foto</button></div>
+<label>Codice modello</label><div class="f"><input id="code" placeholder="es. RB3025 001/51"><button class="cp ghost" data-c="code">Copia</button></div>
+<label>Marca (facoltativa, aiuta la ricerca)</label><div class="f"><input id="brand"><button class="cp ghost" data-c="brand">Copia</button></div>
+<div class="row" style="margin-top:12px"><button id="bFind">Cerca nel catalogo online</button></div></div>
+<div class="card"><h2><span class="n">2</span>Scheda prodotto</h2>
+<label>Titolo</label><div class="f"><input id="title"><button class="cp ghost" data-c="title">Copia</button></div>
+<label>Nome</label><div class="f"><input id="name"><button class="cp ghost" data-c="name">Copia</button></div>
+<label>Descrizione</label><div class="f"><textarea id="desc"></textarea><button class="cp ghost" data-c="desc">Copia</button></div>
+<label>Store verificati (uno per riga: store | prezzo € | link)</label><div class="f"><textarea id="stores"></textarea><button class="cp ghost" data-c="stores">Copia</button></div>
+<div class="row" style="margin-top:8px"><button class="ghost" id="bAvg">Ricalcola prezzo medio</button></div>
+<label>Prezzo medio ricercato (€)</label><div class="f"><input id="avg" inputmode="decimal"><button class="cp ghost" data-c="avg">Copia</button></div>
+<label>Sconto (%) – da inserire quando vuoi</label><div class="f"><input id="pct" inputmode="decimal" placeholder="vuoto = nessuno"><button class="cp" id="bDisc">Applica</button></div>
+<label>Prezzo scontato (€)</label><div class="f"><input id="disc" inputmode="decimal"><button class="cp ghost" data-c="disc">Copia</button></div></div>
+<div class="card"><h2><span class="n">3</span>Foto di riferimento e 5 viste</h2>
+<div class="row"><input type="file" id="fRef" accept="image/*" style="flex:1"><button id="bGen">Genera 5 foto</button></div>
+<p style="font-size:.85rem;color:var(--mute)">Le viste sono create dall'IA partendo solo dalla tua foto: controlla sempre che montatura, logo e colore coincidano prima di pubblicare.</p>
+<div class="imgs" id="imgs"></div><div class="row" style="margin-top:10px"><button class="ghost" id="bZip">Scarica tutte le foto</button></div></div>
+<div class="card"><h2><span class="n">4</span>Salva il progetto</h2><div class="row"><button id="bSave">Salva bozza</button><button class="ghost" id="bDone">Segna come completato</button></div></div>
+</section></main>
+<dialog id="dlg"><h2>Impostazioni</h2>
+<label>Chiave API Gemini</label><input id="sKey" type="password">
+<label>Modello testo + ricerca web</label><input id="sTxt" value="gemini-2.5-flash">
+<label>Modello immagini</label><input id="sImg" value="gemini-2.5-flash-image">
+<label>Configurazione Firebase (JSON dell'app web)</label><textarea id="sFb" placeholder='{"apiKey":"...","projectId":"...","storageBucket":"..."}'></textarea>
+<div class="row" style="margin-top:12px"><button id="sOk">Salva</button><button class="ghost" id="sNo">Chiudi</button></div></dialog>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script>
+const $=id=>document.getElementById(id), ANG=["vista frontale","tre quarti da sinistra","tre quarti da destra","profilo laterale (asta in vista)","dall'alto con le aste aperte"];
+let S=JSON.parse(localStorage.getItem("ve_set")||"{}"),db,st,cur,refB64=null,refMime="image/jpeg";
+const FIELDS={code:"code",brand:"brand",title:"title",name:"name",desc:"desc",stores:"stores",avg:"avg",pct:"pct",disc:"disc"};
+function msg(t,e){$("msg").textContent=t;$("msg").className=e?"err":""}
+function fresh(){cur={id:null,images:[],status:"bozza"};refB64=null;for(const k in FIELDS)$(k).value="";draw();msg("Nuovo prodotto pronto. Fotografa il codice sull'asta.")}
+function b64(file,max=1280){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",.9).split(",")[1])};i.src=URL.createObjectURL(file)})}
+async function gem(model,parts,tools){
+ if(!S.key)throw Error("Inserisci la chiave Gemini nelle impostazioni.");
+ const body={contents:[{parts}]};if(tools)body.tools=tools;
+ const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${S.key}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+ const j=await r.json();if(!r.ok)throw Error(j.error?.message||"Errore Gemini");
+ return j.candidates?.[0]?.content?.parts||[]}
+const txt=p=>p.map(x=>x.text||"").join("");
+function num(s){const n=parseFloat(String(s).replace(",","."));return isNaN(n)?null:n}
+function avg(){const v=$("stores").value.split("\n").map(l=>num((l.split("|")[1]||"").replace(/[^\d.,]/g,""))).filter(x=>x!==null);
+ if(v.length)$("avg").value=(v.reduce((a,b)=>a+b,0)/v.length).toFixed(2);return v.length}
+function disc(){const a=num($("avg").value),p=num($("pct").value);if(a===null||p===null){msg("Servono prezzo medio e percentuale.",1);return}
+ $("disc").value=(a*(1-p/100)).toFixed(2);msg("Prezzo scontato calcolato. Ricorda di salvare.")}
+function draw(){$("imgs").innerHTML="";cur.images.forEach((im,i)=>{const f=document.createElement("figure"),g=new Image(),a=document.createElement("button");
+ g.src=im.url||"data:image/png;base64,"+im.b64;a.textContent="Scarica";a.className="ghost";a.style.marginTop="6px";a.onclick=()=>dl(im,i);f.append(g,a);$("imgs").append(f)})}
+function dl(im,i){const a=document.createElement("a");a.href=im.url||"data:image/png;base64,"+im.b64;a.download=`${($("code").value||"occhiale").replace(/\W+/g,"_")}_${i+1}.png`;a.target="_blank";a.click()}
+document.querySelectorAll("[data-c]").forEach(b=>b.onclick=async()=>{const el=$(b.dataset.c);try{await navigator.clipboard.writeText(el.value)}catch{el.select();document.execCommand("copy")}msg("Copiato.")});
+$("bAvg").onclick=()=>msg(avg()?"Prezzo medio ricalcolato.":"Nessun prezzo valido nelle righe.",!avg);
+$("bDisc").onclick=disc;
+$("bRead").onclick=async()=>{const f=$("fCode").files[0];if(!f)return msg("Scegli prima la foto dell'asta.",1);msg("Leggo il codice…");
+ try{const p=await gem(S.txt,[{text:"Leggi il codice modello e il codice colore stampati sull'asta di questo occhiale. Rispondi solo con il testo del codice, e se vedi anche la marca scrivila dopo ' | '."},{inlineData:{mimeType:"image/jpeg",data:await b64(f,1600)}}]);
+ const [c,b]=txt(p).trim().split("|");$("code").value=c.trim();if(b)$("brand").value=b.trim();msg("Codice letto: controllalo e correggilo se serve.")}catch(e){msg(e.message,1)}};
+$("bFind").onclick=async()=>{const c=$("code").value.trim();if(!c)return msg("Inserisci il codice.",1);msg("Cerco nei cataloghi online…");$("bFind").disabled=true;
+ try{const q=`Cerca su internet l'occhiale con codice modello "${c}" ${$("brand").value?"di marca "+$("brand").value:""}. Usa solo fonti affidabili: sito ufficiale del marchio e rivenditori autorizzati/verificati. Rispondi SOLO con un JSON valido, senza altro testo: {"brand":"","name":"","title":"titolo per un e-commerce","description":"descrizione in italiano di 60-90 parole basata solo su dati trovati","stores":[{"store":"","price":0,"url":""}],"note":"dubbi o incertezze"}. Se non trovi il modello con certezza, lascia i campi vuoti e spiega in note.`;
+ const p=await gem(S.txt,[{text:q}],[{google_search:{}}]),m=txt(p).match(/\{[\s\S]*\}/);if(!m)throw Error("Risposta non leggibile, riprova.");
+ const j=JSON.parse(m[0]);if(j.brand)$("brand").value=j.brand;$("name").value=j.name||"";$("title").value=j.title||"";$("desc").value=j.description||"";
+ $("stores").value=(j.stores||[]).map(s=>`${s.store} | ${s.price} | ${s.url}`).join("\n");avg();
+ msg(j.note?"Nota: "+j.note:"Fatto. Verifica i dati prima di salvare.")}catch(e){msg(e.message,1)}$("bFind").disabled=false};
+$("fRef").onchange=async e=>{const f=e.target.files[0];if(f){refMime="image/jpeg";refB64=await b64(f,1280);msg("Foto di riferimento caricata.")}};
+$("bGen").onclick=async()=>{if(!refB64)return msg("Carica prima la foto di riferimento.",1);$("bGen").disabled=true;cur.images=[];draw();
+ for(let i=0;i<5;i++){msg(`Genero foto ${i+1} di 5…`);
+  try{const p=await gem(S.img,[{text:`Usando SOLO l'occhiale della foto di riferimento, crea una foto prodotto fotorealistica ad altissima risoluzione su sfondo bianco da studio, con luce morbida: ${ANG[i]}. Mantieni identici forma della montatura, colore, materiali, lenti, logo e dettagli. Non cambiare né inventare nulla, nessuna persona o oggetto aggiuntivo.`},{inlineData:{mimeType:refMime,data:refB64}}]);
+  const im=p.find(x=>x.inlineData);if(!im)throw Error("Nessuna immagine restituita");cur.images.push({b64:im.inlineData.data});draw()}catch(e){msg(`Foto ${i+1}: ${e.message}`,1)}}
+ $("bGen").disabled=false;msg("Generazione finita. Confronta le viste con l'originale.")};
+$("bZip").onclick=()=>cur.images.forEach((im,i)=>setTimeout(()=>dl(im,i),i*400));
+async function save(status){if(!db)return msg("Configura Firebase nelle impostazioni.",1);msg("Salvo…");
+ try{const ref=cur.id?db.collection("products").doc(cur.id):db.collection("products").doc();cur.id=ref.id;
+ for(let i=0;i<cur.images.length;i++){const im=cur.images[i];if(!im.url){const r=st.ref(`products/${ref.id}/vista_${i+1}.png`);await r.putString(im.b64,"base64",{contentType:"image/png"});im.url=await r.getDownloadURL();delete im.b64}}
+ const d={};for(const k in FIELDS)d[k]=$(k).value;d.images=cur.images.map(i=>i.url);d.status=status||cur.status;cur.status=d.status;d.updated=firebase.firestore.FieldValue.serverTimestamp();
+ await ref.set(d,{merge:true});msg("Salvato su Firebase.")}catch(e){msg(e.message,1)}}
+$("bSave").onclick=()=>save();$("bDone").onclick=()=>save("completato");
+$("bNew").onclick=fresh;
+function listen(){db.collection("products").orderBy("updated","desc").onSnapshot(s=>{const L=$("list");L.innerHTML=s.empty?"<small>Nessun progetto salvato.</small>":"";
+ s.forEach(d=>{const x=d.data(),b=document.createElement("button");b.className=cur.id===d.id?"on":"";
+ b.innerHTML=`<b></b><small></small>`;b.firstChild.textContent=x.name||x.code||"Senza nome";b.lastChild.textContent=x.status;b.lastChild.className=x.status==="completato"?"ok":"bd";
+ b.onclick=()=>{cur={id:d.id,status:x.status,images:(x.images||[]).map(u=>({url:u}))};for(const k in FIELDS)$(k).value=x[k]||"";refB64=null;draw();msg("Progetto aperto.");listen.cb&&listen.cb()};L.append(b)})},e=>msg(e.message,1))}
+function init(){try{if(S.fb){const c=JSON.parse(S.fb);firebase.initializeApp(c);db=firebase.firestore();st=firebase.storage();listen()}}catch(e){msg("Firebase: "+e.message,1)}}
+$("bSet").onclick=()=>{$("sKey").value=S.key||"";$("sTxt").value=S.txt||"gemini-2.5-flash";$("sImg").value=S.img||"gemini-2.5-flash-image";$("sFb").value=S.fb||"";$("dlg").showModal()};
+$("sNo").onclick=()=>$("dlg").close();
+$("sOk").onclick=()=>{S={key:$("sKey").value.trim(),txt:$("sTxt").value.trim(),img:$("sImg").value.trim(),fb:$("sFb").value.trim()};localStorage.setItem("ve_set",JSON.stringify(S));location.reload()};
+S.txt=S.txt||"gemini-2.5-flash";S.img=S.img||"gemini-2.5-flash-image";fresh();init();
+</script>
 </body>
 </html>
