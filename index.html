@@ -84,8 +84,8 @@ dialog::backdrop{background:rgba(7,13,26,.6);backdrop-filter:blur(4px)}
 </section></main>
 <dialog id="dlg"><h2>Impostazioni</h2>
 <label>Chiave API Gemini</label><input id="sKey" type="password">
-<label>Modello testo + ricerca web</label><input id="sTxt" value="gemini-2.5-flash">
-<label>Modello immagini</label><input id="sImg" value="gemini-2.5-flash-image">
+<label>Modello testo + ricerca web</label><input id="sTxt" value="gemini-3.8-flash">
+<label>Modello immagini</label><input id="sImg" value="gemini-3.1-flash-image-preview">
 <label>Configurazione Firebase (JSON dell'app web)</label><textarea id="sFb" placeholder='{"apiKey":"...","projectId":"...","storageBucket":"..."}'></textarea>
 <div class="row" style="margin-top:12px"><button id="sOk">Salva</button><button class="ghost" id="sNo">Chiudi</button></div></dialog>
 
@@ -145,10 +145,10 @@ function listen(){db.collection("products").orderBy("updated","desc").onSnapshot
  b.innerHTML=`<b></b><small></small>`;b.firstChild.textContent=x.name||x.code||"Senza nome";b.lastChild.textContent=x.status;b.lastChild.className=x.status==="completato"?"ok":"bd";
  b.onclick=()=>{cur={id:d.id,status:x.status,images:(x.images||[]).map(u=>({url:u}))};for(const k in FIELDS)$(k).value=x[k]||"";refB64=null;draw();msg("Progetto aperto.");listen.cb&&listen.cb()};L.append(b)})},e=>msg(e.message,1))}
 function init(){try{if(S.fb){const c=JSON.parse(S.fb);firebase.initializeApp(c);db=firebase.firestore();st=firebase.storage();listen()}}catch(e){msg("Firebase: "+e.message,1)}}
-$("bSet").onclick=()=>{$("sKey").value=S.key||"";$("sTxt").value=S.txt||"gemini-2.5-flash";$("sImg").value=S.img||"gemini-2.5-flash-image";$("sFb").value=S.fb||"";$("dlg").showModal()};
+$("bSet").onclick=()=>{$("sKey").value=S.key||"";$("sTxt").value=S.txt||"gemini-3.8-flash";$("sImg").value=S.img||"gemini-3.1-flash-image-preview";$("sFb").value=S.fb||"";$("dlg").showModal()};
 $("sNo").onclick=()=>$("dlg").close();
 $("sOk").onclick=()=>{S={key:$("sKey").value.trim(),txt:$("sTxt").value.trim(),img:$("sImg").value.trim(),fb:$("sFb").value.trim()};localStorage.setItem("ve_set",JSON.stringify(S));location.reload()};
-S.txt=S.txt||"gemini-2.5-flash";S.img=S.img||"gemini-2.5-flash-image";fresh();init();
+if(!S.txt||/gemini-2\.5/.test(S.txt))S.txt="gemini-3.8-flash";if(!S.img||/gemini-2\.5/.test(S.img))S.img="gemini-3.1-flash-image-preview";localStorage.setItem("ve_set",JSON.stringify(S));fresh();init();
 </script>
 </body>
 </html>
