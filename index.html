@@ -64,7 +64,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 label{display:block;font-size:.85rem;font-weight:600;color:var(--mute);margin:16px 0 6px}
 .f{display:flex;gap:8px}
-.f input,.f textarea{flex:1}
+.f input,.f textarea,.f select{flex:1}
 input,textarea,select{
   width:100%;font:inherit;padding:12px 14px;border:2px solid transparent;
   border-radius:12px;background:var(--bg);color:var(--ink);
@@ -116,7 +116,7 @@ input::file-selector-button{
 p{line-height:1.5}
 #msg{
   position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;
-  max-width:min(92vw,620px);padding:12px 24px;border-radius:999px;
+  max-width:min(92vw,640px);padding:12px 24px;border-radius:999px;
   background:var(--side);color:var(--sink);font-size:.92rem;box-shadow:0 18px 40px rgba(0,0,0,.35);
   display:flex;align-items:center;gap:12px;transition:opacity .2s,transform .2s;
   cursor:pointer;
@@ -125,7 +125,7 @@ p{line-height:1.5}
 #msg.err{background:var(--err);color:#fff}
 dialog{
   border:0;border-radius:22px;background:var(--card);color:var(--ink);
-  max-width:600px;width:92%;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);
+  max-width:620px;width:92%;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);
 }
 dialog::backdrop{background:rgba(7,13,26,.65);backdrop-filter:blur(4px)}
 .help-txt{font-size:.8rem;color:var(--mute);margin-top:4px;line-height:1.4}
@@ -279,15 +279,32 @@ dialog::backdrop{background:rgba(7,13,26,.65);backdrop-filter:blur(4px)}
     <input id="sKey" type="password" placeholder="AIzaSy...">
     <button class="ghost cp" id="bToggleKey" type="button">Mostra</button>
   </div>
+  <div class="row" style="margin-top:8px">
+    <button class="ghost" id="bTestKey" type="button" style="padding:6px 14px;font-size:0.85rem">🔍 Verifica chiave e modelli attivi</button>
+  </div>
+  <div id="keyTestRes" style="display:none;margin-top:8px;padding:8px 12px;border-radius:10px;font-size:0.83rem"></div>
   <div class="help-txt">Ottieni la chiave gratuita su Google AI Studio (aistudio.google.com).</div>
 
   <label>Modello testo + ricerca web</label>
-  <input id="sTxt" value="gemini-3.8-flash">
-  <div class="help-txt">Consigliato: <b>gemini-3.8-flash</b> (ottimizzato per lettura codici, testo e ricerca web).</div>
+  <select id="sTxtSel">
+    <option value="gemini-2.5-flash">gemini-2.5-flash ⭐ Consigliato (Stabile, ricerca web & quota generosa)</option>
+    <option value="gemini-2.0-flash">gemini-2.0-flash ⚡ Super Veloce (Massima disponibilità, quasi mai in sovraccarico)</option>
+    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite 🪶 Ultra-leggero e rapido</option>
+    <option value="gemini-3.8-flash">gemini-3.8-flash 🧠 Più recente (Soggetto ad alta richiesta / 503 su tier gratuito)</option>
+    <option value="custom">Altro (Personalizzato)…</option>
+  </select>
+  <input id="sTxtCustom" placeholder="Inserisci nome modello esatto (es. gemini-2.5-flash)" style="display:none;margin-top:8px">
+  <div class="help-txt">Se il modello scelto è sovraccarico, l'app passa automaticamente a un modello alternativo per non bloccarti.</div>
 
   <label>Modello immagini</label>
-  <input id="sImg" value="gemini-3.1-flash-image-preview">
-  <div class="help-txt">Consigliato: <b>gemini-3.1-flash-image-preview</b> (supporta generazione nativa immagini tramite generateContent con responseModalities).</div>
+  <select id="sImgSel">
+    <option value="gemini-3.1-flash-image-preview">gemini-3.1-flash-image-preview ⭐ Consigliato (Foto studio e-commerce)</option>
+    <option value="gemini-3.1-flash-lite-image">gemini-3.1-flash-lite-image ⚡ Veloce & Leggero</option>
+    <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp 🧪 Multimodale sperimentale</option>
+    <option value="custom">Altro (Personalizzato)…</option>
+  </select>
+  <input id="sImgCustom" placeholder="Inserisci nome modello immagini" style="display:none;margin-top:8px">
+  <div class="help-txt">Genera le 5 viste prodotto su sfondo bianco studio con luce morbida.</div>
 
   <label>Configurazione Firebase (JSON dell'app web)</label>
   <textarea id="sFb" placeholder='{"apiKey":"...","projectId":"...","storageBucket":"..."}'></textarea>
@@ -390,20 +407,71 @@ function safeJsonParse(str) {
   }
 }
 
-// CHIAMATA GEMINI API CON RETRY AUTOMATICO IN CASO DI OVERLOAD
-async function gem(model, parts, tools, genConfig) {
-  for (let i = 0; i < 4; i++) {
-    try {
-      return await gem1(model, parts, tools, genConfig);
-    } catch (e) {
-      if (i < 3 && /high demand|overloaded|503|UNAVAILABLE|rate limit|temporarily unavailable/i.test(e.message)) {
-        msg(`Google è sovraccarico, riprovo (${i + 1}/3) tra ${(i + 1) * 3}s…`);
-        await new Promise(r => setTimeout(r, 3000 * (i + 1)));
-        continue;
+// CATENA DI MODELLI ALTERNATIVI (FALLBACK AUTOMATICO IN CASO DI OVERLOAD O QUOTA)
+function getFallbackChain(startModel, isImage = false) {
+  if (isImage) {
+    const list = [
+      startModel,
+      "gemini-3.1-flash-image-preview",
+      "gemini-3.1-flash-lite-image",
+      "gemini-2.0-flash-exp"
+    ];
+    return [...new Set(list.filter(Boolean))];
+  } else {
+    const list = [
+      startModel,
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-1.5-flash",
+      "gemini-3.8-flash"
+    ];
+    return [...new Set(list.filter(Boolean))];
+  }
+}
+
+// CHIAMATA GEMINI API CON FAILOVER INTELLIGENTE SU MODELLI ALTERNATIVI
+async function gem(model, parts, tools, genConfig, isImage = false) {
+  const chain = getFallbackChain(model, isImage);
+  let lastError = null;
+
+  for (let mIndex = 0; mIndex < chain.length; mIndex++) {
+    const currentModel = chain[mIndex];
+    if (mIndex > 0) {
+      msg(`⚠️ Modello sovraccarico o quota esaurita. Provo automaticamente con: ${currentModel}…`);
+      await new Promise(r => setTimeout(r, 1500));
+    }
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const result = await gem1(currentModel, parts, tools, genConfig);
+        if (mIndex > 0) {
+          msg(`✓ Completato con successo usando ${currentModel} (fallback attivo).`);
+        }
+        return result;
+      } catch (e) {
+        lastError = e;
+        const isOverloadedOrQuota = /high demand|overloaded|503|UNAVAILABLE|rate limit|quota|429|resource|temporarily unavailable/i.test(e.message);
+
+        if (isOverloadedOrQuota) {
+          console.warn(`[Gemini Fallback] Modello ${currentModel} tentativo ${attempt + 1} rifiutato:`, e.message);
+          if (attempt === 0) {
+            await new Promise(r => setTimeout(r, 2000));
+            continue;
+          }
+          break; // Passa al modello successivo della catena
+        } else {
+          // Errore fatale (es. chiave errata), blocca subito
+          if (/API_KEY_INVALID|invalid api key|key not valid|PERMISSION_DENIED/i.test(e.message)) {
+            throw e;
+          }
+          break;
+        }
       }
-      throw e;
     }
   }
+
+  throw lastError || Error("Tutti i modelli alternativi sono attualmente sovraccarichi o con quota esaurita.");
 }
 
 async function gem1(model, parts, tools, genConfig) {
@@ -429,7 +497,6 @@ async function gem1(model, parts, tools, genConfig) {
   }
 
   if (!r.ok) {
-    // Se imageConfig non è supportato da una versione specifica, ritenta senza imageConfig
     if (genConfig && genConfig.imageConfig && /imageConfig|unknown field/i.test(j.error?.message || "")) {
       const fallbackConfig = { responseModalities: genConfig.responseModalities };
       return await gem1(model, parts, tools, fallbackConfig);
@@ -605,7 +672,7 @@ Se non vedi il brand lascia stringa vuota "". Se non riesci a leggere il codice 
     const p = await gem(S.txt, [
       { text: promptText },
       { inlineData: { mimeType: "image/jpeg", data: codeB64 } }
-    ]);
+    ], null, null, false);
 
     const res = txt(p);
     const parsed = safeJsonParse(res);
@@ -658,7 +725,7 @@ Se non trovi il modello esatto con certezza, compila con i dati più attendibili
 
     let p, web = true;
     try {
-      p = await gem(S.txt, [{ text: q }], [{ google_search: {} }]);
+      p = await gem(S.txt, [{ text: q }], [{ google_search: {} }], null, false);
     } catch (e) {
       if (!/quota|429|resource|permission|ground|search|unsupported|tier|disabled/i.test(e.message)) {
         throw e;
@@ -667,7 +734,7 @@ Se non trovi il modello esatto con certezza, compila con i dati più attendibili
       msg("Ricerca web non disponibile sul piano (" + e.message.slice(0, 100) + "). Riprovo con le conoscenze del modello…");
       const fallbackPrompt = q.replace("Cerca su internet", "Usando le tue conoscenze generali di catalogo ottica, descrivi") +
         "\nSe non conosci i prezzi esatti degli store attuali, lascia 'stores' come array vuoto [].";
-      p = await gem(S.txt, [{ text: fallbackPrompt }]);
+      p = await gem(S.txt, [{ text: fallbackPrompt }], null, null, false);
     }
 
     const parsed = safeJsonParse(txt(p));
@@ -760,7 +827,7 @@ async function dl(im, i) {
   }
 }
 
-// STEP 3: GENERAZIONE DELLE 5 VISTE CON MODELLO GEMINI IMAGE
+// STEP 3: GENERAZIONE DELLE 5 VISTE CON MODELLO GEMINI IMAGE E DELAY ANTI-RATE-LIMIT
 $("bGen").onclick = async () => {
   const f = $("fRef").files[0];
   if (!refB64 && f) {
@@ -797,7 +864,6 @@ Mantieni RIGOROSAMENTE IDENTICI:
 - viti, cerniere e naselli
 Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhiale isolato su bianco.`;
 
-      // Configuriamo le modalità di output: obbligatorio per gemini-3.1-flash-image-preview!
       const genConfig = {
         responseModalities: ["IMAGE", "TEXT"],
         imageConfig: { aspectRatio: "1:1" }
@@ -806,7 +872,7 @@ Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhi
       const p = await gem(S.img, [
         { text: promptText },
         { inlineData: { mimeType: refMime, data: refB64 } }
-      ], null, genConfig);
+      ], null, genConfig, true);
 
       const im = p.find(x => x.inlineData || x.inline_data);
       const imgData = im?.inlineData || im?.inline_data;
@@ -820,6 +886,11 @@ Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhi
         mimeType: imgData.mimeType || imgData.mime_type || "image/png"
       });
       draw();
+
+      // Pausa di 2s tra le richieste per evitare di sforare il limite al minuto (RPM)
+      if (i < 4) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
     } catch (e) {
       console.error(`Errore generazione vista ${i + 1}:`, e);
       errs.push(`Vista ${i + 1} (${ANG[i]}): ${e.message}`);
@@ -829,7 +900,7 @@ Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhi
 
   $("bGen").disabled = false;
   if (errs.length === 5) {
-    msg("Errore nella generazione di tutte le 5 viste: " + errs[0], 1);
+    msg("Errore nella generazione delle viste: " + errs[0], 1);
   } else if (errs.length > 0) {
     msg(`Generate ${5 - errs.length} viste su 5. Alcuni errori: ${errs.join("; ")}`, 1);
   } else {
@@ -1148,12 +1219,60 @@ function init() {
   renderLocalList();
 }
 
-// DIALOG IMPOSTAZIONI
-$("bSet").onclick = () => {
+// DIALOG IMPOSTAZIONI: GESTIONE MODELLI E TEST CHIAVE
+function syncSettingsUI() {
   $("sKey").value = S.key || "";
-  $("sTxt").value = S.txt || "gemini-3.8-flash";
-  $("sImg").value = S.img || "gemini-3.1-flash-image-preview";
+
+  // Modello Testo
+  const curTxt = S.txt || "gemini-2.5-flash";
+  const txtSel = $("sTxtSel");
+  const txtCust = $("sTxtCustom");
+  const foundTxt = Array.from(txtSel.options).some(o => o.value === curTxt);
+  if (foundTxt) {
+    txtSel.value = curTxt;
+    txtCust.style.display = "none";
+  } else {
+    txtSel.value = "custom";
+    txtCust.value = curTxt;
+    txtCust.style.display = "block";
+  }
+
+  // Modello Immagini
+  const curImg = S.img || "gemini-3.1-flash-image-preview";
+  const imgSel = $("sImgSel");
+  const imgCust = $("sImgCustom");
+  const foundImg = Array.from(imgSel.options).some(o => o.value === curImg);
+  if (foundImg) {
+    imgSel.value = curImg;
+    imgCust.style.display = "none";
+  } else {
+    imgSel.value = "custom";
+    imgCust.value = curImg;
+    imgCust.style.display = "block";
+  }
+
   $("sFb").value = S.fb || "";
+  $("keyTestRes").style.display = "none";
+}
+
+$("sTxtSel").onchange = () => {
+  const isCustom = $("sTxtSel").value === "custom";
+  $("sTxtCustom").style.display = isCustom ? "block" : "none";
+  if (isCustom && !$("sTxtCustom").value) {
+    $("sTxtCustom").value = "gemini-2.5-flash";
+  }
+};
+
+$("sImgSel").onchange = () => {
+  const isCustom = $("sImgSel").value === "custom";
+  $("sImgCustom").style.display = isCustom ? "block" : "none";
+  if (isCustom && !$("sImgCustom").value) {
+    $("sImgCustom").value = "gemini-3.1-flash-image-preview";
+  }
+};
+
+$("bSet").onclick = () => {
+  syncSettingsUI();
   $("dlg").showModal();
 };
 $("sNo").onclick = () => $("dlg").close();
@@ -1163,20 +1282,62 @@ $("bToggleKey").onclick = () => {
   $("bToggleKey").textContent = isPass ? "Nascondi" : "Mostra";
 };
 
+// TEST DIRETTO CHIAVE API E MODELLI ATTIVI
+$("bTestKey").onclick = async () => {
+  const k = $("sKey").value.trim();
+  const resBox = $("keyTestRes");
+  if (!k) {
+    resBox.style.display = "block";
+    resBox.style.background = "rgba(217,35,46,0.15)";
+    resBox.style.color = "var(--err)";
+    resBox.textContent = "Inserisci prima la tua chiave API Gemini nel campo sopra.";
+    return;
+  }
+
+  resBox.style.display = "block";
+  resBox.style.background = "var(--acc2)";
+  resBox.style.color = "var(--ink)";
+  resBox.textContent = "Verifica della chiave e interrogazione modelli su Google AI Studio in corso…";
+
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(k)}`);
+    const j = await r.json();
+    if (!r.ok) {
+      throw Error(j.error?.message || `Errore HTTP ${r.status}`);
+    }
+    const modelNames = (j.models || [])
+      .map(m => m.name.replace("models/", ""))
+      .filter(name => /flash|image|pro/i.test(name));
+
+    resBox.style.background = "rgba(16,185,129,0.15)";
+    resBox.style.color = "var(--ok)";
+    resBox.innerHTML = `<b>✓ Chiave API valida e funzionante!</b><br>Modelli disponibili per il tuo account:<br><span style="font-size:0.78rem">${modelNames.slice(0, 10).join(", ") || "Tutti i modelli standard"}</span>`;
+  } catch (err) {
+    resBox.style.background = "rgba(217,35,46,0.15)";
+    resBox.style.color = "var(--err)";
+    resBox.innerHTML = `<b>❌ Errore verifica chiave:</b><br>${err.message}`;
+  }
+};
+
 $("sOk").onclick = () => {
+  const chosenTxt = $("sTxtSel").value === "custom" ? $("sTxtCustom").value.trim() : $("sTxtSel").value;
+  const chosenImg = $("sImgSel").value === "custom" ? $("sImgCustom").value.trim() : $("sImgSel").value;
+
   S = {
     key: $("sKey").value.trim(),
-    txt: $("sTxt").value.trim() || "gemini-3.8-flash",
-    img: $("sImg").value.trim() || "gemini-3.1-flash-image-preview",
+    txt: chosenTxt || "gemini-2.5-flash",
+    img: chosenImg || "gemini-3.1-flash-image-preview",
     fb: $("sFb").value.trim()
   };
   localStorage.setItem("ve_set", JSON.stringify(S));
   location.reload();
 };
 
-// AUTO-AGGIORNAMENTO MODELLI DEPRECATI ALL'AVVIO
-if (!S.txt || /gemini-(?:1\.[05]|2\.[05])/.test(S.txt)) S.txt = "gemini-3.8-flash";
-if (!S.img || /gemini-(?:1\.[05]|2\.[05])|imagen/.test(S.img)) S.img = "gemini-3.1-flash-image-preview";
+// DEFAULT INTELLIGENTE: Sblocco automatico da vecchie impostazioni bloccate su 3.8-flash
+if (!S.txt || S.txt === "gemini-3.8-flash") {
+  S.txt = "gemini-2.5-flash";
+}
+if (!S.img) S.img = "gemini-3.1-flash-image-preview";
 localStorage.setItem("ve_set", JSON.stringify(S));
 
 fresh();
