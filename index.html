@@ -5,151 +5,1182 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vision Express – Catalogo occhiali</title>
 <style>
-:root{--bg:#eef2f8;--card:#fff;--ink:#0a1b33;--mute:#62708a;--acc:#1f5bff;--acc2:#dfe8ff;--line:#e1e8f3;--gold:#ffb703;--side:#0a1b33;--sink:#e8eefc;--sh:0 14px 34px -16px rgba(10,27,51,.28)}
-@media (prefers-color-scheme:dark){:root{--bg:#070d1a;--card:#101a2e;--ink:#eaf0ff;--mute:#8d9bb8;--acc:#5f8cff;--acc2:#18284d;--line:#1f2d4a;--side:#0d1730;--sh:0 14px 34px -16px rgba(0,0,0,.7)}}
+:root{
+  --bg:#eef2f8;--card:#fff;--ink:#0a1b33;--mute:#62708a;--acc:#1f5bff;--acc2:#dfe8ff;
+  --line:#e1e8f3;--gold:#ffb703;--side:#0a1b33;--sink:#e8eefc;--sh:0 14px 34px -16px rgba(10,27,51,.28);
+  --err:#d9232e;--ok:#10b981;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#070d1a;--card:#101a2e;--ink:#eaf0ff;--mute:#8d9bb8;--acc:#5f8cff;--acc2:#18284d;
+    --line:#1f2d4a;--side:#0d1730;--sh:0 14px 34px -16px rgba(0,0,0,.7);--err:#ff525b;--ok:#34d399;
+  }
+}
 *{box-sizing:border-box}
-body{margin:0;color:var(--ink);font:16px/1.55 "Avenir Next","Segoe UI Variable","Segoe UI",system-ui,sans-serif;background:radial-gradient(900px 420px at 90% -8%,var(--acc2),transparent 70%),var(--bg);min-height:100vh}
-header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:22px clamp(16px,4vw,40px) 6px;max-width:1240px;margin:0 auto}
-.brand{display:flex;gap:14px;align-items:center}.brand svg{width:54px;height:32px;color:var(--acc)}
-h1{font-size:1.45rem;margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.1}.brand span{font-size:.85rem;color:var(--mute)}
+body{
+  margin:0;color:var(--ink);
+  font:16px/1.55 "Avenir Next","Segoe UI Variable","Segoe UI",system-ui,sans-serif;
+  background:radial-gradient(900px 420px at 90% -8%,var(--acc2),transparent 70%),var(--bg);
+  min-height:100vh;
+}
+header{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+  padding:22px clamp(16px,4vw,40px) 6px;max-width:1240px;margin:0 auto;
+}
+.brand{display:flex;gap:14px;align-items:center}
+.brand svg{width:54px;height:32px;color:var(--acc);flex-shrink:0}
+h1{font-size:1.45rem;margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.brand span{font-size:.85rem;color:var(--mute)}
 h2{font-size:1.15rem;margin:0 0 16px;font-weight:700;letter-spacing:-.01em;display:flex;gap:12px;align-items:center}
-.n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#7a5cff);color:#fff;font-size:.9rem;font-weight:700}
-main{display:grid;grid-template-columns:300px 1fr;gap:26px;max-width:1240px;margin:18px auto 90px;padding:0 clamp(16px,4vw,40px);align-items:start}
-@media(max-width:860px){main{grid-template-columns:1fr}aside{position:static!important}}
+.n{
+  display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--acc),#7a5cff);color:#fff;font-size:.9rem;font-weight:700;flex-shrink:0;
+}
+main{
+  display:grid;grid-template-columns:300px 1fr;gap:26px;max-width:1240px;
+  margin:18px auto 90px;padding:0 clamp(16px,4vw,40px);align-items:start;
+}
+@media(max-width:860px){
+  main{grid-template-columns:1fr}
+  aside{position:static!important}
+}
 aside{position:sticky;top:18px}
 .side{background:var(--side);color:var(--sink);border-radius:22px;padding:22px;box-shadow:var(--sh)}
 .side h2{color:var(--sink)}
 .card{background:var(--card);border-radius:22px;padding:26px;margin-bottom:22px;box-shadow:var(--sh);border:1px solid var(--line)}
-button{font:inherit;font-weight:600;border:0;background:linear-gradient(135deg,var(--acc),#6a4dff);color:#fff;border-radius:12px;padding:10px 18px;cursor:pointer;box-shadow:0 8px 18px -8px var(--acc);transition:transform .15s,box-shadow .15s}
+button{
+  font:inherit;font-weight:600;border:0;
+  background:linear-gradient(135deg,var(--acc),#6a4dff);color:#fff;
+  border-radius:12px;padding:10px 18px;cursor:pointer;
+  box-shadow:0 8px 18px -8px var(--acc);transition:transform .15s,box-shadow .15s,opacity .15s;
+}
 button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 12px 22px -8px var(--acc)}
 button.ghost{background:var(--acc2);color:var(--acc);box-shadow:none}
+button.ghost:hover:not(:disabled){background:var(--line)}
+button.danger{background:transparent;color:var(--err);box-shadow:none;border:1px solid currentColor}
+button.danger:hover:not(:disabled){background:rgba(217,35,46,0.1)}
 button:disabled{opacity:.55;cursor:wait}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 label{display:block;font-size:.85rem;font-weight:600;color:var(--mute);margin:16px 0 6px}
-.f{display:flex;gap:8px}.f input,.f textarea{flex:1}
-input,textarea{width:100%;font:inherit;padding:12px 14px;border:2px solid transparent;border-radius:12px;background:var(--bg);color:var(--ink);transition:border-color .15s,background .15s}
-input:focus,textarea:focus{border-color:var(--acc);background:var(--card)}
+.f{display:flex;gap:8px}
+.f input,.f textarea{flex:1}
+input,textarea,select{
+  width:100%;font:inherit;padding:12px 14px;border:2px solid transparent;
+  border-radius:12px;background:var(--bg);color:var(--ink);
+  transition:border-color .15s,background .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--acc);background:var(--card)}
 textarea{min-height:104px;resize:vertical}
-input[type=file]{padding:8px;background:var(--bg);border:2px dashed var(--line)}
-input::file-selector-button{font:inherit;font-weight:600;border:0;background:var(--acc2);color:var(--acc);border-radius:8px;padding:8px 12px;margin-right:12px;cursor:pointer}
-.cp{padding:0 14px;align-self:stretch;font-size:.85rem;border-radius:12px;max-height:46px}
+input[type=file]{padding:8px;background:var(--bg);border:2px dashed var(--line);cursor:pointer}
+input::file-selector-button{
+  font:inherit;font-weight:600;border:0;background:var(--acc2);color:var(--acc);
+  border-radius:8px;padding:8px 12px;margin-right:12px;cursor:pointer;
+}
+.cp{padding:0 14px;align-self:stretch;font-size:.85rem;border-radius:12px;max-height:46px;white-space:nowrap}
 #avg,#disc{font-size:1.7rem;font-weight:800;letter-spacing:-.02em}
 #disc{border-color:var(--gold);color:var(--ink)}
-.list button{display:block;width:100%;text-align:left;background:rgba(255,255,255,.06);color:var(--sink);box-shadow:none;margin-bottom:8px;padding:12px 14px;font-weight:500}
+.list{max-height:600px;overflow-y:auto;padding-right:4px}
+.list button{
+  display:block;width:100%;text-align:left;background:rgba(255,255,255,.06);
+  color:var(--sink);box-shadow:none;margin-bottom:8px;padding:12px 14px;font-weight:500;
+  border-radius:12px;border:1px solid transparent;transition:background .15s;
+}
 .list button:hover:not(:disabled){background:rgba(255,255,255,.13);transform:none;box-shadow:none}
-.list button.on{background:var(--acc);color:#fff}
-.list b{display:block;font-weight:700}.list small{color:#9db0d4;font-size:.8rem}
-.list button.on small{color:#e0e8ff}.bd{color:var(--gold)!important}.ok{color:#5be0a5!important}
+.list button.on{background:var(--acc);color:#fff;border-color:rgba(255,255,255,.3)}
+.list b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list small{color:#9db0d4;font-size:.8rem}
+.list button.on small{color:#e0e8ff}
+.bd{color:var(--gold)!important}.ok{color:var(--ok)!important}
+.thumb-preview{
+  max-height:120px;max-width:200px;border-radius:12px;border:2px solid var(--line);
+  margin-top:10px;object-fit:contain;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.08);display:block;
+}
 .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:16px}
-.imgs:empty::before{content:"Le 5 viste appariranno qui";grid-column:1/-1;padding:44px 16px;text-align:center;color:var(--mute);border:2px dashed var(--line);border-radius:16px}
-.imgs figure{margin:0;background:var(--bg);border-radius:16px;padding:10px;transition:transform .2s,box-shadow .2s}
+.imgs:empty::before{
+  content:"Le 5 viste appariranno qui man mano che vengono generate";
+  grid-column:1/-1;padding:44px 16px;text-align:center;color:var(--mute);
+  border:2px dashed var(--line);border-radius:16px;
+}
+.imgs figure{
+  margin:0;background:var(--bg);border-radius:16px;padding:12px;
+  transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;
+}
 .imgs figure:hover{transform:translateY(-3px);box-shadow:var(--sh)}
+.img-label{
+  font-size:.78rem;font-weight:700;color:var(--mute);margin-bottom:8px;
+  text-transform:capitalize;line-height:1.2;
+}
 .imgs img{width:100%;border-radius:10px;background:#fff;aspect-ratio:1;object-fit:contain;display:block}
 .imgs figure button{width:100%;margin-top:10px;padding:8px}
 p{line-height:1.5}
-#msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;max-width:min(92vw,560px);padding:12px 20px;border-radius:999px;background:var(--side);color:var(--sink);font-size:.92rem;box-shadow:var(--sh)}
-#msg:empty{display:none}#msg.err{background:#b4232c;color:#fff}
-dialog{border:0;border-radius:22px;background:var(--card);color:var(--ink);max-width:560px;width:92%;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
-dialog::backdrop{background:rgba(7,13,26,.6);backdrop-filter:blur(4px)}
+#msg{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;
+  max-width:min(92vw,620px);padding:12px 24px;border-radius:999px;
+  background:var(--side);color:var(--sink);font-size:.92rem;box-shadow:0 18px 40px rgba(0,0,0,.35);
+  display:flex;align-items:center;gap:12px;transition:opacity .2s,transform .2s;
+  cursor:pointer;
+}
+#msg:empty{display:none}
+#msg.err{background:var(--err);color:#fff}
+dialog{
+  border:0;border-radius:22px;background:var(--card);color:var(--ink);
+  max-width:600px;width:92%;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);
+}
+dialog::backdrop{background:rgba(7,13,26,.65);backdrop-filter:blur(4px)}
+.help-txt{font-size:.8rem;color:var(--mute);margin-top:4px;line-height:1.4}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header><div class="brand"><svg viewBox="0 0 54 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><circle cx="14" cy="17" r="11"/><circle cx="40" cy="17" r="11"/><path d="M25 14c1.5-2 2.5-2 4 0"/></svg><div><h1>Vision Express</h1><span>Catalogo occhiali</span></div></div>
-<div class="row"><button id="bNew">Nuovo prodotto</button><button class="ghost" id="bSet">Impostazioni</button></div></header>
-<main>
-<aside><div class="side"><h2>Progetti</h2><div class="list" id="list"><small>Configura Firebase nelle impostazioni.</small></div></div></aside>
-<section>
-<div id="msg"></div>
-<div class="card"><h2><span class="n">1</span>Codice sull'asta</h2>
-<div class="row"><input type="file" id="fCode" accept="image/*" capture="environment" style="flex:1"><button id="bRead" class="ghost">Leggi il codice dalla foto</button></div>
-<label>Codice modello</label><div class="f"><input id="code" placeholder="es. RB3025 001/51"><button class="cp ghost" data-c="code">Copia</button></div>
-<label>Marca (facoltativa, aiuta la ricerca)</label><div class="f"><input id="brand"><button class="cp ghost" data-c="brand">Copia</button></div>
-<div class="row" style="margin-top:12px"><button id="bFind">Cerca nel catalogo online</button></div></div>
-<div class="card"><h2><span class="n">2</span>Scheda prodotto</h2>
-<label>Titolo</label><div class="f"><input id="title"><button class="cp ghost" data-c="title">Copia</button></div>
-<label>Nome</label><div class="f"><input id="name"><button class="cp ghost" data-c="name">Copia</button></div>
-<label>Descrizione</label><div class="f"><textarea id="desc"></textarea><button class="cp ghost" data-c="desc">Copia</button></div>
-<label>Store verificati (uno per riga: store | prezzo € | link)</label><div class="f"><textarea id="stores"></textarea><button class="cp ghost" data-c="stores">Copia</button></div>
-<div class="row" style="margin-top:8px"><button class="ghost" id="bAvg">Ricalcola prezzo medio</button></div>
-<label>Prezzo medio ricercato (€)</label><div class="f"><input id="avg" inputmode="decimal"><button class="cp ghost" data-c="avg">Copia</button></div>
-<label>Sconto (%) – da inserire quando vuoi</label><div class="f"><input id="pct" inputmode="decimal" placeholder="vuoto = nessuno"><button class="cp" id="bDisc">Applica</button></div>
-<label>Prezzo scontato (€)</label><div class="f"><input id="disc" inputmode="decimal"><button class="cp ghost" data-c="disc">Copia</button></div></div>
-<div class="card"><h2><span class="n">3</span>Foto di riferimento e 5 viste</h2>
-<div class="row"><input type="file" id="fRef" accept="image/*" style="flex:1"><button id="bGen">Genera 5 foto</button></div>
-<p style="font-size:.85rem;color:var(--mute)">Le viste sono create dall'IA partendo solo dalla tua foto: controlla sempre che montatura, logo e colore coincidano prima di pubblicare.</p>
-<div class="imgs" id="imgs"></div><div class="row" style="margin-top:10px"><button class="ghost" id="bZip">Scarica tutte le foto</button></div></div>
-<div class="card"><h2><span class="n">4</span>Salva il progetto</h2><div class="row"><button id="bSave">Salva bozza</button><button class="ghost" id="bDone">Segna come completato</button></div></div>
-</section></main>
-<dialog id="dlg"><h2>Impostazioni</h2>
-<label>Chiave API Gemini</label><input id="sKey" type="password">
-<label>Modello testo + ricerca web</label><input id="sTxt" value="gemini-3.8-flash">
-<label>Modello immagini</label><input id="sImg" value="gemini-3.1-flash-image-preview">
-<label>Configurazione Firebase (JSON dell'app web)</label><textarea id="sFb" placeholder='{"apiKey":"...","projectId":"...","storageBucket":"..."}'></textarea>
-<div class="row" style="margin-top:12px"><button id="sOk">Salva</button><button class="ghost" id="sNo">Chiudi</button></div></dialog>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 54 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+      <circle cx="14" cy="17" r="11"/>
+      <circle cx="40" cy="17" r="11"/>
+      <path d="M25 14c1.5-2 2.5-2 4 0"/>
+    </svg>
+    <div>
+      <h1>Vision Express</h1>
+      <span>Catalogo occhiali</span>
+    </div>
+  </div>
+  <div class="row">
+    <button id="bNew">Nuovo prodotto</button>
+    <button class="ghost" id="bSet">Impostazioni</button>
+  </div>
+</header>
 
+<main>
+<aside>
+  <div class="side">
+    <h2>Progetti</h2>
+    <div class="list" id="list">
+      <small style="opacity:0.8">Caricamento progetti…</small>
+    </div>
+  </div>
+</aside>
+
+<section>
+  <div id="msg" title="Clicca per chiudere"></div>
+
+  <!-- STEP 1: CODICE SULL'ASTA -->
+  <div class="card">
+    <h2><span class="n">1</span>Codice sull'asta</h2>
+    <div class="row">
+      <input type="file" id="fCode" accept="image/*" capture="environment" style="flex:1">
+      <button id="bRead" class="ghost">Leggi il codice dalla foto</button>
+    </div>
+    <img id="codeThumb" class="thumb-preview" style="display:none" alt="Anteprima asta">
+
+    <label>Codice modello</label>
+    <div class="f">
+      <input id="code" placeholder="es. RB3025 001/51">
+      <button class="cp ghost" data-c="code">Copia</button>
+    </div>
+
+    <label>Marca (facoltativa, aiuta la ricerca)</label>
+    <div class="f">
+      <input id="brand" placeholder="es. Ray-Ban, Gucci, Persol…">
+      <button class="cp ghost" data-c="brand">Copia</button>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <button id="bFind">Cerca nel catalogo online</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: SCHEDA PRODOTTO -->
+  <div class="card">
+    <h2><span class="n">2</span>Scheda prodotto</h2>
+    <label>Titolo e-commerce</label>
+    <div class="f">
+      <input id="title">
+      <button class="cp ghost" data-c="title">Copia</button>
+    </div>
+
+    <label>Nome modello</label>
+    <div class="f">
+      <input id="name">
+      <button class="cp ghost" data-c="name">Copia</button>
+    </div>
+
+    <label>Descrizione commerciale</label>
+    <div class="f">
+      <textarea id="desc"></textarea>
+      <button class="cp ghost" data-c="desc">Copia</button>
+    </div>
+
+    <label>Store verificati (uno per riga: store | prezzo € | link)</label>
+    <div class="f">
+      <textarea id="stores" placeholder="Ottica San Marco | 149.00 | https://..."></textarea>
+      <button class="cp ghost" data-c="stores">Copia</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="ghost" id="bAvg">Ricalcola prezzo medio</button>
+    </div>
+
+    <label>Prezzo medio ricercato (€)</label>
+    <div class="f">
+      <input id="avg" inputmode="decimal" placeholder="0.00">
+      <button class="cp ghost" data-c="avg">Copia</button>
+    </div>
+
+    <label>Sconto (%) – inserisci la percentuale quando vuoi</label>
+    <div class="f">
+      <input id="pct" inputmode="decimal" placeholder="es. 20 (premi Invio per calcolare)">
+      <button class="cp" id="bDisc">Applica</button>
+    </div>
+
+    <label>Prezzo scontato (€)</label>
+    <div class="f">
+      <input id="disc" inputmode="decimal" placeholder="0.00">
+      <button class="cp ghost" data-c="disc">Copia</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: FOTO DI RIFERIMENTO E 5 VISTE -->
+  <div class="card">
+    <h2><span class="n">3</span>Foto di riferimento e 5 viste</h2>
+    <div class="row">
+      <input type="file" id="fRef" accept="image/*" style="flex:1">
+      <button id="bGen">Genera 5 foto</button>
+    </div>
+    <img id="refThumb" class="thumb-preview" style="display:none" alt="Anteprima occhiale di riferimento">
+
+    <p style="font-size:.85rem;color:var(--mute);margin-top:10px">
+      Le 5 viste sono create da Gemini partendo esclusivamente dalla tua foto di riferimento: controlla sempre montatura, finitura, logo e lenti prima della pubblicazione.
+    </p>
+
+    <div class="imgs" id="imgs"></div>
+    <div class="row" style="margin-top:16px">
+      <button class="ghost" id="bZip">Scarica tutte le foto (ZIP)</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: SALVA IL PROGETTO -->
+  <div class="card">
+    <h2><span class="n">4</span>Salva il progetto</h2>
+    <div class="row">
+      <button id="bSave">Salva bozza</button>
+      <button class="ghost" id="bDone">Segna come completato</button>
+      <button class="danger" id="bDel" style="margin-left:auto">Elimina progetto</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- DIALOG IMPOSTAZIONI -->
+<dialog id="dlg">
+  <h2>Impostazioni</h2>
+  
+  <label>Chiave API Gemini</label>
+  <div class="f">
+    <input id="sKey" type="password" placeholder="AIzaSy...">
+    <button class="ghost cp" id="bToggleKey" type="button">Mostra</button>
+  </div>
+  <div class="help-txt">Ottieni la chiave gratuita su Google AI Studio (aistudio.google.com).</div>
+
+  <label>Modello testo + ricerca web</label>
+  <input id="sTxt" value="gemini-3.8-flash">
+  <div class="help-txt">Consigliato: <b>gemini-3.8-flash</b> (ottimizzato per lettura codici, testo e ricerca web).</div>
+
+  <label>Modello immagini</label>
+  <input id="sImg" value="gemini-3.1-flash-image-preview">
+  <div class="help-txt">Consigliato: <b>gemini-3.1-flash-image-preview</b> (supporta generazione nativa immagini tramite generateContent con responseModalities).</div>
+
+  <label>Configurazione Firebase (JSON dell'app web)</label>
+  <textarea id="sFb" placeholder='{"apiKey":"...","projectId":"...","storageBucket":"..."}'></textarea>
+  <div class="help-txt">Incolla l'oggetto JSON o l'intero snippet <code>const firebaseConfig = { ... }</code> dalla console Firebase. Se lasciato vuoto, le bozze vengono salvate localmente nel browser.</div>
+
+  <div class="row" style="margin-top:20px;justify-content:flex-end">
+    <button class="ghost" id="sNo">Chiudi</button>
+    <button id="sOk">Salva impostazioni</button>
+  </div>
+</dialog>
+
+<!-- SCRIPTS: JSZip + Firebase compat SDKs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
 <script>
-const $=id=>document.getElementById(id), ANG=["vista frontale","tre quarti da sinistra","tre quarti da destra","profilo laterale (asta in vista)","dall'alto con le aste aperte"];
-let S=JSON.parse(localStorage.getItem("ve_set")||"{}"),db,st,cur,refB64=null,refMime="image/jpeg";
-const FIELDS={code:"code",brand:"brand",title:"title",name:"name",desc:"desc",stores:"stores",avg:"avg",pct:"pct",disc:"disc"};
-function msg(t,e){$("msg").textContent=t;$("msg").className=e?"err":""}
-function fresh(){cur={id:null,images:[],status:"bozza"};refB64=null;for(const k in FIELDS)$(k).value="";draw();msg("Nuovo prodotto pronto. Fotografa il codice sull'asta.")}
-function b64(file,max=1280){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",.9).split(",")[1])};i.src=URL.createObjectURL(file)})}
-async function gem(model,parts,tools){for(let i=0;i<4;i++){try{return await gem1(model,parts,tools)}catch(e){if(i<3&&/high demand|overloaded|503|UNAVAILABLE/i.test(e.message)){msg("Google è sovraccarico, riprovo ("+(i+1)+"/3)…");await new Promise(r=>setTimeout(r,3000*(i+1)));continue}throw e}}}
-async function gem1(model,parts,tools){
- if(!S.key)throw Error("Inserisci la chiave Gemini nelle impostazioni.");
- const body={contents:[{parts}]};if(tools)body.tools=tools;
- const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${S.key}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
- const j=await r.json();if(!r.ok){const v=(j.error?.details||[]).flatMap(d=>d.violations||[]).map(x=>(x.quotaMetric||"")+" "+JSON.stringify(x.quotaDimensions||{})).join(" ; ");throw Error((j.error?.message||"Errore Gemini")+(v?" ["+v+"]":""));}
- return j.candidates?.[0]?.content?.parts||[]}
-const txt=p=>p.map(x=>x.text||"").join("");
-function num(s){const n=parseFloat(String(s).replace(",","."));return isNaN(n)?null:n}
-function avg(){const v=$("stores").value.split("\n").map(l=>num((l.split("|")[1]||"").replace(/[^\d.,]/g,""))).filter(x=>x!==null);
- if(v.length)$("avg").value=(v.reduce((a,b)=>a+b,0)/v.length).toFixed(2);return v.length}
-function disc(){const a=num($("avg").value),p=num($("pct").value);if(a===null||p===null){msg("Servono prezzo medio e percentuale.",1);return}
- $("disc").value=(a*(1-p/100)).toFixed(2);msg("Prezzo scontato calcolato. Ricorda di salvare.")}
-function draw(){$("imgs").innerHTML="";cur.images.forEach((im,i)=>{const f=document.createElement("figure"),g=new Image(),a=document.createElement("button");
- g.src=im.url||"data:image/png;base64,"+im.b64;a.textContent="Scarica";a.className="ghost";a.style.marginTop="6px";a.onclick=()=>dl(im,i);f.append(g,a);$("imgs").append(f)})}
-function dl(im,i){const a=document.createElement("a");a.href=im.url||"data:image/png;base64,"+im.b64;a.download=`${($("code").value||"occhiale").replace(/\W+/g,"_")}_${i+1}.png`;a.target="_blank";a.click()}
-document.querySelectorAll("[data-c]").forEach(b=>b.onclick=async()=>{const el=$(b.dataset.c);try{await navigator.clipboard.writeText(el.value)}catch{el.select();document.execCommand("copy")}msg("Copiato.")});
-$("bAvg").onclick=()=>msg(avg()?"Prezzo medio ricalcolato.":"Nessun prezzo valido nelle righe.",!avg);
-$("bDisc").onclick=disc;
-$("bRead").onclick=async()=>{const f=$("fCode").files[0];if(!f)return msg("Scegli prima la foto dell'asta.",1);msg("Leggo il codice…");
- try{const p=await gem(S.txt,[{text:"Leggi il codice modello e il codice colore stampati sull'asta di questo occhiale. Rispondi solo con il testo del codice, e se vedi anche la marca scrivila dopo ' | '."},{inlineData:{mimeType:"image/jpeg",data:await b64(f,1600)}}]);
- const [c,b]=txt(p).trim().split("|");$("code").value=c.trim();if(b)$("brand").value=b.trim();msg("Codice letto: controllalo e correggilo se serve.")}catch(e){msg(e.message,1)}};
-$("bFind").onclick=async()=>{const c=$("code").value.trim();if(!c)return msg("Inserisci il codice.",1);msg("Cerco nei cataloghi online…");$("bFind").disabled=true;
- try{const q=`Cerca su internet l'occhiale con codice modello "${c}" ${$("brand").value?"di marca "+$("brand").value:""}. Usa solo fonti affidabili: sito ufficiale del marchio e rivenditori autorizzati/verificati. Rispondi SOLO con un JSON valido, senza altro testo: {"brand":"","name":"","title":"titolo per un e-commerce","description":"descrizione in italiano di 60-90 parole basata solo su dati trovati","stores":[{"store":"","price":0,"url":""}],"note":"dubbi o incertezze"}. Se non trovi il modello con certezza, lascia i campi vuoti e spiega in note.`;
- let p,web=true;try{p=await gem(S.txt,[{text:q}],[{google_search:{}}])}catch(e){if(!/quota|429|RESOURCE/i.test(e.message))throw e;web=false;msg("Ricerca web rifiutata ("+e.message.slice(0,300)+"). Riprovo senza web…",1);p=await gem(S.txt,[{text:q.replace("Cerca su internet","Usando solo le tue conoscenze, senza ricerca web, descrivi")+" Lascia stores vuoto: non hai accesso ai prezzi."}])}const m=txt(p).match(/\{[\s\S]*\}/);if(!m)throw Error("Risposta non leggibile, riprova.");
- const j=JSON.parse(m[0]);if(j.brand)$("brand").value=j.brand;$("name").value=j.name||"";$("title").value=j.title||"";$("desc").value=j.description||"";
- $("stores").value=(j.stores||[]).map(s=>`${s.store} | ${s.price} | ${s.url}`).join("\n");avg();
- msg(!web?"Compilato SENZA ricerca web: verifica titolo e descrizione, prezzi da inserire a mano.":j.note?"Nota: "+j.note:"Fatto. Verifica i dati prima di salvare.")}catch(e){msg(e.message,1)}$("bFind").disabled=false};
-$("fRef").onchange=async e=>{const f=e.target.files[0];if(f){refMime="image/jpeg";refB64=await b64(f,1280);msg("Foto di riferimento caricata.")}};
-$("bGen").onclick=async()=>{if(!refB64)return msg("Carica prima la foto di riferimento.",1);$("bGen").disabled=true;cur.images=[];draw();
- for(let i=0;i<5;i++){msg(`Genero foto ${i+1} di 5…`);
-  try{const p=await gem(S.img,[{text:`Usando SOLO l'occhiale della foto di riferimento, crea una foto prodotto fotorealistica ad altissima risoluzione su sfondo bianco da studio, con luce morbida: ${ANG[i]}. Mantieni identici forma della montatura, colore, materiali, lenti, logo e dettagli. Non cambiare né inventare nulla, nessuna persona o oggetto aggiuntivo.`},{inlineData:{mimeType:refMime,data:refB64}}]);
-  const im=p.find(x=>x.inlineData);if(!im)throw Error("Nessuna immagine restituita");cur.images.push({b64:im.inlineData.data});draw()}catch(e){msg(`Foto ${i+1}: ${e.message}`,1)}}
- $("bGen").disabled=false;msg("Generazione finita. Confronta le viste con l'originale.")};
-$("bZip").onclick=()=>cur.images.forEach((im,i)=>setTimeout(()=>dl(im,i),i*400));
-async function save(status){if(!db)return msg("Configura Firebase nelle impostazioni.",1);msg("Salvo…");
- try{const ref=cur.id?db.collection("products").doc(cur.id):db.collection("products").doc();cur.id=ref.id;
- for(let i=0;i<cur.images.length;i++){const im=cur.images[i];if(!im.url){const r=st.ref(`products/${ref.id}/vista_${i+1}.png`);await r.putString(im.b64,"base64",{contentType:"image/png"});im.url=await r.getDownloadURL();delete im.b64}}
- const d={};for(const k in FIELDS)d[k]=$(k).value;d.images=cur.images.map(i=>i.url);d.status=status||cur.status;cur.status=d.status;d.updated=firebase.firestore.FieldValue.serverTimestamp();
- await ref.set(d,{merge:true});msg("Salvato su Firebase.")}catch(e){msg(e.message,1)}}
-$("bSave").onclick=()=>save();$("bDone").onclick=()=>save("completato");
-$("bNew").onclick=fresh;
-function listen(){db.collection("products").orderBy("updated","desc").onSnapshot(s=>{const L=$("list");L.innerHTML=s.empty?"<small>Nessun progetto salvato.</small>":"";
- s.forEach(d=>{const x=d.data(),b=document.createElement("button");b.className=cur.id===d.id?"on":"";
- b.innerHTML=`<b></b><small></small>`;b.firstChild.textContent=x.name||x.code||"Senza nome";b.lastChild.textContent=x.status;b.lastChild.className=x.status==="completato"?"ok":"bd";
- b.onclick=()=>{cur={id:d.id,status:x.status,images:(x.images||[]).map(u=>({url:u}))};for(const k in FIELDS)$(k).value=x[k]||"";refB64=null;draw();msg("Progetto aperto.");listen.cb&&listen.cb()};L.append(b)})},e=>msg(e.message,1))}
-function init(){try{if(S.fb){const c=JSON.parse(S.fb);firebase.initializeApp(c);db=firebase.firestore();st=firebase.storage();listen()}}catch(e){msg("Firebase: "+e.message,1)}}
-$("bSet").onclick=()=>{$("sKey").value=S.key||"";$("sTxt").value=S.txt||"gemini-3.8-flash";$("sImg").value=S.img||"gemini-3.1-flash-image-preview";$("sFb").value=S.fb||"";$("dlg").showModal()};
-$("sNo").onclick=()=>$("dlg").close();
-$("sOk").onclick=()=>{S={key:$("sKey").value.trim(),txt:$("sTxt").value.trim(),img:$("sImg").value.trim(),fb:$("sFb").value.trim()};localStorage.setItem("ve_set",JSON.stringify(S));location.reload()};
-if(!S.txt||/gemini-2\.5/.test(S.txt))S.txt="gemini-3.8-flash";if(!S.img||/gemini-2\.5/.test(S.img))S.img="gemini-3.1-flash-image-preview";localStorage.setItem("ve_set",JSON.stringify(S));fresh();init();
+const $ = id => document.getElementById(id);
+const ANG = [
+  "vista frontale",
+  "tre quarti da sinistra",
+  "tre quarti da destra",
+  "profilo laterale (asta in vista)",
+  "dall'alto con le aste aperte"
+];
+const FIELDS = {
+  code: "code", brand: "brand", title: "title", name: "name",
+  desc: "desc", stores: "stores", avg: "avg", pct: "pct", disc: "disc"
+};
+
+let S = JSON.parse(localStorage.getItem("ve_set") || "{}");
+let db = null, st = null;
+let cur = { id: null, images: [], status: "bozza" };
+let refB64 = null, refMime = "image/jpeg";
+let codeB64 = null;
+let msgTimer = null;
+
+// NOTIFICHE UTENTE
+function msg(text, isError = false) {
+  const el = $("msg");
+  if (!text) { el.textContent = ""; return; }
+  el.textContent = (isError ? "⚠️ " : "ℹ️ ") + text;
+  el.className = isError ? "err" : "";
+  clearTimeout(msgTimer);
+  if (!isError) {
+    msgTimer = setTimeout(() => { el.textContent = ""; }, 5000);
+  }
+}
+$("msg").onclick = () => { $("msg").textContent = ""; };
+
+// GESTIONE CONVERSIONE IMMAGINE IN BASE64 E RESIZE CANVAS
+function b64(file, max = 1280) {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(Error("Nessun file selezionato."));
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".heic") || name.endsWith(".heif")) {
+      return reject(Error("Il formato HEIC di Apple non è supportato direttamente dal browser. Usa una foto JPG/PNG o scatta direttamente dalla fotocamera."));
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      resolve(dataUrl.split(",")[1]);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(Error("Impossibile leggere l'immagine. Usa un formato standard JPG o PNG."));
+    };
+    img.src = url;
+  });
+}
+
+// ROBUST JSON PARSER CON SUPPORTO AI MARKDOWN FENCE E TRAILING COMMAS
+function safeJsonParse(str) {
+  if (!str) return null;
+  const codeBlock = str.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  const target = codeBlock ? codeBlock[1] : str;
+  const match = target.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  const jsonStr = match[0];
+  try {
+    return JSON.parse(jsonStr);
+  } catch (err) {
+    try {
+      const cleaned = jsonStr
+        .replace(/,\s*([\]}])/g, '$1')
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, c => (c === '\n' || c === '\r' || c === '\t' ? c : ''));
+      return JSON.parse(cleaned);
+    } catch {
+      return null;
+    }
+  }
+}
+
+// CHIAMATA GEMINI API CON RETRY AUTOMATICO IN CASO DI OVERLOAD
+async function gem(model, parts, tools, genConfig) {
+  for (let i = 0; i < 4; i++) {
+    try {
+      return await gem1(model, parts, tools, genConfig);
+    } catch (e) {
+      if (i < 3 && /high demand|overloaded|503|UNAVAILABLE|rate limit|temporarily unavailable/i.test(e.message)) {
+        msg(`Google è sovraccarico, riprovo (${i + 1}/3) tra ${(i + 1) * 3}s…`);
+        await new Promise(r => setTimeout(r, 3000 * (i + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+async function gem1(model, parts, tools, genConfig) {
+  if (!S.key) throw Error("Inserisci la chiave API Gemini nelle impostazioni (in alto a destra).");
+  
+  const body = { contents: [{ parts }] };
+  if (tools && tools.length) body.tools = tools;
+  if (genConfig) body.generationConfig = genConfig;
+
+  let r, j;
+  try {
+    r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(S.key)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }
+    );
+    j = await r.json();
+  } catch (netErr) {
+    throw Error("Errore di rete nella richiesta a Google Gemini: " + netErr.message);
+  }
+
+  if (!r.ok) {
+    // Se imageConfig non è supportato da una versione specifica, ritenta senza imageConfig
+    if (genConfig && genConfig.imageConfig && /imageConfig|unknown field/i.test(j.error?.message || "")) {
+      const fallbackConfig = { responseModalities: genConfig.responseModalities };
+      return await gem1(model, parts, tools, fallbackConfig);
+    }
+
+    const v = (j.error?.details || [])
+      .flatMap(d => d.violations || [])
+      .map(x => (x.quotaMetric || "") + " " + JSON.stringify(x.quotaDimensions || {}))
+      .filter(Boolean)
+      .join(" ; ");
+    const errMsg = j.error?.message || `Errore Gemini (${r.status})`;
+    throw Error(errMsg + (v ? ` [Dettagli quota: ${v}]` : ""));
+  }
+
+  const candidate = j.candidates?.[0];
+  if (!candidate) {
+    if (j.promptFeedback?.blockReason) {
+      throw Error(`Richiesta bloccata dai filtri di sicurezza: ${j.promptFeedback.blockReason}`);
+    }
+    throw Error("Nessuna risposta restituita dal modello Gemini.");
+  }
+
+  return candidate.content?.parts || [];
+}
+
+const txt = parts => (parts || []).map(x => x.text || "").join("");
+
+// PARSER NUMERICO UNIVERSALE (EUROPEO / USA)
+function num(s) {
+  if (s == null) return null;
+  let str = String(s).trim();
+  if (!str) return null;
+  if (str.includes('.') && str.includes(',')) {
+    if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
+      str = str.replace(/\./g, '').replace(',', '.');
+    } else {
+      str = str.replace(/,/g, '');
+    }
+  } else if (str.includes(',')) {
+    str = str.replace(',', '.');
+  }
+  const n = parseFloat(str.replace(/[^\d.-]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+// CALCOLO PREZZO MEDIO E SCONTO
+function avg() {
+  const lines = $("stores").value.split("\n");
+  const prices = lines
+    .map(line => {
+      const parts = line.split("|");
+      return parts.length >= 2 ? num(parts[1]) : null;
+    })
+    .filter(x => x !== null && x > 0);
+
+  if (prices.length > 0) {
+    const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+    $("avg").value = average.toFixed(2);
+    if ($("pct").value.trim()) {
+      calcDisc(false);
+    }
+    return prices.length;
+  }
+  return 0;
+}
+
+function calcDisc(showMessage = true) {
+  const a = num($("avg").value);
+  const p = num($("pct").value);
+  if (a === null || p === null) {
+    if (showMessage) msg("Servono sia il prezzo medio che la percentuale di sconto per calcolare.", 1);
+    return;
+  }
+  const discounted = Math.max(0, a * (1 - p / 100));
+  $("disc").value = discounted.toFixed(2);
+  if (showMessage) msg(`Prezzo scontato calcolato: ${$("disc").value} € (-${p}%). Ricorda di salvare.`);
+}
+
+$("bAvg").onclick = () => {
+  const count = avg();
+  msg(
+    count ? `Prezzo medio calcolato su ${count} store verificati.` : "Nessun prezzo valido trovato nelle righe degli store.",
+    count === 0
+  );
+};
+$("bDisc").onclick = () => calcDisc(true);
+$("pct").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); calcDisc(true); } };
+$("pct").oninput = () => {
+  if ($("pct").value.trim() && num($("avg").value) !== null) {
+    calcDisc(false);
+  }
+};
+
+// COPIA NEGLI APPUNTI CON FEEDBACK VISIVO
+document.querySelectorAll("[data-c]").forEach(b => {
+  b.onclick = async () => {
+    const el = $(b.dataset.c);
+    if (!el) return;
+    const val = el.value.trim();
+    if (!val) return msg("Campo vuoto, niente da copiare.", 1);
+    try {
+      await navigator.clipboard.writeText(el.value);
+    } catch {
+      el.select();
+      document.execCommand("copy");
+    }
+    const orig = b.textContent;
+    b.textContent = "✓ Fatto";
+    setTimeout(() => { b.textContent = orig; }, 1500);
+    msg("Copiato negli appunti.");
+  };
+});
+
+// ANTEPRIME IMMAGINI CARICATE
+$("fCode").onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    codeB64 = await b64(f, 1600);
+    const thumb = $("codeThumb");
+    thumb.src = `data:image/jpeg;base64,${codeB64}`;
+    thumb.style.display = "block";
+    msg("Foto dell'asta caricata. Clicca su 'Leggi il codice dalla foto'.");
+  } catch (x) {
+    codeB64 = null;
+    $("codeThumb").style.display = "none";
+    msg(x.message, 1);
+  }
+};
+
+$("fRef").onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  refMime = "image/jpeg";
+  try {
+    refB64 = await b64(f, 1280);
+    const thumb = $("refThumb");
+    thumb.src = `data:image/jpeg;base64,${refB64}`;
+    thumb.style.display = "block";
+    msg("Foto di riferimento caricata con successo.");
+  } catch (x) {
+    refB64 = null;
+    $("refThumb").style.display = "none";
+    msg(x.message, 1);
+  }
+};
+
+// STEP 1: LETTURA CODICE ASTA CON OCR GEMINI
+$("bRead").onclick = async () => {
+  const f = $("fCode").files[0];
+  if (!refB64 && !f && !codeB64) {
+    return msg("Scegli o scatta prima la foto dell'asta dell'occhiale.", 1);
+  }
+  msg("Lettura codice in corso dall'asta…");
+  $("bRead").disabled = true;
+
+  try {
+    if (!codeB64 && f) {
+      codeB64 = await b64(f, 1600);
+      $("codeThumb").src = `data:image/jpeg;base64,${codeB64}`;
+      $("codeThumb").style.display = "block";
+    }
+
+    const promptText = `Analizza la foto dell'asta interna di questo occhiale (da vista o da sole).
+Estrai:
+1. Codice modello completo con codice colore ed eventuali misure (es. "RB3025 001/51", "GG0061S 002 56-22-140", "TF5401 001").
+2. Marca o brand del produttore se visibile o deducibile dal logo/nome (es. "Ray-Ban", "Gucci", "Tom Ford", "Persol", "Oakley", ecc.).
+
+Rispondi ESCLUSIVAMENTE con un JSON valido:
+{"code": "codice modello completo", "brand": "marca occhiale"}
+Se non vedi il brand lascia stringa vuota "". Se non riesci a leggere il codice spiega cosa vedi nel campo code.`;
+
+    const p = await gem(S.txt, [
+      { text: promptText },
+      { inlineData: { mimeType: "image/jpeg", data: codeB64 } }
+    ]);
+
+    const res = txt(p);
+    const parsed = safeJsonParse(res);
+
+    if (parsed && (parsed.code || parsed.brand)) {
+      if (parsed.code) $("code").value = parsed.code.trim();
+      if (parsed.brand) $("brand").value = parsed.brand.trim();
+      msg("Codice letto con successo: controllalo ed eventualmente perfezionalo.");
+    } else {
+      const raw = res.replace(/```json|```|\{|\}|"/g, "").trim();
+      const parts = raw.split("|");
+      if (parts.length > 1) {
+        $("code").value = parts[0].trim();
+        $("brand").value = parts[1].trim();
+      } else {
+        $("code").value = raw.trim();
+      }
+      msg("Codice letto: controllalo e correggilo se serve.");
+    }
+  } catch (e) {
+    msg("Errore lettura asta: " + e.message, 1);
+  } finally {
+    $("bRead").disabled = false;
+  }
+};
+
+// STEP 2: RICERCA NEL CATALOGO ONLINE CON RICERCA WEB O FALLBACK
+$("bFind").onclick = async () => {
+  const c = $("code").value.trim();
+  if (!c) return msg("Inserisci prima il codice modello.", 1);
+  const brandVal = $("brand").value.trim();
+
+  msg("Cerco nei cataloghi e rivenditori online…");
+  $("bFind").disabled = true;
+
+  try {
+    const q = `Cerca su internet l'occhiale con codice modello "${c}" ${brandVal ? "di marca " + brandVal : ""}. Usa solo fonti affidabili: sito ufficiale del marchio e rivenditori autorizzati/verificati.
+Rispondi SOLO con un JSON valido, senza altro testo:
+{
+  "brand": "marchio dell'occhiale",
+  "name": "nome commerciale del modello (es. Aviator Classic, Wayfarer, Clubmaster)",
+  "title": "titolo completo per e-commerce (es. Occhiali da sole Ray-Ban Aviator Classic RB3025 001/51)",
+  "description": "descrizione commerciale in italiano di 60-90 parole basata sulle caratteristiche (materiale montatura, lenti, UV, stile)",
+  "stores": [
+    {"store": "Nome store o sito ufficiale", "price": 145.00, "url": "https://..."}
+  ],
+  "note": "eventuali note o dubbi sul modello trovato"
+}
+Se non trovi il modello esatto con certezza, compila con i dati più attendibili e segnala i dettagli in note.`;
+
+    let p, web = true;
+    try {
+      p = await gem(S.txt, [{ text: q }], [{ google_search: {} }]);
+    } catch (e) {
+      if (!/quota|429|resource|permission|ground|search|unsupported|tier|disabled/i.test(e.message)) {
+        throw e;
+      }
+      web = false;
+      msg("Ricerca web non disponibile sul piano (" + e.message.slice(0, 100) + "). Riprovo con le conoscenze del modello…");
+      const fallbackPrompt = q.replace("Cerca su internet", "Usando le tue conoscenze generali di catalogo ottica, descrivi") +
+        "\nSe non conosci i prezzi esatti degli store attuali, lascia 'stores' come array vuoto [].";
+      p = await gem(S.txt, [{ text: fallbackPrompt }]);
+    }
+
+    const parsed = safeJsonParse(txt(p));
+    if (!parsed) throw Error("Risposta del catalogo non leggibile, riprova.");
+
+    if (parsed.brand) $("brand").value = parsed.brand;
+    if (parsed.name) $("name").value = parsed.name;
+    if (parsed.title) $("title").value = parsed.title;
+    if (parsed.description) $("desc").value = parsed.description;
+
+    if (Array.isArray(parsed.stores) && parsed.stores.length) {
+      $("stores").value = parsed.stores
+        .map(s => `${s.store || "Store"} | ${s.price != null ? s.price : ""} | ${s.url || ""}`)
+        .join("\n");
+      avg();
+    }
+
+    if (!web) {
+      msg("Compilato SENZA ricerca web attiva. Verifica titolo e descrizione, e inserisci i prezzi store a mano.");
+    } else if (parsed.note) {
+      msg("Dati compilati. Nota: " + parsed.note);
+    } else {
+      msg("Scheda prodotto compilata con successo! Verifica i dati.");
+    }
+  } catch (e) {
+    msg("Errore catalogo: " + e.message, 1);
+  } finally {
+    $("bFind").disabled = false;
+  }
+};
+
+// DISEGNO DELLA GRIGLIA IMMAGINI GENERATE
+function draw() {
+  const box = $("imgs");
+  box.innerHTML = "";
+  if (!cur.images || !cur.images.length) return;
+
+  cur.images.forEach((im, i) => {
+    const f = document.createElement("figure");
+    const label = document.createElement("div");
+    label.className = "img-label";
+    label.textContent = `${i + 1}. ${ANG[i] || "Vista"}`;
+
+    const g = new Image();
+    const mime = im.mimeType || "image/png";
+    g.src = im.url || `data:${mime};base64,${im.b64}`;
+    g.alt = ANG[i] || `Vista ${i + 1}`;
+
+    const a = document.createElement("button");
+    a.textContent = "Scarica";
+    a.className = "ghost";
+    a.onclick = () => dl(im, i);
+
+    f.append(label, g, a);
+    box.append(f);
+  });
+}
+
+// DOWNLOAD SINGOLA IMMAGINE
+async function dl(im, i) {
+  const codeClean = ($("code").value || "occhiale").trim().replace(/[^\w.-]+/g, "_");
+  const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
+  const filename = `${codeClean}_vista_${i + 1}.${ext}`;
+
+  if (im.b64) {
+    const a = document.createElement("a");
+    a.href = `data:${im.mimeType || "image/png"};base64,${im.b64}`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  }
+
+  if (im.url) {
+    try {
+      const res = await fetch(im.url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch {
+      window.open(im.url, "_blank");
+    }
+  }
+}
+
+// STEP 3: GENERAZIONE DELLE 5 VISTE CON MODELLO GEMINI IMAGE
+$("bGen").onclick = async () => {
+  const f = $("fRef").files[0];
+  if (!refB64 && f) {
+    try {
+      refMime = "image/jpeg";
+      refB64 = await b64(f, 1280);
+      $("refThumb").src = `data:image/jpeg;base64,${refB64}`;
+      $("refThumb").style.display = "block";
+    } catch (x) {
+      return msg(x.message, 1);
+    }
+  }
+  if (!refB64) return msg("Carica prima la foto di riferimento dell'occhiale.", 1);
+
+  $("bGen").disabled = true;
+  cur.images = [];
+  draw();
+  let errs = [];
+
+  const brandOrCode = [($("brand").value || "").trim(), ($("code").value || "").trim()].filter(Boolean).join(" ");
+
+  for (let i = 0; i < 5; i++) {
+    msg(`Genero vista ${i + 1} di 5 (${ANG[i]})…`);
+    try {
+      const promptText = `Foto prodotto per catalogo e-commerce di ottica ad altissima risoluzione.
+Crea una foto prodotto fotorealistica su sfondo bianco puro da studio (#FFFFFF), con illuminazione morbida senza ombre marcate: ${ANG[i]}.
+${brandOrCode ? `Modello di riferimento: ${brandOrCode}. ` : ""}
+ATTENZIONE FONDAMENTALE: Usa come fonte di verità ESCLUSIVAMENTE l'occhiale visibile nella foto di riferimento allegata.
+Mantieni RIGOROSAMENTE IDENTICI:
+- forma geometrica della montatura e del ponte
+- colore esatto, sfumature, trasparenze e materiali (acetato, metallo, titanio)
+- colore, polarizzazione e sfumatura delle lenti
+- logo del marchio sulle aste e/o sulla lente
+- viti, cerniere e naselli
+Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhiale isolato su bianco.`;
+
+      // Configuriamo le modalità di output: obbligatorio per gemini-3.1-flash-image-preview!
+      const genConfig = {
+        responseModalities: ["IMAGE", "TEXT"],
+        imageConfig: { aspectRatio: "1:1" }
+      };
+
+      const p = await gem(S.img, [
+        { text: promptText },
+        { inlineData: { mimeType: refMime, data: refB64 } }
+      ], null, genConfig);
+
+      const im = p.find(x => x.inlineData || x.inline_data);
+      const imgData = im?.inlineData || im?.inline_data;
+      if (!imgData?.data) {
+        const textFallback = txt(p).trim();
+        throw Error(textFallback ? `Nessuna immagine: ${textFallback.slice(0, 100)}` : "Il modello non ha restituito dati immagine");
+      }
+
+      cur.images.push({
+        b64: imgData.data,
+        mimeType: imgData.mimeType || imgData.mime_type || "image/png"
+      });
+      draw();
+    } catch (e) {
+      console.error(`Errore generazione vista ${i + 1}:`, e);
+      errs.push(`Vista ${i + 1} (${ANG[i]}): ${e.message}`);
+      msg(errs.join(" | "), 1);
+    }
+  }
+
+  $("bGen").disabled = false;
+  if (errs.length === 5) {
+    msg("Errore nella generazione di tutte le 5 viste: " + errs[0], 1);
+  } else if (errs.length > 0) {
+    msg(`Generate ${5 - errs.length} viste su 5. Alcuni errori: ${errs.join("; ")}`, 1);
+  } else {
+    msg("Tutte le 5 viste sono state generate! Confrontale con l'originale prima di salvare.");
+  }
+};
+
+// DOWNLOAD TUTTE LE FOTO IN ARCHIVIO ZIP
+$("bZip").onclick = async () => {
+  if (!cur.images || !cur.images.length) {
+    return msg("Nessuna foto generata da scaricare.", 1);
+  }
+
+  if (window.JSZip) {
+    msg("Creazione archivio ZIP in corso…");
+    const zip = new JSZip();
+    const codeClean = ($("code").value || "occhiale").trim().replace(/[^\w.-]+/g, "_");
+
+    for (let i = 0; i < cur.images.length; i++) {
+      const im = cur.images[i];
+      const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
+      const filename = `${codeClean}_vista_${i + 1}.${ext}`;
+
+      if (im.b64) {
+        zip.file(filename, im.b64, { base64: true });
+      } else if (im.url) {
+        try {
+          const res = await fetch(im.url);
+          const blob = await res.blob();
+          zip.file(filename, blob);
+        } catch (err) {
+          console.warn("Impossibile includere immagine remota nello ZIP:", err);
+        }
+      }
+    }
+
+    try {
+      const content = await zip.generateAsync({ type: "blob" });
+      const blobUrl = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `${codeClean}_5_viste.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      msg("Archivio ZIP scaricato con successo!");
+    } catch (err) {
+      msg("Errore creazione ZIP: " + err.message, 1);
+    }
+  } else {
+    cur.images.forEach((im, i) => setTimeout(() => dl(im, i), i * 450));
+    msg("Download sequenziale delle foto avviato.");
+  }
+};
+
+// AGGIORNAMENTO EVIDENZIAZIONE PROGETTO ATTIVO NELLA SIDEBAR
+function updateListSelection() {
+  const buttons = $("list").querySelectorAll("button[data-id]");
+  buttons.forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.id === (cur?.id || ""));
+  });
+}
+
+// STEP 4: SALVATAGGIO PROGETTO SU FIREBASE O BOZZA LOCALE
+async function save(status) {
+  const currentStatus = status || cur.status || "bozza";
+  cur.status = currentStatus;
+
+  if (!db) {
+    saveLocalDraft(currentStatus);
+    return;
+  }
+
+  msg("Salvataggio su Firebase in corso…");
+  const saveBtn = $("bSave");
+  const doneBtn = $("bDone");
+  saveBtn.disabled = true;
+  doneBtn.disabled = true;
+
+  try {
+    const docRef = cur.id && !cur.id.startsWith("local_") ? db.collection("products").doc(cur.id) : db.collection("products").doc();
+    cur.id = docRef.id;
+
+    let storageErrors = [];
+    if (st && cur.images && cur.images.length) {
+      for (let i = 0; i < cur.images.length; i++) {
+        const im = cur.images[i];
+        if (!im.url && im.b64) {
+          try {
+            const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
+            const fileRef = st.ref(`products/${docRef.id}/vista_${i + 1}.${ext}`);
+            await fileRef.putString(im.b64, "base64", { contentType: im.mimeType || "image/png" });
+            im.url = await fileRef.getDownloadURL();
+          } catch (stErr) {
+            console.warn("Storage upload failed for image", i + 1, stErr);
+            storageErrors.push(`Foto ${i + 1} (${stErr.message})`);
+          }
+        }
+      }
+    }
+
+    const d = {};
+    for (const k in FIELDS) d[k] = $(k).value;
+    d.images = (cur.images || []).map(i => i.url).filter(Boolean);
+    d.status = currentStatus;
+    d.updated = firebase.firestore.FieldValue.serverTimestamp();
+
+    await docRef.set(d, { merge: true });
+    updateListSelection();
+
+    if (storageErrors.length) {
+      msg(`Dati salvati su Firestore. Attenzione Storage: ${storageErrors.join("; ")}`, 1);
+    } else {
+      msg(`Progetto salvato su Firebase come "${currentStatus}" con successo!`);
+    }
+  } catch (e) {
+    msg("Errore salvataggio Firebase: " + e.message, 1);
+  } finally {
+    saveBtn.disabled = false;
+    doneBtn.disabled = false;
+  }
+}
+
+function saveLocalDraft(status) {
+  const d = {};
+  for (const k in FIELDS) d[k] = $(k).value;
+  d.id = cur.id || ("local_" + Date.now());
+  cur.id = d.id;
+  d.status = status;
+  d.updated = Date.now();
+
+  let localDrafts = JSON.parse(localStorage.getItem("ve_local_drafts") || "[]");
+  const idx = localDrafts.findIndex(x => x.id === d.id);
+  if (idx >= 0) localDrafts[idx] = d;
+  else localDrafts.unshift(d);
+
+  localStorage.setItem("ve_local_drafts", JSON.stringify(localDrafts.slice(0, 40)));
+  renderLocalList();
+  msg(`Salvato come "${status}" nelle bozze locali del browser (Firebase non configurato).`);
+}
+
+$("bSave").onclick = () => save("bozza");
+$("bDone").onclick = () => save("completato");
+
+// ELIMINAZIONE PROGETTO
+$("bDel").onclick = async () => {
+  if (!cur.id) return msg("Nessun progetto aperto da eliminare.", 1);
+  if (!confirm("Sei sicuro di voler eliminare questo progetto?")) return;
+
+  if (db && !cur.id.startsWith("local_")) {
+    try {
+      await db.collection("products").doc(cur.id).delete();
+      msg("Progetto eliminato da Firebase.");
+    } catch (e) {
+      return msg("Errore eliminazione Firebase: " + e.message, 1);
+    }
+  } else {
+    let localDrafts = JSON.parse(localStorage.getItem("ve_local_drafts") || "[]");
+    localDrafts = localDrafts.filter(x => x.id !== cur.id);
+    localStorage.setItem("ve_local_drafts", JSON.stringify(localDrafts));
+    renderLocalList();
+    msg("Bozza locale eliminata.");
+  }
+  fresh();
+};
+
+// RESET NUOVO PRODOTTO
+function fresh() {
+  cur = { id: null, images: [], status: "bozza" };
+  refB64 = null;
+  codeB64 = null;
+  $("fCode").value = "";
+  $("fRef").value = "";
+  $("codeThumb").style.display = "none";
+  $("refThumb").style.display = "none";
+
+  for (const k in FIELDS) $(k).value = "";
+  draw();
+  updateListSelection();
+  msg("Nuovo prodotto pronto. Fotografa il codice sull'asta o carica una foto.");
+}
+$("bNew").onclick = fresh;
+
+// GESTIONE LISTA PROGETTI LOCALI (FALLBACK SE FIREBASE NON E' CONFIGURATO)
+function renderLocalList() {
+  if (db) return;
+  const L = $("list");
+  const localDrafts = JSON.parse(localStorage.getItem("ve_local_drafts") || "[]");
+
+  if (!localDrafts.length) {
+    L.innerHTML = `<div style="font-size:0.85rem;line-height:1.4">
+      <b style="color:var(--gold)">Nessun progetto salvato.</b><br>
+      <small style="color:var(--sink);opacity:0.8">Per sincronizzare su cloud, inserisci le credenziali Firebase nelle <a href="#" id="linkSet" style="color:var(--acc);text-decoration:underline">Impostazioni</a>.</small>
+    </div>`;
+    const ls = $("linkSet");
+    if (ls) ls.onclick = e => { e.preventDefault(); $("bSet").click(); };
+    return;
+  }
+
+  L.innerHTML = `<div style="font-size:0.75rem;color:var(--mute);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Bozze salvate localmente</div>`;
+  localDrafts.forEach(d => {
+    const b = document.createElement("button");
+    b.dataset.id = d.id;
+    b.className = cur?.id === d.id ? "on" : "";
+    b.innerHTML = `<b></b><small></small>`;
+    b.querySelector("b").textContent = d.name || d.code || "Senza nome";
+    const sm = b.querySelector("small");
+    sm.textContent = d.status || "bozza";
+    sm.className = d.status === "completato" ? "ok" : "bd";
+
+    b.onclick = () => {
+      cur = { id: d.id, status: d.status, images: [] };
+      for (const k in FIELDS) $(k).value = d[k] || "";
+      refB64 = null;
+      codeB64 = null;
+      $("fRef").value = "";
+      $("fCode").value = "";
+      $("refThumb").style.display = "none";
+      $("codeThumb").style.display = "none";
+      draw();
+      updateListSelection();
+      msg("Bozza locale aperta.");
+    };
+    L.append(b);
+  });
+}
+
+// REALTIME LISTENER FIRESTORE
+function listen() {
+  if (!db) return;
+  db.collection("products").orderBy("updated", "desc").onSnapshot(
+    snapshot => {
+      const L = $("list");
+      if (snapshot.empty) {
+        L.innerHTML = "<small style='opacity:0.8'>Nessun progetto su Firebase. Clicca 'Nuovo prodotto' per iniziare.</small>";
+        return;
+      }
+      L.innerHTML = "";
+      snapshot.forEach(doc => {
+        const x = doc.data();
+        const b = document.createElement("button");
+        b.dataset.id = doc.id;
+        b.className = cur?.id === doc.id ? "on" : "";
+        b.innerHTML = `<b></b><small></small>`;
+        b.querySelector("b").textContent = x.name || x.code || "Senza nome";
+        const sm = b.querySelector("small");
+        sm.textContent = x.status || "bozza";
+        sm.className = x.status === "completato" ? "ok" : "bd";
+
+        b.onclick = () => {
+          cur = {
+            id: doc.id,
+            status: x.status || "bozza",
+            images: (x.images || []).map(u => ({ url: u }))
+          };
+          for (const k in FIELDS) $(k).value = x[k] || "";
+          refB64 = null;
+          codeB64 = null;
+          $("fRef").value = "";
+          $("fCode").value = "";
+          $("refThumb").style.display = "none";
+          $("codeThumb").style.display = "none";
+          draw();
+          updateListSelection();
+          msg(`Progetto "${x.name || x.code || doc.id}" aperto.`);
+        };
+        L.append(b);
+      });
+      updateListSelection();
+    },
+    error => {
+      console.warn("Errore listener Firestore:", error);
+      msg("Firebase Firestore: " + error.message, 1);
+    }
+  );
+}
+
+// INIZIALIZZAZIONE FIREBASE E PARSER CONFIGURAZIONE RESILIENTE
+function init() {
+  try {
+    if (S.fb && S.fb.trim()) {
+      let configStr = S.fb.trim();
+      if (configStr.includes("=")) {
+        configStr = configStr.substring(configStr.indexOf("=") + 1);
+      }
+      if (configStr.endsWith(";")) {
+        configStr = configStr.slice(0, -1);
+      }
+      let c;
+      try {
+        c = JSON.parse(configStr);
+      } catch {
+        const fixed = configStr
+          .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+          .replace(/,\s*([}\]])/g, '$1');
+        c = JSON.parse(fixed);
+      }
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(c);
+      }
+      db = firebase.firestore();
+      try {
+        st = firebase.storage();
+      } catch (stErr) {
+        console.warn("Storage non inizializzato:", stErr);
+      }
+      listen();
+      return;
+    }
+  } catch (e) {
+    msg("Errore configurazione Firebase: " + e.message, 1);
+  }
+
+  renderLocalList();
+}
+
+// DIALOG IMPOSTAZIONI
+$("bSet").onclick = () => {
+  $("sKey").value = S.key || "";
+  $("sTxt").value = S.txt || "gemini-3.8-flash";
+  $("sImg").value = S.img || "gemini-3.1-flash-image-preview";
+  $("sFb").value = S.fb || "";
+  $("dlg").showModal();
+};
+$("sNo").onclick = () => $("dlg").close();
+$("bToggleKey").onclick = () => {
+  const isPass = $("sKey").type === "password";
+  $("sKey").type = isPass ? "text" : "password";
+  $("bToggleKey").textContent = isPass ? "Nascondi" : "Mostra";
+};
+
+$("sOk").onclick = () => {
+  S = {
+    key: $("sKey").value.trim(),
+    txt: $("sTxt").value.trim() || "gemini-3.8-flash",
+    img: $("sImg").value.trim() || "gemini-3.1-flash-image-preview",
+    fb: $("sFb").value.trim()
+  };
+  localStorage.setItem("ve_set", JSON.stringify(S));
+  location.reload();
+};
+
+// AUTO-AGGIORNAMENTO MODELLI DEPRECATI ALL'AVVIO
+if (!S.txt || /gemini-(?:1\.[05]|2\.[05])/.test(S.txt)) S.txt = "gemini-3.8-flash";
+if (!S.img || /gemini-(?:1\.[05]|2\.[05])|imagen/.test(S.img)) S.img = "gemini-3.1-flash-image-preview";
+localStorage.setItem("ve_set", JSON.stringify(S));
+
+fresh();
+init();
 </script>
 </body>
 </html>
