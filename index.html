@@ -254,8 +254,17 @@ dialog::backdrop{background:rgba(7,13,26,.65);backdrop-filter:blur(4px)}
     </p>
 
     <div class="imgs" id="imgs"></div>
-    <div class="row" style="margin-top:16px">
-      <button class="ghost" id="bZip">Scarica tutte le foto (ZIP)</button>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div class="row">
+        <button class="ghost" id="bZip">Scarica tutte le foto (ZIP)</button>
+      </div>
+      <div class="row">
+        <label style="margin:0;font-size:0.85rem;color:var(--mute)">Formato foto:</label>
+        <select id="imgFormat" style="width:auto;padding:8px 12px;font-size:0.85rem">
+          <option value="jpg" selected>JPEG (.jpg) – Ottimizzato e-commerce</option>
+          <option value="png">PNG (.png) – Formato non compresso</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -374,8 +383,11 @@ function b64(file, max = 1280) {
       canvas.width = Math.max(1, Math.round(img.width * scale));
       canvas.height = Math.max(1, Math.round(img.height * scale));
       const ctx = canvas.getContext("2d");
+      // Sfondo bianco puro: evita bordi neri su trasparenze PNG quando convertite in JPEG
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
       resolve(dataUrl.split(",")[1]);
     };
     img.onerror = () => {
@@ -767,11 +779,34 @@ Rispondi SOLO con un JSON valido, senza altro testo prima o dopo:
   }
 };
 
+// CONVERSIONE BASE64 IN JPEG ALTA QUALITA' SU SFONDO BIANCO
+function convertB64ToJpeg(b64Str, quality = 0.92) {
+  return new Promise((resolve) => {
+    if (!b64Str) return resolve(b64Str);
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth || img.width;
+      c.height = img.naturalHeight || img.height;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const dataUrl = c.toDataURL("image/jpeg", quality);
+      resolve(dataUrl.split(",")[1]);
+    };
+    img.onerror = () => resolve(b64Str);
+    img.src = b64Str.startsWith("data:") ? b64Str : "data:image/png;base64," + b64Str;
+  });
+}
+
 // DISEGNO DELLA GRIGLIA IMMAGINI GENERATE
 function draw() {
   const box = $("imgs");
   box.innerHTML = "";
   if (!cur.images || !cur.images.length) return;
+
+  const currentFmt = $("imgFormat") ? $("imgFormat").value.toUpperCase() : "JPG";
 
   cur.images.forEach((im, i) => {
     const f = document.createElement("figure");
@@ -785,7 +820,7 @@ function draw() {
     g.alt = ANG[i] || `Vista ${i + 1}`;
 
     const a = document.createElement("button");
-    a.textContent = "Scarica";
+    a.textContent = `Scarica (${currentFmt})`;
     a.className = "ghost";
     a.onclick = () => dl(im, i);
 
@@ -794,15 +829,26 @@ function draw() {
   });
 }
 
-// DOWNLOAD SINGOLA IMMAGINE
+if ($("imgFormat")) {
+  $("imgFormat").onchange = () => draw();
+}
+
+// DOWNLOAD SINGOLA IMMAGINE (JPG O PNG)
 async function dl(im, i) {
   const codeClean = ($("code").value || "occhiale").trim().replace(/[^\w.-]+/g, "_");
-  const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
+  const format = $("imgFormat") ? $("imgFormat").value : "jpg";
+  const ext = format === "jpg" ? "jpg" : "png";
   const filename = `${codeClean}_vista_${i + 1}.${ext}`;
 
   if (im.b64) {
+    let outputB64 = im.b64;
+    let mime = im.mimeType || "image/png";
+    if (format === "jpg" && !mime.includes("jpeg")) {
+      outputB64 = await convertB64ToJpeg(im.b64, 0.92);
+      mime = "image/jpeg";
+    }
     const a = document.createElement("a");
-    a.href = `data:${im.mimeType || "image/png"};base64,${im.b64}`;
+    a.href = `data:${mime};base64,${outputB64}`;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -910,24 +956,30 @@ Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhi
   }
 };
 
-// DOWNLOAD TUTTE LE FOTO IN ARCHIVIO ZIP
+// DOWNLOAD TUTTE LE FOTO IN ARCHIVIO ZIP (JPG O PNG)
 $("bZip").onclick = async () => {
   if (!cur.images || !cur.images.length) {
     return msg("Nessuna foto generata da scaricare.", 1);
   }
 
+  const format = $("imgFormat") ? $("imgFormat").value : "jpg";
+  const ext = format === "jpg" ? "jpg" : "png";
+  const codeClean = ($("code").value || "occhiale").trim().replace(/[^\w.-]+/g, "_");
+
   if (window.JSZip) {
-    msg("Creazione archivio ZIP in corso…");
+    msg(`Creazione archivio ZIP con foto ${ext.toUpperCase()} in corso…`);
     const zip = new JSZip();
-    const codeClean = ($("code").value || "occhiale").trim().replace(/[^\w.-]+/g, "_");
 
     for (let i = 0; i < cur.images.length; i++) {
       const im = cur.images[i];
-      const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
       const filename = `${codeClean}_vista_${i + 1}.${ext}`;
 
       if (im.b64) {
-        zip.file(filename, im.b64, { base64: true });
+        let fileB64 = im.b64;
+        if (format === "jpg" && (!im.mimeType || !im.mimeType.includes("jpeg"))) {
+          fileB64 = await convertB64ToJpeg(im.b64, 0.92);
+        }
+        zip.file(filename, fileB64, { base64: true });
       } else if (im.url) {
         try {
           const res = await fetch(im.url);
@@ -944,12 +996,12 @@ $("bZip").onclick = async () => {
       const blobUrl = URL.createObjectURL(content);
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = `${codeClean}_5_viste.zip`;
+      a.download = `${codeClean}_5_viste_${ext}.zip`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-      msg("Archivio ZIP scaricato con successo!");
+      msg(`Archivio ZIP con foto ${ext.toUpperCase()} scaricato con successo!`);
     } catch (err) {
       msg("Errore creazione ZIP: " + err.message, 1);
     }
@@ -993,9 +1045,17 @@ async function save(status) {
         const im = cur.images[i];
         if (!im.url && im.b64) {
           try {
-            const ext = (im.mimeType && im.mimeType.includes("jpeg")) ? "jpg" : "png";
+            const format = $("imgFormat") ? $("imgFormat").value : "jpg";
+            let uploadB64 = im.b64;
+            let mime = im.mimeType || "image/png";
+            let ext = "png";
+            if (format === "jpg") {
+              uploadB64 = await convertB64ToJpeg(im.b64, 0.92);
+              mime = "image/jpeg";
+              ext = "jpg";
+            }
             const fileRef = st.ref(`products/${docRef.id}/vista_${i + 1}.${ext}`);
-            await fileRef.putString(im.b64, "base64", { contentType: im.mimeType || "image/png" });
+            await fileRef.putString(uploadB64, "base64", { contentType: mime });
             im.url = await fileRef.getDownloadURL();
           } catch (stErr) {
             console.warn("Storage upload failed for image", i + 1, stErr);
