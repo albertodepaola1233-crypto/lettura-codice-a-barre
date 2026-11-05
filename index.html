@@ -460,19 +460,25 @@ function getFallbackChain(startModel, isImage = false) {
 }
 
 // CHIAMATA GEMINI API CON DISACCOPPIAMENTO STRUMENTI E FAILOVER INTELLIGENTE
+// IMPORTANTE: questa funzione opera in SILENZIO — nessuna chiamata a msg() qui dentro.
+// Solo il chiamante mostra i messaggi all'utente, così l'utente vede un solo messaggio finale.
 async function gem(model, parts, tools, genConfig, isImage = false) {
   // Se è presente uno strumento di grounding web (google_search), proviamo.
   // Se la quota del piano non include il grounding web, riproviamo SUBITO senza strumento!
+  let usedWebSearch = true;
   if (tools && tools.length) {
     try {
-      return await gem1(model, parts, tools, genConfig);
+      const result = await gem1(model, parts, tools, genConfig);
+      result._usedWebSearch = true;
+      return result;
     } catch (toolErr) {
       if (/quota|429|resource|permission|ground|search|unsupported|tier|disabled|limit/i.test(toolErr.message)) {
         console.warn("[Gemini] Ricerca web non abilitata sulla quota della chiave. Compilo usando la memoria del modello.");
-        msg("Ricerca web non abilitata sulla quota: compilo con le informazioni di catalogo del modello…");
-        return await gem(model, parts, null, genConfig, isImage);
+        usedWebSearch = false;
+        // Proseguiamo senza tools — nessun messaggio all'utente qui
+      } else {
+        throw toolErr;
       }
-      throw toolErr;
     }
   }
 
@@ -482,16 +488,15 @@ async function gem(model, parts, tools, genConfig, isImage = false) {
   for (let mIndex = 0; mIndex < chain.length; mIndex++) {
     const currentModel = chain[mIndex];
     if (mIndex > 0) {
-      msg(`⚠️ Modello sovraccarico o quota esaurita. Provo con: ${currentModel}…`);
-      await new Promise(r => setTimeout(r, 1200));
+      console.warn(`[Gemini Fallback] Provo modello alternativo: ${currentModel}`);
+      await new Promise(r => setTimeout(r, 400));
     }
 
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const result = await gem1(currentModel, parts, tools, genConfig);
-        if (mIndex > 0) {
-          msg(`✓ Completato con successo usando ${currentModel}.`);
-        }
+        const result = await gem1(currentModel, parts, null, genConfig);
+        result._usedWebSearch = usedWebSearch;
+        result._fallbackModel = mIndex > 0 ? currentModel : null;
         return result;
       } catch (e) {
         lastError = e;
@@ -500,7 +505,7 @@ async function gem(model, parts, tools, genConfig, isImage = false) {
         if (isQuotaOrOverload) {
           console.warn(`[Gemini Fallback] Modello ${currentModel} tentativo ${attempt + 1}:`, e.message);
           if (attempt === 0) {
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 600));
             continue;
           }
           break; // Passa al prossimo modello valido
@@ -690,7 +695,7 @@ $("fRef").onchange = async e => {
 // STEP 1: LETTURA CODICE ASTA CON OCR GEMINI 3.5 FLASH LITE
 $("bRead").onclick = async () => {
   const f = $("fCode").files[0];
-  if (!refB64 && !f && !codeB64) {
+  if (!codeB64 && !f) {
     return msg("Scegli o scatta prima la foto dell'asta dell'occhiale.", 1);
   }
   msg("Lettura codice in corso dall'asta…");
@@ -769,6 +774,7 @@ Rispondi SOLO con un JSON valido, senza altro testo prima o dopo:
 
     // Tentativo con grounding Google Search; se non disponibile, il sistema fa fallback automatico
     const p = await gem(S.txt, [{ text: q }], [{ google_search: {} }], null, false);
+    const webUsed = p._usedWebSearch !== false;
     const parsed = safeJsonParse(txt(p));
     if (!parsed) throw Error("Risposta del modello non leggibile come JSON, riprova.");
 
@@ -784,10 +790,11 @@ Rispondi SOLO con un JSON valido, senza altro testo prima o dopo:
       avg();
     }
 
+    const webNote = webUsed ? "" : " (senza ricerca web – prezzi da verificare manualmente)";
     if (parsed.note) {
-      msg("Scheda prodotto compilata! Nota: " + parsed.note);
+      msg("Scheda compilata" + webNote + "! Nota: " + parsed.note);
     } else {
-      msg("Scheda prodotto compilata con successo! Verifica i dati.");
+      msg("Scheda prodotto compilata con successo" + webNote + "! Verifica i dati.");
     }
   } catch (e) {
     msg("Errore catalogo: " + e.message, 1);
@@ -957,7 +964,7 @@ Nessuna persona, nessun volto, nessun manichino o oggetto di scena. Solo l'occhi
     } catch (e) {
       console.error(`Errore generazione vista ${i + 1}:`, e);
       if (/limit: 0|requests per day limit exceeded|free_tier_requests|Free Tier/i.test(e.message)) {
-        errs.push("Quota giornaliera gratuita per le immagini Nano Banana esaurita per oggi su Google AI Studio (il limite gratuito si azzera ogni 24 ore). Riprova più tardi.");
+        errs.push("Limite giornaliero gratuito per le immagini raggiunto su Google AI Studio. Il limite si resetta ogni 24 ore — riprova più tardi o rigenera la chiave API da aistudio.google.com.");
         break; // Interrompiamo per evitare chiamate ripetute a quota esaurita
       } else {
         errs.push(`Vista ${i + 1} (${ANG[i]}): ${e.message}`);
